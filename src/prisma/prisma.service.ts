@@ -26,15 +26,19 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     super({
       datasources: {
         db: {
-          // url: `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=public`
           url: `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?schema=${schema}`
         }
       }
     })
+    console.log(this)
   }
 
   async onModuleInit () {
-    await this.$connect()
+    try {
+      await this.$connect()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async enableShutdownHooks (app: INestApplication) {

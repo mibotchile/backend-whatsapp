@@ -7,12 +7,12 @@ import { MessageController } from './message/message.controller'
 import { MessageService } from './message/message.service'
 import { GroupModule } from './group/group.module'
 import { ChannelModule } from './channel/channel.module'
-import path from 'path'
+import { resolve } from 'node:path'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: path.resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
+      envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
     }),
     TwilioModule,
     GroupModule,
