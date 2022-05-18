@@ -35,4 +35,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 #enviroment vars
-.env
+.env*
+
+#prisma
+prisma/migrations/*
