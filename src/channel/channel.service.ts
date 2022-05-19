@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../prisma/prisma.service'
-import { Channel, Prisma } from '@prisma/client'
+import { Channel, Prisma, PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class ChannelService {
-  constructor (private prisma: PrismaService) {}
+  constructor (private prisma: PrismaClient) {}
 
   async create (data: Prisma.ChannelCreateInput): Promise<Channel> {
     return this.prisma.group.create({

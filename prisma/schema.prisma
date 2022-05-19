@@ -9,24 +9,24 @@ datasource db {
 
 model Group {
   id          Int      @id @default(autoincrement())
-  name        String
+  name        String   @db.VarChar(50)
   description String
   tags        Json
-  created_by  String
-  updated_by  String
+  created_by  String   @db.VarChar(120)
+  updated_by  String   @db.VarChar(120)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
-  status      Int      @default(1)
+  status      Int      @default(1) @db.SmallInt
 }
 
 model Channel {
   id          Int      @id @default(autoincrement())
-  name        String
+  name        String   @db.VarChar(50)
   description String
   tags        Json
-  created_by  String
-  updated_by  String
+  created_by  String   @db.VarChar(120)
+  updated_by  String   @db.VarChar(120)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
-  status      Int      @default(1)
+  status      Int      @default(1) @db.SmallInt
 }
