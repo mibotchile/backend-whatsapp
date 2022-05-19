@@ -1,21 +1,15 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-  Query
-} from '@nestjs/common'
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { GroupService } from './groups.service'
-import { Group /*, Prisma */ } from '@prisma/client'
+import { Group } from '@prisma/client'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 
 @Controller('group')
+@ApiTags('Groups')
 export class GroupController {
   constructor (private readonly groupService: GroupService) {}
 
   @Post()
+  @ApiBody({})
   async create (@Body() postData: any): Promise<Group> {
     // const data:Prisma.GroupCreateInput = {
     //   name: postData.name,
@@ -24,6 +18,8 @@ export class GroupController {
     //   created_by: postData.userName,
     //   updated_by: '-'
     // }
+    // console.log(data)
+
     postData.updated_by = ''
     return this.groupService.create(postData)
   }

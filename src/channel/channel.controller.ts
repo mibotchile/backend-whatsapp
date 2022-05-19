@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { ChannelService } from './channel.service'
 import { Channel } from '@prisma/client'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('channel')
+@ApiTags('Channels')
 export class ChannelController {
   constructor (private readonly channelService: ChannelService) {}
   @Post()
