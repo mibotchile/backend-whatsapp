@@ -3,6 +3,7 @@ import { urlencoded, json } from 'body-parser'
 import { AppModule } from './app.module'
 import { MibotSessionMiddleware } from './middlewares/mibot-session.middleware'
 import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger'
+import * as cors from 'cors'
 // import { AuthenticationMiddleware } from './middlewares/authentication-middleware'
 
 async function bootstrap () {
@@ -24,6 +25,7 @@ async function bootstrap () {
   }
   SwaggerModule.setup('api', app, document, customOptions)
 
+  app.use(cors({ credentials: true, origin: true }))
   app.use(urlencoded({ extended: true }))
   app.use(json())
   app.use(new MibotSessionMiddleware().use)
