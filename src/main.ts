@@ -3,7 +3,7 @@ import { urlencoded, json } from 'body-parser'
 import { AppModule } from './app.module'
 import { MibotSessionMiddleware } from './middlewares/mibot-session.middleware'
 import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger'
-import { AuthenticationMiddleware } from './middlewares/authentication-middleware'
+// import { AuthenticationMiddleware } from './middlewares/authentication-middleware'
 
 async function bootstrap () {
   console.log('ENV: ', process.env.ENVIROMENT)
@@ -28,7 +28,7 @@ async function bootstrap () {
   app.use(urlencoded({ extended: true }))
   app.use(json())
   app.use(new MibotSessionMiddleware().use)
-  app.use(new AuthenticationMiddleware().use)
+  // app.use(new AuthenticationMiddleware().use)
   await app.listen(process.env.APP_PORT || 3000)
 }
 bootstrap()

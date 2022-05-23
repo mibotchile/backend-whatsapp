@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaClient, Group, Prisma } from '@prisma/client'
+import { PrismaClient, group, Prisma } from '@prisma/client'
 
 @Injectable()
 export class GroupService {
   constructor (private prisma: PrismaClient) {}
-  async create (data: Prisma.GroupCreateInput): Promise<Group> {
+  async create (data: Prisma.groupCreateInput): Promise<group> {
     // console.log(data)
     return this.prisma.group.create({
       data
     })
   }
 
-  async findAll ({ pageSize, page }): Promise<Group[]> {
+  async findAll ({ pageSize, page }): Promise<group[]> {
     page -= 1
     const skip = (page < 0 ? 0 : page) * pageSize
     const pagination = {} as any
@@ -27,7 +27,7 @@ export class GroupService {
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
 
-  async findActives (pageSize = 0, page = 0): Promise<Group[]> {
+  async findActives (pageSize = 0, page = 0): Promise<group[]> {
     page -= 1
     const skip = (page < 0 ? 0 : page) * pageSize
     const pagination = {} as any
@@ -44,13 +44,13 @@ export class GroupService {
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
 
-  async findById (id: number): Promise<Group | null> {
+  async findById (id: number): Promise<group | null> {
     return this.prisma.group.findUnique({
       where: { id }
     })
   }
 
-  async update (id: number, data: Prisma.GroupUpdateInput): Promise<Group> {
+  async update (id: number, data: Prisma.groupUpdateInput): Promise<group> {
     return this.prisma.group.update({
       data,
       where: { id }

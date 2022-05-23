@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { RoleService } from './role.service'
-import { Role } from '@prisma/client'
+import { role } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { RoleDto } from './role.dto'
 
@@ -13,7 +13,7 @@ export class RoleController {
 
   @Post()
   @ApiBody({ type: RoleDto, description: 'Create new role' })
-  async create (@Body() postData: any): Promise<Role> {
+  async create (@Body() postData: any): Promise<role> {
     // const data:Prisma.RoleCreateInput = {
     //   name: postData.name,
     //   description: postData.description,
@@ -30,7 +30,7 @@ export class RoleController {
   @Get()
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findAll (@Query() queryParams: any): Promise<Role[]> {
+  async findAll (@Query() queryParams: any): Promise<role[]> {
     console.log(queryParams)
 
     return this.roleService.findAll({
@@ -42,7 +42,7 @@ export class RoleController {
   @Get('actives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findActives (@Query() queryParams: any): Promise<Role[]> {
+  async findActives (@Query() queryParams: any): Promise<role[]> {
     console.log(queryParams)
     return this.roleService.findActives(
       Number(queryParams.pageSize),
@@ -51,14 +51,14 @@ export class RoleController {
   }
 
   @Get(':id')
-  async findById (@Param('id') id: string): Promise<Role> {
+  async findById (@Param('id') id: string): Promise<role> {
     console.log(id)
     return this.roleService.findById(Number(id))
   }
 
   @Put(':id')
   @ApiBody({ type: RoleDto })
-  async update (@Param('id') id: string, @Body() data: any): Promise<Role> {
+  async update (@Param('id') id: string, @Body() data: any): Promise<role> {
     delete data.created_by
     data.updated_by = 'fernando'
     return this.roleService.update(+id, data)

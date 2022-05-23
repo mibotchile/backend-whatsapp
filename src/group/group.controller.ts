@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { GroupService } from './groups.service'
-import { Group } from '@prisma/client'
+import { group } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { GroupDto } from './group.dto'
 
@@ -13,7 +13,7 @@ export class GroupController {
 
   @Post()
   @ApiBody({ type: GroupDto, description: 'Create new group' })
-  async create (@Body() postData: any): Promise<Group> {
+  async create (@Body() postData: any): Promise<group> {
     // const data:Prisma.GroupCreateInput = {
     //   name: postData.name,
     //   description: postData.description,
@@ -30,7 +30,7 @@ export class GroupController {
   @Get()
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findAll (@Query() queryParams: any): Promise<Group[]> {
+  async findAll (@Query() queryParams: any): Promise<group[]> {
     console.log(queryParams)
 
     return this.groupService.findAll({
@@ -42,7 +42,7 @@ export class GroupController {
   @Get('actives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findActives (@Query() queryParams: any): Promise<Group[]> {
+  async findActives (@Query() queryParams: any): Promise<group[]> {
     console.log(queryParams)
     return this.groupService.findActives(
       Number(queryParams.pageSize),
@@ -51,14 +51,14 @@ export class GroupController {
   }
 
   @Get(':id')
-  async findById (@Param('id') id: string): Promise<Group> {
+  async findById (@Param('id') id: string): Promise<group> {
     console.log(id)
     return this.groupService.findById(Number(id))
   }
 
   @Put(':id')
   @ApiBody({ type: GroupDto })
-  async update (@Param('id') id: string, @Body() data: any): Promise<Group> {
+  async update (@Param('id') id: string, @Body() data: any): Promise<group> {
     delete data.created_by
     return this.groupService.update(+id, data)
   }

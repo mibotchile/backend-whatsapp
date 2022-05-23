@@ -16,7 +16,7 @@ export class PrismaClientManager implements OnModuleDestroy {
     const tenantId = mibotSession.project_uid
     let client = this.clients[tenantId]
 
-    const schema = !mibotSession ? 'public' : `project_${mibotSession.project_uid}`
+    const schema = !mibotSession ? 'public' : `project_${mibotSession.project_uid.toLowerCase()}`
 
     if (!global.schemas.includes(schema)) {
       client = new PrismaClient({

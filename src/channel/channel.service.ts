@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common'
-import { Channel, Prisma, PrismaClient } from '@prisma/client'
+import { channel, Prisma, PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class ChannelService {
   constructor (private prisma: PrismaClient) {}
 
-  async create (data: Prisma.ChannelCreateInput): Promise<Channel> {
+  async create (data: Prisma.channelCreateInput): Promise<channel> {
     return this.prisma.group.create({
       data
     })
   }
 
-  async findAll ({ pageSize, page }): Promise<Channel[]> {
+  async findAll ({ pageSize, page }): Promise<channel[]> {
     page -= 1
     const skip = (page < 0 ? 0 : page) * pageSize
     const pagination = {} as any
@@ -26,7 +26,7 @@ export class ChannelService {
     })
   }
 
-  async findActives (pageSize = 0, page = 0): Promise<Channel[]> {
+  async findActives (pageSize = 0, page = 0): Promise<channel[]> {
     page -= 1
     const skip = (page < 0 ? 0 : page) * pageSize
     const pagination = {} as any
@@ -42,13 +42,13 @@ export class ChannelService {
     })
   }
 
-  async findById (id: number): Promise<Channel | null> {
+  async findById (id: number): Promise<channel | null> {
     return this.prisma.group.findUnique({
       where: { id }
     })
   }
 
-  async update (id: number, data: Prisma.ChannelUpdateInput): Promise<Channel> {
+  async update (id: number, data: Prisma.channelUpdateInput): Promise<channel> {
     return this.prisma.group.update({
       data,
       where: { id }

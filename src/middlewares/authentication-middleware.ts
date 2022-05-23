@@ -30,7 +30,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
     // console.log('Token:', token);
 
     if (validator.isJWT(token) !== true) {
-      console.log('Token invalid!')
+      console.log('Token invalid! jus')
       return res.status(401).send({ success: false, msg: 'Token invalid!' })
     }
     res.locals.token = token
@@ -52,7 +52,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
           return res.status(403).json({ success: false, msg: 'Token has expired!' })
         }
         if (error.code === 'auth/argument-error') {
-          console.log('Token invalid!')
+          console.log('Token invalid sdf!')
           return res.status(401).json({ success: false, msg: 'Token invalid!' })
         }
         return res.status(500).json({ success: false, msg: 'Token validation error!' })

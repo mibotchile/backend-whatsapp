@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { ChannelService } from './channel.service'
-import { Channel } from '@prisma/client'
+import { channel } from '@prisma/client'
 import { ApiTags } from '@nestjs/swagger'
 
 @Controller('channel')
@@ -8,13 +8,13 @@ import { ApiTags } from '@nestjs/swagger'
 export class ChannelController {
   constructor (private readonly channelService: ChannelService) {}
   @Post()
-  async create (@Body() postData: any): Promise<Channel> {
+  async create (@Body() postData: any): Promise<channel> {
     postData.updated_by = ''
     return this.channelService.create(postData)
   }
 
   @Get()
-  async findAll (@Query() queryParams: any): Promise<Channel[]> {
+  async findAll (@Query() queryParams: any): Promise<channel[]> {
     return this.channelService.findAll({
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
@@ -22,7 +22,7 @@ export class ChannelController {
   }
 
   @Get('actives')
-  async findActives (@Query() queryParams: any): Promise<Channel[]> {
+  async findActives (@Query() queryParams: any): Promise<channel[]> {
     return this.channelService.findActives(
       Number(queryParams.pageSize),
       Number(queryParams.page)
@@ -30,12 +30,12 @@ export class ChannelController {
   }
 
   @Get(':id')
-  async findById (@Param('id') id: string): Promise<Channel> {
+  async findById (@Param('id') id: string): Promise<channel> {
     return this.channelService.findById(Number(id))
   }
 
   @Put(':id')
-  async update (@Param('id') id: string, @Body() data: any): Promise<Channel> {
+  async update (@Param('id') id: string, @Body() data: any): Promise<channel> {
     delete data.created_by
     return this.channelService.update(+id, data)
   }
