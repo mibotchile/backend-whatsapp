@@ -1,66 +1,114 @@
-import { Injectable } from '@nestjs/common'
-import { PrismaClient, group, Prisma } from '@prisma/client'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { PrismaClient, Prisma } from '@prisma/client'
 
 @Injectable()
 export class GroupService {
   constructor (private prisma: PrismaClient) {}
-  async create (data: Prisma.groupCreateInput): Promise<group> {
+  async create (data: Prisma.groupCreateInput): Promise<any> {
     // console.log(data)
-    return this.prisma.group.create({
+    data.created_by = 'System'
+    const groups = await this.prisma.group.findMany({ where: { name: data.name } })
+    if (groups.length > 0) {
+      throw new HttpException({
+        data: [],
+        success: false,
+        message: 'A group with this name already exists'
+      }, HttpStatus.NOT_ACCEPTABLE)
+    }
+    const dataRes = await this.prisma.group.create({
       data
     })
-  }
-
-  async findAll ({ pageSize, page }): Promise<group[]> {
-    page -= 1
-    const skip = (page < 0 ? 0 : page) * pageSize
-    const pagination = {} as any
-    if (!isNaN(skip)) {
-      pagination.skip = skip
-      pagination.take = pageSize
-    } else {
-      pagination.take = 10
+    return {
+      data: dataRes,
+      success: true,
+      message: 'successfully created group'
     }
-    return this.prisma.group.findMany({
-      ...pagination
-    })
-    // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
 
-  async findActives (pageSize = 0, page = 0): Promise<group[]> {
-    page -= 1
-    const skip = (page < 0 ? 0 : page) * pageSize
-    const pagination = {} as any
-    if (!isNaN(skip)) {
-      pagination.skip = skip
-      pagination.take = pageSize
-    } else {
-      pagination.take = 10
+  async update (id: number, data: Prisma.groupUpdateInput): Promise<any> {
+    const groups = await this.prisma.group.findMany({ where: { name: data.name as string, NOT: { id } } })
+
+    if (groups.length > 0) {
+      throw new HttpException({
+        data: [],
+        success: false,
+        message: 'A group with this name already exists'
+      }, HttpStatus.NOT_ACCEPTABLE)
     }
-    return this.prisma.group.findMany({
-      ...pagination,
-      where: { status: 1 }
-    })
-    // return this.prisma.$queryRaw`select * from "public"."Group"`
-  }
-
-  async findById (id: number): Promise<group | null> {
-    return this.prisma.group.findUnique({
-      where: { id }
-    })
-  }
-
-  async update (id: number, data: Prisma.groupUpdateInput): Promise<group> {
-    return this.prisma.group.update({
+    const dataRes = await this.prisma.group.update({
       data,
       where: { id }
     })
+    return {
+      data: dataRes,
+      success: true,
+      message: 'successfully updated group'
+    }
+  }
+
+  async findAll ({ pageSize, page }): Promise<any> {
+    page -= 1
+    const skip = (page < 0 ? 0 : page) * pageSize
+    const pagination = {} as any
+    if (!isNaN(skip)) {
+      pagination.skip = skip
+      pagination.take = pageSize
+    } else {
+      pagination.take = 10
+    }
+    const groups = await this.prisma.group.findMany({
+      ...pagination
+    })
+    return {
+      data: groups,
+      success: true,
+      message: 'successfully updated group'
+    }
+    // return this.prisma.$queryRaw`select * from "public"."Group"`
+  }
+
+  async findActives (pageSize = 0, page = 0): Promise<any> {
+    page -= 1
+    const skip = (page < 0 ? 0 : page) * pageSize
+    const pagination = {} as any
+    if (!isNaN(skip)) {
+      pagination.skip = skip
+      pagination.take = pageSize
+    } else {
+      pagination.take = 10
+    }
+    const groups = await this.prisma.group.findMany({
+      ...pagination,
+      where: { status: 1 }
+    })
+    return {
+      data: groups,
+      success: true,
+      message: 'successfully updated group'
+    }
+    // return this.prisma.$queryRaw`select * from "public"."Group"`
+  }
+
+  async findById (id: number): Promise<any> {
+    const group = this.prisma.group.findUnique({
+      where: { id }
+    })
+    return {
+      data: group,
+      success: true,
+      message: 'successfully updated group'
+    }
   }
 
   async remove (id: number) {
-    return this.prisma.group.update({
+    const groupDeleted = await this.prisma.group.update({
       data: { status: 0 },
       where: { id }
     })
+    return {
+      data: groupDeleted,
+      success: true,
+      message: 'successfully updated group'
+    }
   }
 }
