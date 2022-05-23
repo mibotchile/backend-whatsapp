@@ -53,8 +53,6 @@ export class GroupService {
     if (!isNaN(skip)) {
       pagination.skip = skip
       pagination.take = pageSize
-    } else {
-      pagination.take = 10
     }
     const groups = await this.prisma.group.findMany({
       ...pagination
@@ -74,8 +72,6 @@ export class GroupService {
     if (!isNaN(skip)) {
       pagination.skip = skip
       pagination.take = pageSize
-    } else {
-      pagination.take = 10
     }
     const groups = await this.prisma.group.findMany({
       ...pagination,
