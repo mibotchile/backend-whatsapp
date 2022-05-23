@@ -9,7 +9,8 @@ import * as cors from 'cors'
 async function bootstrap () {
   console.log('ENV: ', process.env.ENVIROMENT)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
-  const app = await NestFactory.create(AppModule, { cors: true })
+  const app = await NestFactory.create(AppModule)
+  app.use(cors({ credentials: true, origin: true }))
   const config = new DocumentBuilder()
     .setTitle('API WHATSAPP')
     .setDescription('Description')
@@ -25,7 +26,6 @@ async function bootstrap () {
   }
   SwaggerModule.setup('api', app, document, customOptions)
 
-  app.use(cors({ credentials: true, origin: true }))
   app.use(urlencoded({ extended: true }))
   app.use(json())
   app.use(new MibotSessionMiddleware().use)
