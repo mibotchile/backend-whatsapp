@@ -8,8 +8,7 @@ import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/sw
 async function bootstrap () {
   console.log('ENV: ', process.env.ENVIROMENT)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
-  const app = await NestFactory.create(AppModule)
-
+  const app = await NestFactory.create(AppModule, { cors: true })
   const config = new DocumentBuilder()
     .setTitle('API WHATSAPP')
     .setDescription('Description')
