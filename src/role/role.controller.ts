@@ -1,20 +1,20 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
-import { GroupService } from './groups.service'
-import { Group } from '@prisma/client'
+import { RoleService } from './role.service'
+import { Role } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
-import { GroupDto } from './group.dto'
+import { RoleDto } from './role.dto'
 
-@Controller('group')
-@ApiTags('Groups')
+@Controller('role')
+@ApiTags('Roles')
 @ApiHeader({ name: 'mibot_session', required: true })
 @ApiHeader({ name: 'Authorization', required: true, example: 'beareer slkjdjklskdlfkj' })
-export class GroupController {
-  constructor (private readonly groupService: GroupService) {}
+export class RoleController {
+  constructor (private readonly roleService: RoleService) {}
 
   @Post()
-  @ApiBody({ type: GroupDto, description: 'Create new group' })
-  async create (@Body() postData: any): Promise<Group> {
-    // const data:Prisma.GroupCreateInput = {
+  @ApiBody({ type: RoleDto, description: 'Create new role' })
+  async create (@Body() postData: any): Promise<Role> {
+    // const data:Prisma.RoleCreateInput = {
     //   name: postData.name,
     //   description: postData.description,
     //   tags: postData.tags,
@@ -22,18 +22,18 @@ export class GroupController {
     //   updated_by: '-'
     // }
     // console.log(data)
-
+    postData.created_by = 'Fernando'
     postData.updated_by = ''
-    return this.groupService.create(postData)
+    return this.roleService.create(postData)
   }
 
   @Get()
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findAll (@Query() queryParams: any): Promise<Group[]> {
+  async findAll (@Query() queryParams: any): Promise<Role[]> {
     console.log(queryParams)
 
-    return this.groupService.findAll({
+    return this.roleService.findAll({
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
     })
@@ -42,29 +42,30 @@ export class GroupController {
   @Get('actives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findActives (@Query() queryParams: any): Promise<Group[]> {
+  async findActives (@Query() queryParams: any): Promise<Role[]> {
     console.log(queryParams)
-    return this.groupService.findActives(
+    return this.roleService.findActives(
       Number(queryParams.pageSize),
       Number(queryParams.page)
     )
   }
 
   @Get(':id')
-  async findById (@Param('id') id: string): Promise<Group> {
+  async findById (@Param('id') id: string): Promise<Role> {
     console.log(id)
-    return this.groupService.findById(Number(id))
+    return this.roleService.findById(Number(id))
   }
 
   @Put(':id')
-  @ApiBody({ type: GroupDto })
-  async update (@Param('id') id: string, @Body() data: any): Promise<Group> {
+  @ApiBody({ type: RoleDto })
+  async update (@Param('id') id: string, @Body() data: any): Promise<Role> {
     delete data.created_by
-    return this.groupService.update(+id, data)
+    data.updated_by = 'fernando'
+    return this.roleService.update(+id, data)
   }
 
   @Delete(':id')
   async remove (@Param('id') id: string) {
-    return this.groupService.remove(+id)
+    return this.roleService.remove(+id)
   }
 }

@@ -33,7 +33,7 @@ export class PrismaClientManager implements OnModuleDestroy {
       const sql:string = fs.readFileSync(resolve(process.cwd(), 'prisma/migrations', migrations[0], 'migration.sql'), { encoding: 'utf-8' })
       // console.log(sql)
 
-      await client.$queryRawUnsafe(`CREATE SCHEMA "${schema}"
+      await client.$queryRawUnsafe(`CREATE SCHEMA ${schema}
       ${sql.replaceAll(';', '\n')}`)
       client.$disconnect()
       global.schemas.push(schema)

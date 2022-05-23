@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Group {
+model group {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(50)
   description String
@@ -19,14 +19,27 @@ model Group {
   status      Int      @default(1) @db.SmallInt
 }
 
-model Channel {
+model role {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(50)
   description String
-  tags        Json
+  fronted     Json
+  backend     Json
   created_by  String   @db.VarChar(120)
   updated_by  String   @db.VarChar(120)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   status      Int      @default(1) @db.SmallInt
 }
+
+// model Channel {
+//   id          Int      @id @default(autoincrement())
+//   name        String   @db.VarChar(50)
+//   description String
+//   tags        Json
+//   created_by  String   @db.VarChar(120)
+//   updated_by  String   @db.VarChar(120)
+//   created_at  DateTime @default(now())
+//   updated_at  DateTime @updatedAt
+//   status      Int      @default(1) @db.SmallInt
+// }

@@ -11,7 +11,17 @@ export class MibotSessionMiddleware implements NestMiddleware {
       })
       return
     }
-    const mibotSession = JSON.parse(req.headers.mibot_session)
+
+    let mibotSession
+    try {
+      mibotSession = JSON.parse(req.headers.mibot_session)
+    } catch (error) {
+      res.status(401).json({
+        message: 'mibot_session header has to be of type json',
+        error: 'Bad Request'
+      })
+      return
+    }
 
     res.locals.PROJECT_UID = mibotSession.project_uid
     res.locals.CLIENT_UID = mibotSession.client_uid

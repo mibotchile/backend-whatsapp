@@ -5,6 +5,7 @@ import { ChannelModule } from './channel/channel.module'
 import { resolve } from 'node:path'
 import { PrismaModule } from './prisma/prisma.module'
 import { AppService } from './app.service'
+import { RoleModule } from './role/role.module'
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { AppService } from './app.service'
     }),
     GroupModule,
     ChannelModule,
-    PrismaModule
+    PrismaModule,
+    RoleModule
   ],
   providers: [AppService]
 })

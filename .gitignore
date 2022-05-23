@@ -38,4 +38,9 @@ lerna-debug.log*
 .env*
 !.env.sample
 
+#
+/src/config/google-credentials/*
+!/src/config/google-credentials/sample.json
+
+
 
