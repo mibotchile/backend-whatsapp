@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } from '@nestjs/common'
 import { GroupService } from './groups.service'
 import { group } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { GroupDto } from './group.dto'
+import { RolesGuard } from 'src/guards/roles.guard'
 
 @Controller('group')
+@UseGuards(RolesGuard)
 @ApiTags('Groups')
 @ApiHeader({ name: 'mibot_session', required: true })
-@ApiHeader({ name: 'Authorization', required: true, example: 'beareer slkjdjklskdlfkj' })
+@ApiHeader({ name: 'Authorization', required: true, example: 'bearer s4lkjds54g5554sfd65sd56f654df65sd4f5we5454a654j564kjk89hgg3s545kdlfkj' })
 export class GroupController {
   constructor (private readonly groupService: GroupService) {}
 
@@ -22,7 +24,7 @@ export class GroupController {
     //   updated_by: '-'
     // }
     // console.log(data)
-
+    postData.created_by = 'System'
     postData.updated_by = ''
     return this.groupService.create(postData)
   }

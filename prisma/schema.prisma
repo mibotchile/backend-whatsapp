@@ -23,8 +23,7 @@ model role {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(50)
   description String
-  fronted     Json
-  backend     Json
+  config      Json
   created_by  String   @db.VarChar(120)
   updated_by  String   @db.VarChar(120)
   created_at  DateTime @default(now())
