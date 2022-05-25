@@ -55,7 +55,8 @@ export class GroupService {
       pagination.take = pageSize
     }
     const groups = await this.prisma.group.findMany({
-      ...pagination
+      ...pagination,
+      orderBy: { id: 'asc' }
     })
     return {
       data: groups,
@@ -75,7 +76,8 @@ export class GroupService {
     }
     const groups = await this.prisma.group.findMany({
       ...pagination,
-      where: { status: 1 }
+      where: { status: 1 },
+      orderBy: { id: 'asc' }
     })
     return {
       data: groups,

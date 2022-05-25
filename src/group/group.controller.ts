@@ -36,7 +36,6 @@ export class GroupController {
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findAll (@Query() queryParams: any): Promise<group[]> {
     console.log(queryParams)
-
     return this.groupService.findAll({
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
