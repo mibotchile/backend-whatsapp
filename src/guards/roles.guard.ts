@@ -49,7 +49,7 @@ export class RolesGuard implements CanActivate {
               name: 'group',
               hasPermissions: true,
               permissions: [
-                'read', 'create'
+                'read', 'create', 'update', 'delete'
               ]
             },
             {
