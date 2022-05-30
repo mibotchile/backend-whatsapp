@@ -9,10 +9,8 @@ export class PrismaClientManager implements OnModuleDestroy {
   // the client instances cache object
   private clients: { [key: string]: PrismaClient } = {}
 
-  async getClient (request: Request): Promise<PrismaClient> {
-    const mibotSession: any = JSON.parse(
-        request.headers.mibot_session as string
-    )
+  async getClient(request: Request): Promise<PrismaClient> {
+    const mibotSession: any = JSON.parse(request.headers.mibot_session as string)
     const tenantId = mibotSession.project_uid
     let client = this.clients[tenantId]
 
@@ -28,9 +26,9 @@ export class PrismaClientManager implements OnModuleDestroy {
       })
       const migrations = fs.readdirSync(resolve(process.cwd(), 'prisma/migrations'))
       migrations.sort((a, b) => {
-        return +(b.split('_')[0]) - +(a.split('_')[0])
+        return +b.split('_')[0] - +a.split('_')[0]
       })
-      const sql:string = fs.readFileSync(resolve(process.cwd(), 'prisma/migrations', migrations[0], 'migration.sql'), { encoding: 'utf-8' })
+      const sql: string = fs.readFileSync(resolve(process.cwd(), 'prisma/migrations', migrations[0], 'migration.sql'), { encoding: 'utf-8' })
       // console.log(sql)
 
       await client.$queryRawUnsafe(`CREATE SCHEMA ${schema}
@@ -57,10 +55,7 @@ export class PrismaClientManager implements OnModuleDestroy {
     return client
   }
 
-  async onModuleDestroy () {
-    // wait for every cached instance to be disposed
-    await Promise.all(
-      Object.values(this.clients).map((client) => client.$disconnect())
-    )
+  async onModuleDestroy() {
+    await Promise.all(Object.values(this.clients).map((client) => client.$disconnect()))
   }
 }

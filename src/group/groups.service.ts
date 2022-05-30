@@ -7,33 +7,43 @@ export class GroupService {
   async create (data: Prisma.groupCreateInput): Promise<any> {
     // console.log(data)
     data.created_by = 'System'
-    const groups = await this.prisma.group.findMany({ where: { name: data.name } })
+    const groups = await this.prisma.group.findMany({
+      where: { name: data.name }
+    })
     if (groups.length > 0) {
-      throw new HttpException({
-        data: [],
-        success: false,
-        message: 'A group with this name already exists'
-      }, HttpStatus.NOT_ACCEPTABLE)
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'A group with this name already exists'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
     }
-    const dataRes = await this.prisma.group.create({
+    const data_res = await this.prisma.group.create({
       data
     })
     return {
-      data: dataRes,
+      data: data_res,
       success: true,
       message: 'successfully created group'
     }
   }
 
   async update (id: number, data: Prisma.groupUpdateInput): Promise<any> {
-    const groups = await this.prisma.group.findMany({ where: { name: data.name as string, NOT: { id } } })
+    const groups = await this.prisma.group.findMany({
+      where: { name: data.name as string, NOT: { id } }
+    })
 
     if (groups.length > 0) {
-      throw new HttpException({
-        data: [],
-        success: false,
-        message: 'A group with this name already exists'
-      }, HttpStatus.NOT_ACCEPTABLE)
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'A group with this name already exists'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
     }
     const dataRes = await this.prisma.group.update({
       data,
@@ -61,7 +71,7 @@ export class GroupService {
     return {
       data: groups,
       success: true,
-      message: 'successfully updated group'
+      message: 'lis of all groups'
     }
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
@@ -82,7 +92,7 @@ export class GroupService {
     return {
       data: groups,
       success: true,
-      message: 'successfully updated group'
+      message: 'list of groups actives'
     }
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
@@ -94,7 +104,7 @@ export class GroupService {
     return {
       data: group,
       success: true,
-      message: 'successfully updated group'
+      message: 'group'
     }
   }
 
@@ -106,7 +116,7 @@ export class GroupService {
     return {
       data: groupDeleted,
       success: true,
-      message: 'successfully updated group'
+      message: 'successfully desactive group'
     }
   }
 }

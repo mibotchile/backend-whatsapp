@@ -4,22 +4,22 @@ import { AppModule } from './app.module'
 import { MibotSessionMiddleware } from './middlewares/mibot-session.middleware'
 import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger'
 import * as cors from 'cors'
+import { RolesGuard } from './guards/roles.guard'
 // import { AuthenticationMiddleware } from './middlewares/authentication-middleware'
 
-async function bootstrap () {
+async function bootstrap() {
   console.log('ENV: ', process.env.ENVIROMENT)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
 
   const app = await NestFactory.create(AppModule)
+  app.useGlobalGuards(new RolesGuard())
   app.use(cors({ credentials: true, origin: true }))
 
-  const config = new DocumentBuilder()
-    .setTitle('API WHATSAPP')
-    .setDescription('Description')
-    .setVersion('1.0')
-    .build()
+  const config = new DocumentBuilder().setTitle('API WHATSAPP').setDescription('Description').setVersion('1.0').build()
 
-  const document = SwaggerModule.createDocument(app, config, { ignoreGlobalPrefix: true })
+  const document = SwaggerModule.createDocument(app, config, {
+    ignoreGlobalPrefix: true
+  })
   const customOptions: SwaggerCustomOptions = {
     swaggerOptions: {
       persistAuthorization: true

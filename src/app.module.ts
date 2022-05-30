@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { PrismaModule } from './prisma/prisma.module'
 import { AppService } from './app.service'
 import { RoleModule } from './role/role.module'
+import { UserModule } from './user/user.module'
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { RoleModule } from './role/role.module'
     GroupModule,
     ChannelModule,
     PrismaModule,
-    RoleModule
+    RoleModule,
+    UserModule
   ],
   providers: [AppService]
 })

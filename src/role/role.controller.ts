@@ -1,33 +1,35 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } from '@nestjs/common'
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { RoleService } from './role.service'
 import { role } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { RoleDto } from './role.dto'
-import { RolesGuard } from 'src/guards/roles.guard'
 
 @Controller('role')
-@UseGuards(RolesGuard)
 @ApiTags('Roles')
 @ApiHeader({ name: 'mibot_session', required: true })
-@ApiHeader({ name: 'Authorization', required: true, example: 'beareer slkjdjklskdlfkj' })
+@ApiHeader({
+  name: 'Authorization',
+  required: true,
+  example: 'beareer slkjdjklskdlfkj'
+})
 export class RoleController {
-  constructor (private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) {}
 
   @Post()
   @ApiBody({
     type: RoleDto,
     description: 'Create new role'
   })
-  async create (@Body() postData: any): Promise<role> {
-    postData.created_by = 'System'
-    postData.updated_by = ''
-    return this.roleService.create(postData)
+  async create(@Body() data: any): Promise<role> {
+    data.created_by = 'System'
+    data.updated_by = ''
+    return this.roleService.create(data)
   }
 
   @Get()
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findAll (@Query() queryParams: any): Promise<role[]> {
+  async findAll(@Query() queryParams: any): Promise<role[]> {
     console.log(queryParams)
 
     return this.roleService.findAll({
@@ -39,30 +41,27 @@ export class RoleController {
   @Get('actives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findActives (@Query() queryParams: any): Promise<role[]> {
+  async findActives(@Query() queryParams: any): Promise<role[]> {
     console.log(queryParams)
-    return this.roleService.findActives(
-      Number(queryParams.pageSize),
-      Number(queryParams.page)
-    )
+    return this.roleService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
   @Get(':id')
-  async findById (@Param('id') id: string): Promise<role> {
+  async findById(@Param('id') id: string): Promise<role> {
     console.log(id)
     return this.roleService.findById(Number(id))
   }
 
   @Put(':id')
   @ApiBody({ type: RoleDto })
-  async update (@Param('id') id: string, @Body() data: any): Promise<role> {
+  async update(@Param('id') id: string, @Body() data: any): Promise<role> {
     delete data.created_by
     data.updated_by = 'fernando'
     return this.roleService.update(+id, data)
   }
 
   @Delete(':id')
-  async remove (@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.roleService.remove(+id)
   }
 }

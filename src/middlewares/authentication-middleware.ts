@@ -8,7 +8,11 @@ export class AuthenticationMiddleware implements NestMiddleware {
   constructor () {
     console.log('se inició')
 
-    const credentialsCert = JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, { encoding: 'utf-8' }))
+    const credentialsCert = JSON.parse(
+      fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, {
+        encoding: 'utf-8'
+      })
+    )
     admin.initializeApp({
       credential: admin.credential.cert(credentialsCert),
       databaseURL: process.env.FIREBASE_DATABASE_URL
@@ -22,7 +26,9 @@ export class AuthenticationMiddleware implements NestMiddleware {
         return
       } else {
         console.log('**Auth token not found**')
-        return res.status(403).send({ success: false, msg: 'Auth token not found' })
+        return res
+          .status(403)
+          .send({ success: false, msg: 'Auth token not found' })
       }
     }
 
@@ -49,13 +55,19 @@ export class AuthenticationMiddleware implements NestMiddleware {
       .catch((error) => {
         if (error.code === 'auth/id-token-expired') {
           console.log('Token has expired!')
-          return res.status(403).json({ success: false, msg: 'Token has expired!' })
+          return res
+            .status(403)
+            .json({ success: false, msg: 'Token has expired!' })
         }
         if (error.code === 'auth/argument-error') {
           console.log('Token invalid sdf!')
-          return res.status(401).json({ success: false, msg: 'Token invalid!' })
+          return res
+            .status(401)
+            .json({ success: false, msg: 'Token invalid!' })
         }
-        return res.status(500).json({ success: false, msg: 'Token validation error!' })
+        return res
+          .status(500)
+          .json({ success: false, msg: 'Token validation error!' })
       })
   }
 }

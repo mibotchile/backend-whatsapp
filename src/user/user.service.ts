@@ -2,56 +2,57 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaClient, Prisma } from '@prisma/client'
 
 @Injectable()
-export class RoleService {
+export class UserService {
   constructor (private prisma: PrismaClient) {}
-  async create (data: Prisma.roleCreateInput): Promise<any> {
+  async create (data: Prisma.userCreateInput): Promise<any> {
+    // console.log(data)
     data.created_by = 'System'
-    const roles = await this.prisma.role.findMany({
+    const users = await this.prisma.user.findMany({
       where: { name: data.name }
     })
-    if (roles.length > 0) {
+    if (users.length > 0) {
       throw new HttpException(
         {
           data: [],
           success: false,
-          message: 'A role with this name already exists'
+          message: 'A user with this name already exists'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
     }
-    const dataRes = await this.prisma.role.create({
+    const data_res = await this.prisma.user.create({
       data
     })
     return {
-      data: dataRes,
+      data: data_res,
       success: true,
-      message: 'successfully created role'
+      message: 'successfully created user'
     }
   }
 
-  async update (id: number, data: Prisma.roleUpdateInput): Promise<any> {
-    const roles = await this.prisma.role.findMany({
+  async update (id: number, data: Prisma.userUpdateInput): Promise<any> {
+    const users = await this.prisma.user.findMany({
       where: { name: data.name as string, NOT: { id } }
     })
 
-    if (roles.length > 0) {
+    if (users.length > 0) {
       throw new HttpException(
         {
           data: [],
           success: false,
-          message: 'A role with this name already exists'
+          message: 'A user with this name already exists'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
     }
-    const dataRes = await this.prisma.role.update({
+    const dataRes = await this.prisma.user.update({
       data,
       where: { id }
     })
     return {
       data: dataRes,
       success: true,
-      message: 'successfully updated role'
+      message: 'successfully updated user'
     }
   }
 
@@ -63,14 +64,16 @@ export class RoleService {
       pagination.skip = skip
       pagination.take = pageSize
     }
-    const roles = await this.prisma.role.findMany({
-      ...pagination
+    const users = await this.prisma.user.findMany({
+      ...pagination,
+      orderBy: { id: 'asc' }
     })
     return {
-      data: roles,
+      data: users,
       success: true,
-      message: 'lis of all roles'
+      message: 'list all users'
     }
+    // return this.prisma.$queryRaw`select * from "public"."User"`
   }
 
   async findActives (pageSize = 0, page = 0): Promise<any> {
@@ -81,37 +84,39 @@ export class RoleService {
       pagination.skip = skip
       pagination.take = pageSize
     }
-    const roles = await this.prisma.role.findMany({
+    const users = await this.prisma.user.findMany({
       ...pagination,
-      where: { status: 1 }
+      where: { status: 1 },
+      orderBy: { id: 'asc' }
     })
     return {
-      data: roles,
+      data: users,
       success: true,
-      message: 'list of actives roles'
+      message: 'list actives users'
     }
+    // return this.prisma.$queryRaw`select * from "public"."User"`
   }
 
   async findById (id: number): Promise<any> {
-    const role = this.prisma.role.findUnique({
+    const user = this.prisma.user.findUnique({
       where: { id }
     })
     return {
-      data: role,
+      data: user,
       success: true,
-      message: 'role'
+      message: 'user'
     }
   }
 
   async remove (id: number) {
-    const roleDeleted = await this.prisma.role.update({
+    const userDeleted = await this.prisma.user.update({
       data: { status: 0 },
       where: { id }
     })
     return {
-      data: roleDeleted,
+      data: userDeleted,
       success: true,
-      message: 'successfully desactive role'
+      message: 'successfully desactive user'
     }
   }
 }

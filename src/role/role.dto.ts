@@ -56,26 +56,17 @@ export class RoleDto {
           {
             name: 'usuarios',
             hasPermissions: true,
-            permissions: [
-              'create',
-              'read',
-              'update'
-            ]
+            permissions: ['create', 'read', 'update']
           },
           {
             name: 'grupos',
             hasPermissions: true,
-            permissions: [
-              'read'
-            ]
+            permissions: ['read']
           },
           {
             name: 'canales',
             hasPermissions: true,
-            permissions: [
-              'create',
-              'read'
-            ]
+            permissions: ['create', 'read']
           }
         ],
         hasPermissions: false,
@@ -94,29 +85,17 @@ export class RoleDto {
               {
                 name: 'grupos',
                 hasPermissions: true,
-                permissions: [
-                  'read'
-                ]
+                permissions: ['read']
               }
             ],
             hasPermissions: true,
-            permissions: [
-              'create',
-              'read',
-              'update',
-              'delete'
-            ]
+            permissions: ['create', 'read', 'update', 'delete']
           }
         ],
         hasTabs: false,
         tabs: [],
         hasPermissions: true,
-        permissions: [
-          'create',
-          'read',
-          'update',
-          'delete'
-        ]
+        permissions: ['create', 'read', 'update', 'delete']
       }
     ]
   })

@@ -12,6 +12,7 @@ model group {
   name        String   @db.VarChar(50)
   description String
   tags        Json
+  default     Boolean  @default(false)
   created_by  String   @db.VarChar(120)
   updated_by  String   @db.VarChar(120)
   created_at  DateTime @default(now())
@@ -24,11 +25,26 @@ model role {
   name        String   @db.VarChar(50)
   description String
   config      Json
+  default     Boolean  @default(false)
   created_by  String   @db.VarChar(120)
   updated_by  String   @db.VarChar(120)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   status      Int      @default(1) @db.SmallInt
+}
+
+model user {
+  id         Int      @id @default(autoincrement())
+  uid        String   @db.VarChar(50)
+  name       String   @db.VarChar(50)
+  email      String   @db.VarChar(100)
+  groups_id  Json
+  role_id    Int
+  created_by String   @db.VarChar(120)
+  updated_by String   @db.VarChar(120)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  status     Int      @default(1) @db.SmallInt
 }
 
 model channel {

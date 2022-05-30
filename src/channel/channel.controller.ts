@@ -8,9 +8,9 @@ import { ApiTags } from '@nestjs/swagger'
 export class ChannelController {
   constructor (private readonly channelService: ChannelService) {}
   @Post()
-  async create (@Body() postData: any): Promise<channel> {
-    postData.updated_by = ''
-    return this.channelService.create(postData)
+  async create (@Body() data: any): Promise<channel> {
+    data.updated_by = ''
+    return this.channelService.create(data)
   }
 
   @Get()
@@ -23,10 +23,7 @@ export class ChannelController {
 
   @Get('actives')
   async findActives (@Query() queryParams: any): Promise<channel[]> {
-    return this.channelService.findActives(
-      Number(queryParams.pageSize),
-      Number(queryParams.page)
-    )
+    return this.channelService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
   @Get(':id')

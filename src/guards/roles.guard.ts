@@ -4,7 +4,7 @@ import { Observable } from 'rxjs'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  private getPermissions (roleConfig, routeName):string[] {
+  private getPermissions(roleConfig, routeName): string[] {
     let permissions = []
     for (const rc of roleConfig) {
       if (rc.name === routeName) {
@@ -26,8 +26,8 @@ export class RolesGuard implements CanActivate {
     return permissions
   }
 
-  canActivate (context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const request:Request = context.switchToHttp().getRequest()
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    const request: Request = context.switchToHttp().getRequest()
     const role = {
       config: [
         {
@@ -39,26 +39,17 @@ export class RolesGuard implements CanActivate {
             {
               name: 'user',
               hasPermissions: true,
-              permissions: [
-                'create',
-                'read',
-                'update'
-              ]
+              permissions: ['create', 'read', 'update']
             },
             {
               name: 'group',
               hasPermissions: true,
-              permissions: [
-                'read', 'create', 'update', 'delete'
-              ]
+              permissions: ['create', 'update', 'delete']
             },
             {
               name: 'channel',
               hasPermissions: true,
-              permissions: [
-                'create',
-                'read'
-              ]
+              permissions: ['create', 'read']
             }
           ],
           hasPermissions: false,
@@ -77,31 +68,17 @@ export class RolesGuard implements CanActivate {
                 {
                   name: 'role',
                   hasPermissions: true,
-                  permissions: [
-                    'read',
-                    'create',
-                    'update'
-                  ]
+                  permissions: ['read', 'create', 'update']
                 }
               ],
               hasPermissions: true,
-              permissions: [
-                'create',
-                'read',
-                'update',
-                'delete'
-              ]
+              permissions: ['create', 'read', 'update', 'delete']
             }
           ],
           hasTabs: false,
           tabs: [],
           hasPermissions: true,
-          permissions: [
-            'create',
-            'read',
-            'update',
-            'delete'
-          ]
+          permissions: ['create', 'read', 'update', 'delete']
         }
       ]
     }
@@ -127,14 +104,15 @@ export class RolesGuard implements CanActivate {
     }
 
     if (!permissions.includes(permissionRequired)) {
-      throw new HttpException({
-        error: 'HttpStatus.UNAUTHORIZED',
-        success: false,
-        message: 'you do not have permissions to perform this action'
-      }, HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        {
+          error: 'HttpStatus.FORBIDDEN',
+          success: false,
+          message: 'you do not have permissions to perform this action'
+        },
+        HttpStatus.FORBIDDEN
+      )
     }
-
-    // console.log(request)
     return true
   }
 }

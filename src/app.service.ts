@@ -15,10 +15,12 @@ export class AppService {
     console.log(databaseUrl)
 
     let schemas
-    prisma.$queryRaw`SELECT schema_name FROM information_schema.schemata where schema_name like 'project_%'`.then((data:any) => {
-      schemas = data.map(s => s.schema_name)
-      global.schemas = schemas
-      console.log(schemas)
-    })
+    prisma.$queryRaw`SELECT schema_name FROM information_schema.schemata where schema_name like 'project_%'`.then(
+      (data: any) => {
+        schemas = data.map((s) => s.schema_name)
+        global.schemas = schemas
+        console.log(schemas)
+      }
+    )
   }
 }
