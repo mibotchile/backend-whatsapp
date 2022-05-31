@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaClient, Prisma } from '@prisma/client'
+import * as admin from 'firebase-admin'
 
 @Injectable()
 export class UserService {
@@ -20,6 +21,16 @@ export class UserService {
         HttpStatus.NOT_ACCEPTABLE
       )
     }
+    const userRecord = await admin.auth().createUser({
+      email: data.email,
+      emailVerified: false,
+      password: 'secretPassword',
+      displayName: data.name,
+      disabled: false
+    })
+
+    data.uid = userRecord.uid
+    console.log('Successfully created new user:', userRecord.uid)
     const data_res = await this.prisma.user.create({
       data
     })
@@ -30,7 +41,18 @@ export class UserService {
     }
   }
 
-  async update (id: number, data: Prisma.userUpdateInput): Promise<any> {
+  async update (idParam:string, data: Prisma.userUpdateInput): Promise<any> {
+    const id = +idParam
+    if (isNaN(id)) {
+      throw new HttpException(
+        {
+          error: [{ id: idParam }],
+          success: false,
+          message: 'the id must be of type number'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
     const users = await this.prisma.user.findMany({
       where: { name: data.name as string, NOT: { id } }
     })
@@ -98,8 +120,11 @@ export class UserService {
   }
 
   async findById (id: number): Promise<any> {
-    const user = this.prisma.user.findUnique({
-      where: { id }
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        role: true
+      }
     })
     return {
       data: user,

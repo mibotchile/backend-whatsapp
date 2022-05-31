@@ -98,7 +98,7 @@ export class GroupService {
   }
 
   async findById (id: number): Promise<any> {
-    const group = this.prisma.group.findUnique({
+    const group = await this.prisma.group.findUnique({
       where: { id }
     })
     return {

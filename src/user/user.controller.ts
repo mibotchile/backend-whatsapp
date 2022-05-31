@@ -68,7 +68,7 @@ export class UserController {
     if (data.groups_id) data.groups_id = data.groups_id.split(',').map(g => Number(g))
     data.updated_by = 'Jenri'
     delete data.created_by
-    return this.userService.update(+id, data)
+    return this.userService.update(id, data)
   }
 
   @Delete(':id')

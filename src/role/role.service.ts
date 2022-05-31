@@ -6,6 +6,42 @@ export class RoleService {
   constructor (private prisma: PrismaClient) {}
   async create (data: Prisma.roleCreateInput): Promise<any> {
     data.created_by = 'System'
+
+    if (!data.name) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'missing name'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+    if (!data.description) {
+      data.description = ''
+    }
+    if (!data.config) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'missing config'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+
+    if (typeof (data.config) === 'string') {
+      throw new HttpException(
+        {
+          error: [{ config: data.config }],
+          success: false,
+          message: 'the config parameter sees to be of type json'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+
     const roles = await this.prisma.role.findMany({
       where: { name: data.name }
     })
@@ -19,31 +55,66 @@ export class RoleService {
         HttpStatus.NOT_ACCEPTABLE
       )
     }
-    const dataRes = await this.prisma.role.create({
-      data
-    })
-    return {
-      data: dataRes,
-      success: true,
-      message: 'successfully created role'
-    }
-  }
 
-  async update (id: number, data: Prisma.roleUpdateInput): Promise<any> {
-    const roles = await this.prisma.role.findMany({
-      where: { name: data.name as string, NOT: { id } }
-    })
-
-    if (roles.length > 0) {
+    try {
+      const dataRes = await this.prisma.role.create({
+        data
+      })
+      return {
+        data: dataRes,
+        success: true,
+        message: 'successfully created role'
+      }
+    } catch (error) {
       throw new HttpException(
         {
-          data: [],
+          error,
           success: false,
-          message: 'A role with this name already exists'
+          message: 'Error to create new role'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
     }
+  }
+
+  async update (id: number, data: Prisma.roleUpdateInput): Promise<any> {
+    if (isNaN(id)) {
+      throw new HttpException(
+        {
+          error: [{ id }],
+          success: false,
+          message: 'id is no availible'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+    if (data.config && typeof (data.config) === 'string') {
+      throw new HttpException(
+        {
+          error: [{ config: data.config }],
+          success: false,
+          message: 'the config parameter sees to be of type json'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+    if (data.name) {
+      const roles = await this.prisma.role.findMany({
+        where: { name: data.name as string, NOT: { id } }
+      })
+
+      if (roles.length > 0) {
+        throw new HttpException(
+          {
+            data: [],
+            success: false,
+            message: 'A role with this name already exists'
+          },
+          HttpStatus.NOT_ACCEPTABLE
+        )
+      }
+    }
+
     const dataRes = await this.prisma.role.update({
       data,
       where: { id }
@@ -64,7 +135,10 @@ export class RoleService {
       pagination.take = pageSize
     }
     const roles = await this.prisma.role.findMany({
-      ...pagination
+      ...pagination,
+      include: {
+        users: true
+      }
     })
     return {
       data: roles,
@@ -93,7 +167,7 @@ export class RoleService {
   }
 
   async findById (id: number): Promise<any> {
-    const role = this.prisma.role.findUnique({
+    const role = await this.prisma.role.findUnique({
       where: { id }
     })
     return {

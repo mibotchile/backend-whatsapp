@@ -31,6 +31,7 @@ model role {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   status      Int      @default(1) @db.SmallInt
+  users       user[]
 }
 
 model user {
@@ -39,6 +40,7 @@ model user {
   name       String   @db.VarChar(50)
   email      String   @db.VarChar(100)
   groups_id  Json
+  role       role     @relation(fields: [role_id], references: [id])
   role_id    Int
   created_by String   @db.VarChar(120)
   updated_by String   @db.VarChar(120)
