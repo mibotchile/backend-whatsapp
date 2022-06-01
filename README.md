@@ -74,18 +74,31 @@ $ npm run lint
 
 **group**
 
-| Parameter     | Type           | Default | Description      |
-| :------------ | :------------- | :------ | :--------------- |
-| `id`          | `serial`       |         | **Primary Key**. |
-| `name`        | `varchar(50)`  |         | **Required**.    |
-| `description` | `text`         |         |                  |
-| `tags`        | `jsonb(array)` |         | **Required**.    |
+| Parameter     | Type           | Default | Description                                                       |
+| :------------ | :------------- | :------ | :---------------------------------------------------------------- |
+| `id`          | `serial`       |         | **Primary Key**.                                                  |
+| `name`        | `varchar(50)`  |         | **Required**.                                                     |
+| `description` | `text`         |         |                                                                   |
+| `tags`        | `jsonb(array)` |         | **Required**.                                                     |
+| `default`     | `bool`         | false   | define el grupo que se tomara por defecto par los nuevos usuarios |
 
 **role**
 
-| Parameter     | Type          | Default | Description      |
-| :------------ | :------------ | :------ | :--------------- |
-| `id`          | `serial`      |         | **Primary Key**. |
-| `name`        | `varchar(50)` |         | **Required**.    |
-| `description` | `text`        |         |                  |
-| `config`      | `jsonb `      |         | **Required**.    |
+| Parameter     | Type          | Default | Description                                                     |
+| :------------ | :------------ | :------ | :-------------------------------------------------------------- |
+| `id`          | `serial`      |         | **Primary Key**.                                                |
+| `name`        | `varchar(50)` |         | **Required**.                                                   |
+| `description` | `text`        |         |                                                                 |
+| `config`      | `jsonb `      |         | **Required**.                                                   |
+| `default`     | `bool`        | false   | define el rol que se tomara por defecto par los nuevos usuarios |
+
+**role**
+
+| Parameter   | Type          | Default | Description                                          |
+| :---------- | :------------ | :------ | :--------------------------------------------------- |
+| `id`        | `serial`      |         | **Primary Key**.                                     |
+| `uid`       | `varchar(50)` |         | **Required**. uid de firebase                        |
+| `name`      | `varchar(50)` |         | **Required**.                                        |
+| `email`     | `text`        |         | **Required**.                                        |
+| `groups_id` | `jsonb`       |         | **Required**. array de grupos a los que tiene acceso |
+| `role_id`   | `int`         |         | **Required**.                                        |

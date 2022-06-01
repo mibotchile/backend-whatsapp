@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaClient, Prisma } from '@prisma/client'
-import * as admin from 'firebase-admin'
+// import * as admin from 'firebase-admin'
 
 @Injectable()
 export class UserService {
@@ -21,16 +21,16 @@ export class UserService {
         HttpStatus.NOT_ACCEPTABLE
       )
     }
-    const userRecord = await admin.auth().createUser({
-      email: data.email,
-      emailVerified: false,
-      password: 'secretPassword',
-      displayName: data.name,
-      disabled: false
-    })
+    // const userRecord = await admin.auth().createUser({
+    //   email: data.email,
+    //   emailVerified: false,
+    //   password: 'secretPassword',
+    //   displayName: data.name,
+    //   disabled: false
+    // })
 
-    data.uid = userRecord.uid
-    console.log('Successfully created new user:', userRecord.uid)
+    // data.uid = userRecord.uid
+    // console.log('Successfully created new user:', userRecord.uid)
     const data_res = await this.prisma.user.create({
       data
     })

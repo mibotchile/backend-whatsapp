@@ -10,7 +10,6 @@ CREATE TABLE "group" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "status" SMALLINT NOT NULL DEFAULT 1,
-
     CONSTRAINT "group_pkey" PRIMARY KEY ("id")
 );
 
@@ -26,7 +25,6 @@ CREATE TABLE "role" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "status" SMALLINT NOT NULL DEFAULT 1,
-
     CONSTRAINT "role_pkey" PRIMARY KEY ("id")
 );
 
@@ -43,7 +41,6 @@ CREATE TABLE "user" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "status" SMALLINT NOT NULL DEFAULT 1,
-
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
@@ -58,6 +55,5 @@ CREATE TABLE "channel" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "status" SMALLINT NOT NULL DEFAULT 1,
-
     CONSTRAINT "channel_pkey" PRIMARY KEY ("id")
 );

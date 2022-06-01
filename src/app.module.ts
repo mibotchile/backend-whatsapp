@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { GroupModule } from './group/group.module'
 import { ChannelModule } from './channel/channel.module'
@@ -7,6 +7,8 @@ import { PrismaModule } from './prisma/prisma.module'
 import { AppService } from './app.service'
 import { RoleModule } from './role/role.module'
 import { UserModule } from './user/user.module'
+import { ProjectModule } from './projects/project.module'
+import { AuthenticationMiddleware } from './middlewares/authentication-middleware'
 
 @Module({
   imports: [
@@ -17,8 +19,16 @@ import { UserModule } from './user/user.module'
     ChannelModule,
     PrismaModule,
     RoleModule,
-    UserModule
+    UserModule,
+    ProjectModule
   ],
   providers: [AppService]
 })
-export class AppModule {}
+// export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthenticationMiddleware)
+      .forRoutes('*')
+  }
+}

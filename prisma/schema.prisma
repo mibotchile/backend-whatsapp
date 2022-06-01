@@ -39,8 +39,10 @@ model user {
   uid        String   @db.VarChar(50)
   name       String   @db.VarChar(50)
   email      String   @db.VarChar(100)
+  ///array de grupos a los que tiene acceso
   groups_id  Json
   role       role     @relation(fields: [role_id], references: [id])
+  ///id del rol asicgnado
   role_id    Int
   created_by String   @db.VarChar(120)
   updated_by String   @db.VarChar(120)
