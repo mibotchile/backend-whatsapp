@@ -108,6 +108,33 @@ export class GroupService {
     }
   }
 
+  async find (data): Promise<any> {
+    const groups = await this.prisma.group.findMany({
+      where: {
+        name: {
+          contains: data.name,
+          mode: 'insensitive'
+        }
+      }
+    })
+
+    if (groups.length === 0) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'there are no groups matching this name'
+        },
+        HttpStatus.OK
+      )
+    }
+    return {
+      data: groups,
+      success: true,
+      message: 'user'
+    }
+  }
+
   async remove (id: number) {
     const groupDeleted = await this.prisma.group.update({
       data: { status: 0 },

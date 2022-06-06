@@ -133,6 +133,33 @@ export class UserService {
     }
   }
 
+  async find (data): Promise<any> {
+    const users = await this.prisma.user.findMany({
+      where: {
+        name: {
+          contains: data.name,
+          mode: 'insensitive'
+        }
+      }
+    })
+    if (users.length === 0) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'there are no users matching this name'
+        },
+        HttpStatus.NO_CONTENT
+      )
+    }
+
+    return {
+      data: users,
+      success: true,
+      message: 'users'
+    }
+  }
+
   async remove (id: number) {
     const userDeleted = await this.prisma.user.update({
       data: { status: 0 },

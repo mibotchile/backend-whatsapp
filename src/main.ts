@@ -4,13 +4,16 @@ import { AppModule } from './app.module'
 import { MibotSessionMiddleware } from './middlewares/mibot-session.middleware'
 import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger'
 import * as cors from 'cors'
+import { FileLoggerService } from './logger/file-logger.service'
 // import { RolesGuard } from './guards/roles.guard'
 
 async function bootstrap() {
   console.log('ENV: ', process.env.ENVIROMENT)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
 
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    logger: new FileLoggerService()
+  })
   // app.useGlobalGuards(new RolesGuard())
   app.use(cors({ credentials: true, origin: true }))
 

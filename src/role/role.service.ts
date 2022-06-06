@@ -177,6 +177,32 @@ export class RoleService {
     }
   }
 
+  async find (data): Promise<any> {
+    const roles = await this.prisma.role.findMany({
+      where: {
+        name: {
+          contains: data.name,
+          mode: 'insensitive'
+        }
+      }
+    })
+    if (roles.length === 0) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'there are no roles matching this name'
+        },
+        HttpStatus.NO_CONTENT
+      )
+    }
+    return {
+      data: roles,
+      success: true,
+      message: 'list of roles'
+    }
+  }
+
   async remove (id: number) {
     const roleDeleted = await this.prisma.role.update({
       data: { status: 0 },

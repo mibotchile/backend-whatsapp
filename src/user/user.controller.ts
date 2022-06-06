@@ -52,6 +52,13 @@ export class UserController {
     return this.userService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
+  @Get('search')
+  @ApiQuery({ name: 'name', type: String, required: false })
+  async find(@Query() queryParams: any): Promise<user> {
+    if (!queryParams.name)queryParams.name = ''
+    return this.userService.find(queryParams)
+  }
+
   @Get(':id')
   async findById(@Param('id') id: string): Promise<user> {
     console.log(id)

@@ -46,6 +46,13 @@ export class RoleController {
     return this.roleService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
+  @Get('search')
+  @ApiQuery({ name: 'name', type: String, required: false })
+  async find(@Query() queryParams: any): Promise<role[]> {
+    if (!queryParams.name)queryParams.name = ''
+    return this.roleService.find(queryParams)
+  }
+
   @Get(':id')
   async findById(@Param('id') id: string): Promise<role> {
     console.log(id)

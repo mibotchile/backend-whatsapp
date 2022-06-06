@@ -9,6 +9,7 @@ import { RoleModule } from './role/role.module'
 import { UserModule } from './user/user.module'
 import { ProjectModule } from './projects/project.module'
 import { AuthenticationMiddleware } from './middlewares/authentication-middleware'
+import { FileLoggerService } from './logger/file-logger.service'
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { AuthenticationMiddleware } from './middlewares/authentication-middlewar
     UserModule,
     ProjectModule
   ],
-  providers: [AppService]
+  providers: [AppService, FileLoggerService]
 })
 // export class AppModule {}
 export class AppModule implements NestModule {

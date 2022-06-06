@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin'
 import validator from 'validator'
 import * as fs from 'fs'
-import { Injectable, NestMiddleware } from '@nestjs/common'
+import { ForbiddenException, Injectable, NestMiddleware } from '@nestjs/common'
 import * as httpContext from 'express-http-context'
 import { PrismaClient } from '@prisma/client'
 
@@ -28,9 +28,13 @@ export class AuthenticationMiddleware implements NestMiddleware {
         return
       } else {
         console.log('**Auth token not found**')
-        return res
-          .status(403)
-          .send({ success: false, msg: 'Auth token not found' })
+        throw new ForbiddenException(
+          {
+            data: [],
+            success: false,
+            message: 'Auth token not found'
+          }
+        )
       }
     }
 
@@ -49,7 +53,11 @@ export class AuthenticationMiddleware implements NestMiddleware {
 
       res.locals.user = userInfo
       httpContext.set('USER', userInfo)
+      console.log(userInfo)
+
       const users = await this.prisma.user.findMany({ where: { email: userInfo.email } })
+      console.log({ users })
+
       if (users.length === 0) {
         res.status(406).json(
           {

@@ -52,6 +52,13 @@ export class GroupController {
     return this.groupService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
+  @Get('search')
+  @ApiQuery({ name: 'name', type: String, required: false })
+  async find(@Query() queryParams: any): Promise<group[]> {
+    if (!queryParams.name)queryParams.name = ''
+    return this.groupService.find(queryParams)
+  }
+
   @Get(':id')
   async findById(@Param('id') id: string): Promise<group> {
     console.log(id)
