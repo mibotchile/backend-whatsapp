@@ -26,11 +26,7 @@ export class UserController {
     //   updated_by: '-'
     // }
     // console.log(data)
-    if (data.groups_id) {
-      data.groups_id = data.groups_id.split(',').map(g => Number(g))
-    } else {
-      data.groups_id = []
-    }
+    data.groups_id = data.groups_id ? data.groups_id : []
 
     data.created_by = 'System'
     data.updated_by = ''
@@ -65,7 +61,6 @@ export class UserController {
   @Put(':id')
   @ApiBody({ type: UserDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<user> {
-    if (data.groups_id) data.groups_id = data.groups_id.split(',').map(g => Number(g))
     data.updated_by = 'Jenri'
     delete data.created_by
     return this.userService.update(id, data)

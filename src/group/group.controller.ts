@@ -27,7 +27,7 @@ export class GroupController {
     // }
     // console.log(data)
 
-    data.tags = data.tags ? data.tags.split(',') : []
+    data.tags = data.tags ? data.tags : []
     data.created_by = 'System'
     data.updated_by = ''
     return this.groupService.create(data)
@@ -61,7 +61,6 @@ export class GroupController {
   @Put(':id')
   @ApiBody({ type: GroupDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<group> {
-    if (data.tags) data.tags = data.tags.split(',')
     delete data.created_by
     return this.groupService.update(+id, data)
   }
