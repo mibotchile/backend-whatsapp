@@ -59,7 +59,7 @@ export class UserController {
   @Put(':id')
   @ApiBody({ type: UserDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<user> {
-    data.created_by = httpContext.get('USER')
+    data.updated_by = httpContext.get('USER')
     delete data.created_by
     return this.userService.update(id, data)
   }
