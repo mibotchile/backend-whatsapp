@@ -13,23 +13,33 @@ $ npm install
 $ npx prisma generate
 ```
 
+## API Definition  ```/api```
+
+## Status Monitoring ```/status```
+
+```bash
+$ npm install
+$ npx prisma generate
+```
+
 ## Enviroments
 
 ```bash
-# Local = Credenciales de Valhalla (.env.development)
-# Dev = Credenciales de Valhalla  (.env.development)
-# Prod = Credenciales de WorkSpace  (.env.production)
+Local = Credenciales de Valhalla (.env.development)
+Dev = Credenciales de Valhalla  (.env.development)
+Prod = Credenciales de WorkSpace  (.env.production)
 ```
 
 ## Running the app
 
 ```bash
 # development mode
-$ npm run start:dev
+npm run start:dev
 
 # production mode
-$ npm run start:prod
+npm run start:prod
 ```
+
 
 ## Linter
 

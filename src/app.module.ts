@@ -9,13 +9,17 @@ import { RoleModule } from './role/role.module'
 import { UserModule } from './user/user.module'
 import { ProjectModule } from './projects/project.module'
 import { AuthenticationMiddleware } from './middlewares/authentication-middleware'
-import { FileLoggerService } from './logger/file-logger.service'
+import { StatusMonitorModule } from 'nest-status-monitor'
+import { MibotSessionMiddleware } from './middlewares/mibot-session.middleware'
+import { HealthController } from './health.controller'
+import { statusMonitorConfig } from './config/status-monitor.config'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
     }),
+    StatusMonitorModule.setUp(statusMonitorConfig),
     GroupModule,
     ChannelModule,
     PrismaModule,
@@ -23,13 +27,19 @@ import { FileLoggerService } from './logger/file-logger.service'
     UserModule,
     ProjectModule
   ],
-  providers: [AppService, FileLoggerService]
+  controllers: [HealthController],
+  providers: [AppService]
 })
 // export class AppModule {}
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
+      .apply(MibotSessionMiddleware)
+      .exclude('/status', '/health/(.*)')
+      .forRoutes('*')
+    consumer
       .apply(AuthenticationMiddleware)
+      .exclude('/status', '/health/(.*)')
       .forRoutes('*')
   }
 }

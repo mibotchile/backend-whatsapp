@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, HttpCode } from '@nestjs/common'
 import { GroupService } from './groups.service'
 import { group } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { GroupDto } from './group.dto'
+import * as httpContext from 'express-http-context'
 
 @Controller('group')
 @ApiTags('Groups')
@@ -18,17 +19,8 @@ export class GroupController {
   @Post()
   @ApiBody({ type: GroupDto, description: 'Create new group' })
   async create(@Body() data: any): Promise<group> {
-    // const data:Prisma.GroupCreateInput = {
-    //   name: data.name,
-    //   description: data.description,
-    //   tags: data.tags,
-    //   created_by: data.userName,
-    //   updated_by: '-'
-    // }
-    // console.log(data)
-
     data.tags = data.tags ? data.tags : []
-    data.created_by = 'System'
+    data.created_by = httpContext.get('USER')
     data.updated_by = ''
     return this.groupService.create(data)
   }
@@ -53,6 +45,7 @@ export class GroupController {
   }
 
   @Get('search')
+  @HttpCode(403)
   @ApiQuery({ name: 'name', type: String, required: false })
   async find(@Query() queryParams: any): Promise<group[]> {
     if (!queryParams.name)queryParams.name = ''
@@ -68,6 +61,7 @@ export class GroupController {
   @Put(':id')
   @ApiBody({ type: GroupDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<group> {
+    data.updated_by = httpContext.get('USER')
     delete data.created_by
     return this.groupService.update(+id, data)
   }

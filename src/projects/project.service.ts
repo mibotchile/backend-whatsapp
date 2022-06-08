@@ -14,7 +14,7 @@ export class ProjectService {
         {
           data: [],
           success: false,
-          message: 'A project with this uid already exists'
+          message: 'Ya existe un proyecto con este uid'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -38,7 +38,7 @@ export class ProjectService {
     res.json({
       data: [],
       success: true,
-      message: 'successfully created project'
+      message: 'Proyecto creado exitosamente'
     })
   }
 }

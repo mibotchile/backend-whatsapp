@@ -21,6 +21,7 @@ export class PrismaClientManager implements OnModuleDestroy {
   }
 
   async getClient(request: Request): Promise<PrismaClient> {
+    if (!request.headers.mibot_session) return
     const mibotSession: any = JSON.parse(request.headers.mibot_session as string)
     const tenantId = mibotSession.project_uid
 
@@ -38,7 +39,7 @@ export class PrismaClientManager implements OnModuleDestroy {
         {
           data: [],
           success: false,
-          message: 'Athere is no schema for this project'
+          message: 'No existe esquema para este proyecto'
         },
         HttpStatus.NOT_ACCEPTABLE
       )

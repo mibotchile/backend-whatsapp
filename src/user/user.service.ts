@@ -7,7 +7,6 @@ export class UserService {
   constructor (private prisma: PrismaClient) {}
   async create (data: Prisma.userCreateInput): Promise<any> {
     // console.log(data)
-    data.created_by = 'System'
     const users = await this.prisma.user.findMany({
       where: { name: data.name }
     })
@@ -16,7 +15,7 @@ export class UserService {
         {
           data: [],
           success: false,
-          message: 'A user with this name already exists'
+          message: 'Ya existe usuario con este nombre'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -37,7 +36,7 @@ export class UserService {
     return {
       data: data_res,
       success: true,
-      message: 'successfully created user'
+      message: 'Usuario creado exitosamente'
     }
   }
 
@@ -48,11 +47,13 @@ export class UserService {
         {
           error: [{ id: idParam }],
           success: false,
-          message: 'the id must be of type number'
+          message: 'El id deve ser un numero'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
     }
+    if (data.email) delete data.email
+    if (data.uid) delete data.uid
     const users = await this.prisma.user.findMany({
       where: { name: data.name as string, NOT: { id } }
     })
@@ -62,7 +63,7 @@ export class UserService {
         {
           data: [],
           success: false,
-          message: 'A user with this name already exists'
+          message: 'Ya existe usuario con este nombre'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -74,7 +75,7 @@ export class UserService {
     return {
       data: dataRes,
       success: true,
-      message: 'successfully updated user'
+      message: 'Usuario actualizado exitosamente'
     }
   }
 
@@ -93,7 +94,7 @@ export class UserService {
     return {
       data: users,
       success: true,
-      message: 'list all users'
+      message: 'Lista de todos los usuarios'
     }
     // return this.prisma.$queryRaw`select * from "public"."User"`
   }
@@ -114,7 +115,7 @@ export class UserService {
     return {
       data: users,
       success: true,
-      message: 'list actives users'
+      message: 'Lista de usuarios actives'
     }
     // return this.prisma.$queryRaw`select * from "public"."User"`
   }
@@ -147,7 +148,7 @@ export class UserService {
         {
           data: [],
           success: false,
-          message: 'there are no users matching this name'
+          message: 'No existen usuarios que coincidan con este nombre'
         },
         HttpStatus.NO_CONTENT
       )
@@ -156,7 +157,7 @@ export class UserService {
     return {
       data: users,
       success: true,
-      message: 'users'
+      message: 'Lista de usuarios'
     }
   }
 
@@ -168,7 +169,7 @@ export class UserService {
     return {
       data: userDeleted,
       success: true,
-      message: 'successfully desactive user'
+      message: 'Usuario desactivado exitosamente'
     }
   }
 }

@@ -6,7 +6,7 @@ export class FileLoggerService extends ConsoleLogger {
   error(message: any, stack?: string, context?: string) {
     // add your tailored logic here
     const date = new Date()
-    const logDirectory = 'logs/' + new Intl.DateTimeFormat(['ban', 'id']).format(date)
+    const logDirectory = 'logs/' + new Intl.DateTimeFormat('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(Date.now()).replaceAll('-', '/')
     console.log('looooooogg', logDirectory)
     if (!fs.existsSync(logDirectory)) {
       fs.mkdirSync(logDirectory, { recursive: true })
@@ -22,7 +22,7 @@ export class FileLoggerService extends ConsoleLogger {
    */
   warn(message: any, stack?: string, context?: string) {
     const date = new Date()
-    const logDirectory = 'logs/' + new Intl.DateTimeFormat(['ban', 'id']).format(date)
+    const logDirectory = 'logs/' + new Intl.DateTimeFormat('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(Date.now()).replaceAll('-', '/')
     console.log('looooooogg', logDirectory)
     if (!fs.existsSync(logDirectory)) {
       fs.mkdirSync(logDirectory, { recursive: true })

@@ -3,6 +3,7 @@ import { RoleService } from './role.service'
 import { role } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { RoleDto } from './role.dto'
+import * as httpContext from 'express-http-context'
 
 @Controller('role')
 @ApiTags('Roles')
@@ -21,7 +22,7 @@ export class RoleController {
     description: 'Create new role'
   })
   async create(@Body() data: any): Promise<role> {
-    data.created_by = 'System'
+    data.created_by = httpContext.get('USER')
     data.updated_by = ''
     return this.roleService.create(data)
   }
@@ -63,7 +64,7 @@ export class RoleController {
   @ApiBody({ type: RoleDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<role> {
     delete data.created_by
-    data.updated_by = 'fernando'
+    data.updated_by = httpContext.get('USER')
     return this.roleService.update(+id, data)
   }
 

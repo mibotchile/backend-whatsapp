@@ -42,7 +42,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
     // console.log('Token:', token);
 
     if (validator.isJWT(token) !== true) {
-      console.log('Token invalid! jus')
+      console.log('Token invalid!')
       return res.status(401).send({ success: false, msg: 'Token invalid!' })
     }
     res.locals.token = token
@@ -52,18 +52,17 @@ export class AuthenticationMiddleware implements NestMiddleware {
         .verifyIdToken(token)
 
       res.locals.user = userInfo
-      httpContext.set('USER', userInfo)
-      console.log(userInfo)
+      httpContext.set('USER', userInfo.email)
 
       const users = await this.prisma.user.findMany({ where: { email: userInfo.email } })
-      console.log({ users })
+      // console.log({ users })
 
       if (users.length === 0) {
         res.status(406).json(
           {
             data: [],
             success: false,
-            message: 'this user does not have permission to enter'
+            message: 'Este usuario no esta registrado en este servicio'
           }
         )
         // throw new HttpException(
@@ -79,23 +78,23 @@ export class AuthenticationMiddleware implements NestMiddleware {
       }
       // if(decodedToken.email)
     } catch (error) {
-      // console.log(error)
+      console.log(error)
 
       if (error.code === 'auth/id-token-expired') {
         console.log('Token has expired!')
         return res
           .status(403)
-          .json({ success: false, msg: 'Token has expired!' })
+          .json({ success: false, message: 'Token has expired!' })
       }
       if (error.code === 'auth/argument-error') {
-        console.log('Token invalid sdf!')
+        console.log('Token invalid!')
         return res
           .status(401)
-          .json({ success: false, msg: 'Token invalid!' })
+          .json({ success: false, message: 'Token invalid!' })
       }
       return res
         .status(500)
-        .json({ success: false, msg: 'Token validation error!' })
+        .json({ success: false, message: 'Token validation error!' })
     }
   }
 }

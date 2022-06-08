@@ -6,7 +6,6 @@ export class GroupService {
   constructor (private prisma: PrismaClient) {}
   async create (data: Prisma.groupCreateInput): Promise<any> {
     // console.log(data)
-    data.created_by = 'System'
     const groups = await this.prisma.group.findMany({
       where: { name: data.name }
     })
@@ -15,7 +14,7 @@ export class GroupService {
         {
           data: [],
           success: false,
-          message: 'A group with this name already exists'
+          message: 'Ya existe un grupo con el mismo nombre'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -26,7 +25,7 @@ export class GroupService {
     return {
       data: data_res,
       success: true,
-      message: 'successfully created group'
+      message: 'grupo creado exitosamente'
     }
   }
 
@@ -40,7 +39,7 @@ export class GroupService {
         {
           data: [],
           success: false,
-          message: 'A group with this name already exists'
+          message: 'Ya existe un grupo con el mismo nombre'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -52,7 +51,7 @@ export class GroupService {
     return {
       data: dataRes,
       success: true,
-      message: 'successfully updated group'
+      message: 'Grupo actualozado exitosamente'
     }
   }
 
@@ -71,7 +70,7 @@ export class GroupService {
     return {
       data: groups,
       success: true,
-      message: 'lis of all groups'
+      message: 'Lista de todos los grupos'
     }
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
@@ -92,7 +91,7 @@ export class GroupService {
     return {
       data: groups,
       success: true,
-      message: 'list of groups actives'
+      message: 'Lista de grupos activos'
     }
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
@@ -123,7 +122,7 @@ export class GroupService {
         {
           data: [],
           success: false,
-          message: 'there are no groups matching this name'
+          message: 'No existen grupos que coincidan con este nombre'
         },
         HttpStatus.OK
       )
@@ -143,7 +142,7 @@ export class GroupService {
     return {
       data: groupDeleted,
       success: true,
-      message: 'successfully desactive group'
+      message: 'Grupo desactivado aexitosamente'
     }
   }
 }

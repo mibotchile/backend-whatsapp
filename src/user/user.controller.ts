@@ -3,6 +3,7 @@ import { UserService } from './user.service'
 import { user } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { UserDto } from './user.dto'
+import * as httpContext from 'express-http-context'
 
 @Controller('user')
 @ApiTags('Users')
@@ -18,17 +19,9 @@ export class UserController {
   @Post()
   @ApiBody({ type: UserDto, description: 'Create new user' })
   async create(@Body() data: any): Promise<user> {
-    // const data:Prisma.UserCreateInput = {
-    //   name: data.name,
-    //   description: data.description,
-    //   tags: data.tags,
-    //   created_by: data.userName,
-    //   updated_by: '-'
-    // }
-    // console.log(data)
     data.groups_id = data.groups_id ? data.groups_id : []
 
-    data.created_by = 'System'
+    data.created_by = httpContext.get('USER')
     data.updated_by = ''
     return this.userService.create(data)
   }
@@ -37,7 +30,6 @@ export class UserController {
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findAll(@Query() queryParams: any): Promise<user[]> {
-    console.log(queryParams)
     return this.userService.findAll({
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
@@ -48,7 +40,6 @@ export class UserController {
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findActives(@Query() queryParams: any): Promise<user[]> {
-    console.log(queryParams)
     return this.userService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
@@ -68,7 +59,7 @@ export class UserController {
   @Put(':id')
   @ApiBody({ type: UserDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<user> {
-    data.updated_by = 'Jenri'
+    data.created_by = httpContext.get('USER')
     delete data.created_by
     return this.userService.update(id, data)
   }

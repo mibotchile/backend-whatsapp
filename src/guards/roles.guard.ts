@@ -108,7 +108,7 @@ export class RolesGuard implements CanActivate {
         {
           error: 'HttpStatus.FORBIDDEN',
           success: false,
-          message: 'you do not have permissions to perform this action'
+          message: 'No tiene los permisos para realizar esta accion'
         },
         HttpStatus.FORBIDDEN
       )

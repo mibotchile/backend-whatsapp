@@ -5,8 +5,6 @@ import { PrismaClient, Prisma } from '@prisma/client'
 export class RoleService {
   constructor (private prisma: PrismaClient) {}
   async create (data: Prisma.roleCreateInput): Promise<any> {
-    data.created_by = 'System'
-
     if (!data.name) {
       throw new HttpException(
         {
@@ -36,7 +34,7 @@ export class RoleService {
         {
           error: [{ config: data.config }],
           success: false,
-          message: 'the config parameter sees to be of type json'
+          message: 'El parametro config deve ser de tipo JSON'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -50,7 +48,7 @@ export class RoleService {
         {
           data: [],
           success: false,
-          message: 'A role with this name already exists'
+          message: 'Ya existe rol con este nombre'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -63,14 +61,14 @@ export class RoleService {
       return {
         data: dataRes,
         success: true,
-        message: 'successfully created role'
+        message: 'Rol creado exitosamente'
       }
     } catch (error) {
       throw new HttpException(
         {
           error,
           success: false,
-          message: 'Error to create new role'
+          message: 'Error al crear el nuevo rol'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -83,7 +81,7 @@ export class RoleService {
         {
           error: [{ id }],
           success: false,
-          message: 'id is no availible'
+          message: 'El id no es valido'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -93,7 +91,7 @@ export class RoleService {
         {
           error: [{ config: data.config }],
           success: false,
-          message: 'the config parameter sees to be of type json'
+          message: 'El parametro config deve ser de tipo JSON'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -108,7 +106,7 @@ export class RoleService {
           {
             data: [],
             success: false,
-            message: 'A role with this name already exists'
+            message: 'Ya existe rol con este nombre'
           },
           HttpStatus.NOT_ACCEPTABLE
         )
@@ -122,7 +120,7 @@ export class RoleService {
     return {
       data: dataRes,
       success: true,
-      message: 'successfully updated role'
+      message: 'Rol actualizado exitosamente'
     }
   }
 
@@ -143,7 +141,7 @@ export class RoleService {
     return {
       data: roles,
       success: true,
-      message: 'lis of all roles'
+      message: 'Lista de todos los usuarios'
     }
   }
 
@@ -162,7 +160,7 @@ export class RoleService {
     return {
       data: roles,
       success: true,
-      message: 'list of actives roles'
+      message: 'Lista de usuarios activos'
     }
   }
 
@@ -191,7 +189,7 @@ export class RoleService {
         {
           data: [],
           success: false,
-          message: 'there are no roles matching this name'
+          message: 'ya existe rol con este nombre'
         },
         HttpStatus.NO_CONTENT
       )
@@ -199,7 +197,7 @@ export class RoleService {
     return {
       data: roles,
       success: true,
-      message: 'list of roles'
+      message: 'Lista de Roles'
     }
   }
 
@@ -211,7 +209,7 @@ export class RoleService {
     return {
       data: roleDeleted,
       success: true,
-      message: 'successfully desactive role'
+      message: 'Usuario desactivado exitosamente'
     }
   }
 }

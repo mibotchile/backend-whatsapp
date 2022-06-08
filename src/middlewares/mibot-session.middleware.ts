@@ -6,7 +6,7 @@ export class MibotSessionMiddleware implements NestMiddleware {
   use (req: any, res: any, next: () => void) {
     if (!req.headers.mibot_session) {
       res.status(401).json({
-        message: 'missing mibot_session headers',
+        message: 'No existe el header mibot_session',
         error: 'Bad Request'
       })
       return
@@ -17,7 +17,7 @@ export class MibotSessionMiddleware implements NestMiddleware {
       mibotSession = JSON.parse(req.headers.mibot_session)
     } catch (error) {
       res.status(401).json({
-        message: 'mibot_session header has to be of type json',
+        message: 'El header mibot_session deve ser de tipo JSON e incluir project_uid y client_uid',
         error: 'Bad Request'
       })
       return
