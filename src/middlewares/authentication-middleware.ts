@@ -8,7 +8,6 @@ import { PrismaClient } from '@prisma/client'
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware {
   constructor (private readonly prisma:PrismaClient) {
-    console.log('se inició')
     if (admin.apps.length === 0) {
       const credentialsCert = JSON.parse(
         fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, {
@@ -54,7 +53,8 @@ export class AuthenticationMiddleware implements NestMiddleware {
       res.locals.user = userInfo
       httpContext.set('USER', userInfo.email)
 
-      const users = await this.prisma.user.findMany({ where: { email: userInfo.email } })
+      const users = await this.prisma.user.findMany({ where: { email: userInfo.email }, include: { role: true } })
+
       // console.log({ users })
 
       if (users.length === 0) {
@@ -74,6 +74,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
         //   HttpStatus.NOT_ACCEPTABLE
         // )
       } else {
+        httpContext.set('ROLE', users[0].role)
         next()
       }
       // if(decodedToken.email)

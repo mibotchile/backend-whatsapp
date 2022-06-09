@@ -10,7 +10,7 @@ export class RoleService {
         {
           data: [],
           success: false,
-          message: 'missing name'
+          message: 'El parametro nombre no puede ser vacio'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -23,7 +23,7 @@ export class RoleService {
         {
           data: [],
           success: false,
-          message: 'missing config'
+          message: 'No existe el parametro config'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
@@ -41,7 +41,12 @@ export class RoleService {
     }
 
     const roles = await this.prisma.role.findMany({
-      where: { name: data.name }
+      where: {
+        name: {
+          equals: data.name,
+          mode: 'insensitive'
+        }
+      }
     })
     if (roles.length > 0) {
       throw new HttpException(
@@ -52,6 +57,9 @@ export class RoleService {
         },
         HttpStatus.NOT_ACCEPTABLE
       )
+    }
+    if (data.default) {
+      await this.prisma.role.updateMany({ data: { default: false } })
     }
 
     try {
@@ -96,9 +104,16 @@ export class RoleService {
         HttpStatus.NOT_ACCEPTABLE
       )
     }
+
     if (data.name) {
       const roles = await this.prisma.role.findMany({
-        where: { name: data.name as string, NOT: { id } }
+        where: {
+          name: {
+            equals: data.name as string,
+            mode: 'insensitive'
+          },
+          NOT: { id }
+        }
       })
 
       if (roles.length > 0) {
@@ -112,7 +127,9 @@ export class RoleService {
         )
       }
     }
-
+    if (data.default) {
+      await this.prisma.role.updateMany({ data: { default: false } })
+    }
     const dataRes = await this.prisma.role.update({
       data,
       where: { id }

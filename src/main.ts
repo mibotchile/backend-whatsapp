@@ -5,7 +5,6 @@ import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/sw
 import * as cors from 'cors'
 import { FileLoggerService } from './logger/file-logger.service'
 import * as httpContext from 'express-http-context'
-// import { RolesGuard } from './guards/roles.guard'
 import { Transport } from '@nestjs/microservices'
 import { ClientModule } from './messages/client/client.module'
 
@@ -15,7 +14,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new FileLoggerService()
   })
-  // app.useGlobalGuards(new RolesGuard())
   app.use(cors({ credentials: true, origin: true }))
   app.use(httpContext.middleware)
 

@@ -7,7 +7,12 @@ export class GroupService {
   async create (data: Prisma.groupCreateInput): Promise<any> {
     // console.log(data)
     const groups = await this.prisma.group.findMany({
-      where: { name: data.name }
+      where: {
+        name: {
+          equals: data.name,
+          mode: 'insensitive'
+        }
+      }
     })
     if (groups.length > 0) {
       throw new HttpException(
@@ -18,6 +23,9 @@ export class GroupService {
         },
         HttpStatus.NOT_ACCEPTABLE
       )
+    }
+    if (data.default) {
+      await this.prisma.group.updateMany({ data: { default: false } })
     }
     const data_res = await this.prisma.group.create({
       data
@@ -30,19 +38,30 @@ export class GroupService {
   }
 
   async update (id: number, data: Prisma.groupUpdateInput): Promise<any> {
-    const groups = await this.prisma.group.findMany({
-      where: { name: data.name as string, NOT: { id } }
-    })
+    if (data.name) {
+      const groups = await this.prisma.group.findMany({
+        where: {
+          name: {
+            equals: data.name as string,
+            mode: 'insensitive'
+          },
+          NOT: { id }
+        }
+      })
 
-    if (groups.length > 0) {
-      throw new HttpException(
-        {
-          data: [],
-          success: false,
-          message: 'Ya existe un grupo con el mismo nombre'
-        },
-        HttpStatus.NOT_ACCEPTABLE
-      )
+      if (groups.length > 0) {
+        throw new HttpException(
+          {
+            data: [],
+            success: false,
+            message: 'Ya existe un grupo con el mismo nombre'
+          },
+          HttpStatus.NOT_ACCEPTABLE
+        )
+      }
+    }
+    if (data.default) {
+      await this.prisma.group.updateMany({ data: { default: false } })
     }
     const dataRes = await this.prisma.group.update({
       data,

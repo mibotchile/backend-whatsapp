@@ -13,6 +13,8 @@ import { StatusMonitorModule } from 'nest-status-monitor'
 import { MibotSessionMiddleware } from './middlewares/mibot-session.middleware'
 import { HealthController } from './health.controller'
 import { statusMonitorConfig } from './config/status-monitor.config'
+import { RolesGuard } from './guards/roles.guard'
+import { APP_GUARD } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -28,7 +30,11 @@ import { statusMonitorConfig } from './config/status-monitor.config'
     ProjectModule
   ],
   controllers: [HealthController],
-  providers: [AppService]
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    }]
 })
 // export class AppModule {}
 export class AppModule implements NestModule {

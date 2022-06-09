@@ -36,9 +36,9 @@ model role {
 
 model user {
   id         Int      @id @default(autoincrement())
-  uid        String   @db.VarChar(50)
+  uid        String   @unique @db.VarChar(50)
   name       String   @db.VarChar(50)
-  email      String   @db.VarChar(100)
+  email      String   @unique @db.VarChar(100)
   ///array de grupos a los que tiene acceso
   groups_id  Json
   role       role     @relation(fields: [role_id], references: [id])

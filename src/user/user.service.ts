@@ -8,7 +8,12 @@ export class UserService {
   async create (data: Prisma.userCreateInput): Promise<any> {
     // console.log(data)
     const users = await this.prisma.user.findMany({
-      where: { name: data.name }
+      where: {
+        name: {
+          equals: data.name,
+          mode: 'insensitive'
+        }
+      }
     })
     if (users.length > 0) {
       throw new HttpException(
@@ -54,20 +59,29 @@ export class UserService {
     }
     if (data.email) delete data.email
     if (data.uid) delete data.uid
-    const users = await this.prisma.user.findMany({
-      where: { name: data.name as string, NOT: { id } }
-    })
+    if (data.name) {
+      const users = await this.prisma.user.findMany({
+        where: {
+          name: {
+            equals: data.name as string,
+            mode: 'insensitive'
+          },
+          NOT: { id }
+        }
+      })
 
-    if (users.length > 0) {
-      throw new HttpException(
-        {
-          data: [],
-          success: false,
-          message: 'Ya existe usuario con este nombre'
-        },
-        HttpStatus.NOT_ACCEPTABLE
-      )
+      if (users.length > 0) {
+        throw new HttpException(
+          {
+            data: [],
+            success: false,
+            message: 'Ya existe usuario con este nombre'
+          },
+          HttpStatus.NOT_ACCEPTABLE
+        )
+      }
     }
+
     const dataRes = await this.prisma.user.update({
       data,
       where: { id }
