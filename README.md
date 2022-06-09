@@ -17,11 +17,6 @@ $ npx prisma generate
 
 ## Status Monitoring ```/status```
 
-```bash
-$ npm install
-$ npx prisma generate
-```
-
 ## Enviroments
 
 ```bash

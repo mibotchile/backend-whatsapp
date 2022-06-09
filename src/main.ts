@@ -6,6 +6,8 @@ import * as cors from 'cors'
 import { FileLoggerService } from './logger/file-logger.service'
 import * as httpContext from 'express-http-context'
 // import { RolesGuard } from './guards/roles.guard'
+import { Transport } from '@nestjs/microservices'
+import { ClientModule } from './messages/client/client.module'
 
 async function bootstrap() {
   console.log('ENV: ', process.env.ENVIROMENT)
@@ -31,6 +33,19 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true }))
   app.use(json())
   await app.listen(process.env.APP_PORT || 3000)
+
+  const app2 = await NestFactory.createMicroservice(ClientModule, {
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBIT_URL],
+      queue: 'whatsapp.messages.dev',
+      noAck: false,
+      queueOptions: {
+        durable: true
+      }
+    }
+  })
+  await app2.listen()
 }
 
 bootstrap()
