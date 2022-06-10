@@ -50,10 +50,15 @@ export class UserController {
     return this.userService.find(queryParams)
   }
 
-  @Get(':id')
+  @Get('id/:id')
   async findById(@Param('id') id: string): Promise<user> {
     console.log(id)
     return this.userService.findById(Number(id))
+  }
+
+  @Get('uid/:uid')
+  async findByUid(@Param('uid') uid: string): Promise<user> {
+    return this.userService.findByUid(uid)
   }
 
   @Put(':id')

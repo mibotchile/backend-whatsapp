@@ -148,6 +148,20 @@ export class UserService {
     }
   }
 
+  async findByUid (uid:string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { uid },
+      include: {
+        role: true
+      }
+    })
+    return {
+      data: user,
+      success: true,
+      message: 'user'
+    }
+  }
+
   async find (data): Promise<any> {
     const users = await this.prisma.user.findMany({
       where: {
