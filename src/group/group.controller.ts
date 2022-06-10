@@ -45,7 +45,6 @@ export class GroupController {
   }
 
   @Get('search')
-  @HttpCode(403)
   @ApiQuery({ name: 'name', type: String, required: false })
   async find(@Query() queryParams: any): Promise<group[]> {
     if (!queryParams.name)queryParams.name = ''

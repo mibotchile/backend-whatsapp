@@ -32,8 +32,11 @@ export class RolesGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest()
-    const role = httpContext.get('ROLE')
     const routeName = request.route.path.split('/')[1]
+    if (routeName === 'status') return true
+    if (routeName === 'health') return true
+
+    const role = httpContext.get('ROLE')
     const permissions = this.getPermissions(role.config, routeName)
     // console.log(permissions)
 
