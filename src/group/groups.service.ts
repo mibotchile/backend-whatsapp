@@ -75,10 +75,13 @@ export class GroupService {
   }
 
   async findAll ({ pageSize, page }): Promise<any> {
-    page -= 1
-    const skip = (page < 0 ? 0 : page) * pageSize
+    pageSize = Number(pageSize)
+    page = Number(page)
     const pagination = {} as any
-    if (!isNaN(skip)) {
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
       pagination.skip = skip
       pagination.take = pageSize
     }
@@ -95,10 +98,13 @@ export class GroupService {
   }
 
   async findActives (pageSize = 0, page = 0): Promise<any> {
-    page -= 1
-    const skip = (page < 0 ? 0 : page) * pageSize
+    pageSize = Number(pageSize)
+    page = Number(page)
     const pagination = {} as any
-    if (!isNaN(skip)) {
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
       pagination.skip = skip
       pagination.take = pageSize
     }
@@ -126,14 +132,25 @@ export class GroupService {
     }
   }
 
-  async find (data): Promise<any> {
+  async find ({ pageSize, page, name }): Promise<any> {
+    pageSize = Number(pageSize)
+    page = Number(page)
+    const pagination = {} as any
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
+      pagination.skip = skip
+      pagination.take = pageSize
+    }
     const groups = await this.prisma.group.findMany({
       where: {
         name: {
-          contains: data.name,
+          contains: name,
           mode: 'insensitive'
         }
-      }
+      },
+      ...pagination
     })
 
     if (groups.length === 0) {

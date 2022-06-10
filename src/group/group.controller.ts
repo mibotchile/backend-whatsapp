@@ -52,7 +52,7 @@ export class GroupController {
     return this.groupService.find(queryParams)
   }
 
-  @Get(':id')
+  @Get('/id/:id')
   async findById(@Param('id') id: string): Promise<group> {
     console.log(id)
     return this.groupService.findById(Number(id))

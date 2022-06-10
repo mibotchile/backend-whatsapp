@@ -94,16 +94,27 @@ export class UserService {
   }
 
   async findAll ({ pageSize, page }): Promise<any> {
-    page -= 1
-    const skip = (page < 0 ? 0 : page) * pageSize
+    pageSize = Number(pageSize)
+    page = Number(page)
     const pagination = {} as any
-    if (!isNaN(skip)) {
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
       pagination.skip = skip
       pagination.take = pageSize
     }
     const users = await this.prisma.user.findMany({
       ...pagination,
-      orderBy: { id: 'asc' }
+      orderBy: { id: 'asc' },
+      include: {
+        role: {
+          select: {
+            name: true,
+            id: true
+          }
+        }
+      }
     })
     return {
       data: users,
@@ -114,17 +125,28 @@ export class UserService {
   }
 
   async findActives (pageSize = 0, page = 0): Promise<any> {
-    page -= 1
-    const skip = (page < 0 ? 0 : page) * pageSize
+    pageSize = Number(pageSize)
+    page = Number(page)
     const pagination = {} as any
-    if (!isNaN(skip)) {
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
       pagination.skip = skip
       pagination.take = pageSize
     }
     const users = await this.prisma.user.findMany({
       ...pagination,
       where: { status: 1 },
-      orderBy: { id: 'asc' }
+      orderBy: { id: 'asc' },
+      include: {
+        role: {
+          select: {
+            name: true,
+            id: true
+          }
+        }
+      }
     })
     return {
       data: users,
@@ -162,12 +184,52 @@ export class UserService {
     }
   }
 
-  async find (data): Promise<any> {
+  async findGroupsById (id:number): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { id }
+    })
+
+    const groups = await this.prisma.group.findMany({
+      where: {
+        id: {
+          in: user.groups_id as any
+        }
+
+      }
+    })
+    return {
+      data: groups,
+      success: true,
+      message: 'user'
+    }
+  }
+
+  async find ({ pageSize, page, name }): Promise<any> {
+    pageSize = Number(pageSize)
+    page = Number(page)
+    const pagination = {} as any
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
+      pagination.skip = skip
+      pagination.take = pageSize
+    }
+
     const users = await this.prisma.user.findMany({
       where: {
         name: {
-          contains: data.name,
+          contains: name,
           mode: 'insensitive'
+        }
+      },
+      ...pagination,
+      include: {
+        role: {
+          select: {
+            name: true,
+            id: true
+          }
         }
       }
     })

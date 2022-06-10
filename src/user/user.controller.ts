@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { UserService } from './user.service'
 import { user } from '@prisma/client'
-import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
-import { UserDto } from './user.dto'
+import { ApiBody, ApiHeader, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { UserDto, UserResponse } from './user.dto'
 import * as httpContext from 'express-http-context'
 
 @Controller('user')
@@ -59,6 +59,14 @@ export class UserController {
   @Get('uid/:uid')
   async findByUid(@Param('uid') uid: string): Promise<user> {
     return this.userService.findByUid(uid)
+  }
+
+  @ApiResponse({
+    type: UserResponse
+  })
+  @Get(':id/groups')
+  async findGroupsById(@Param('id') id: string): Promise<user> {
+    return this.userService.findGroupsById(Number(id))
   }
 
   @Put(':id')

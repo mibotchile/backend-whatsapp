@@ -38,18 +38,23 @@ export class RolesGuard implements CanActivate {
     // console.log(permissions)
 
     let permissionRequired
+    let action
     switch (request.method) {
       case 'GET':
         permissionRequired = 'read'
+        action = 'leer'
         break
       case 'POST':
         permissionRequired = 'create'
+        action = 'crear'
         break
       case 'PUT':
         permissionRequired = 'update'
+        action = 'actualizar'
         break
       case 'DELETE':
         permissionRequired = 'delete'
+        action = 'desactivar'
         break
     }
 
@@ -58,7 +63,7 @@ export class RolesGuard implements CanActivate {
         {
           error: 'HttpStatus.FORBIDDEN',
           success: false,
-          message: 'No tiene permisos para realizar esta accion'
+          message: `No tiene permisos para ${action} ${routeName} `
         },
         HttpStatus.FORBIDDEN
       )
