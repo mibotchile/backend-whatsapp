@@ -90,7 +90,12 @@ export class GroupService {
       orderBy: { id: 'asc' }
     })
     return {
-      data: groups,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        groups
+      },
       success: true,
       message: 'Lista de todos los grupos'
     }
@@ -114,11 +119,44 @@ export class GroupService {
       orderBy: { id: 'asc' }
     })
     return {
-      data: groups,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        groups
+      },
       success: true,
       message: 'Lista de grupos activos'
     }
     // return this.prisma.$queryRaw`select * from "public"."Group"`
+  }
+
+  async findInactives (pageSize = 0, page = 0): Promise<any> {
+    pageSize = Number(pageSize)
+    page = Number(page)
+    const pagination = {} as any
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
+      pagination.skip = skip
+      pagination.take = pageSize
+    }
+    const groups = await this.prisma.group.findMany({
+      ...pagination,
+      where: { status: 0 },
+      orderBy: { id: 'asc' }
+    })
+    return {
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        groups
+      },
+      success: true,
+      message: 'Lista de grupos inactivos'
+    }
   }
 
   async findById (id: number): Promise<any> {
@@ -143,6 +181,7 @@ export class GroupService {
       pagination.skip = skip
       pagination.take = pageSize
     }
+
     const groups = await this.prisma.group.findMany({
       where: {
         name: {
@@ -164,7 +203,12 @@ export class GroupService {
       )
     }
     return {
-      data: groups,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        groups
+      },
       success: true,
       message: 'user'
     }

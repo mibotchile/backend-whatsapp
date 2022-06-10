@@ -6,7 +6,6 @@ import { PrismaClient, Prisma } from '@prisma/client'
 export class UserService {
   constructor (private prisma: PrismaClient) {}
   async create (data: Prisma.userCreateInput): Promise<any> {
-    // console.log(data)
     const users = await this.prisma.user.findMany({
       where: {
         name: {
@@ -25,16 +24,6 @@ export class UserService {
         HttpStatus.NOT_ACCEPTABLE
       )
     }
-    // const userRecord = await admin.auth().createUser({
-    //   email: data.email,
-    //   emailVerified: false,
-    //   password: 'secretPassword',
-    //   displayName: data.name,
-    //   disabled: false
-    // })
-
-    // data.uid = userRecord.uid
-    // console.log('Successfully created new user:', userRecord.uid)
     const data_res = await this.prisma.user.create({
       data
     })
@@ -94,37 +83,52 @@ export class UserService {
   }
 
   async findAll ({ pageSize, page }): Promise<any> {
-    pageSize = Number(pageSize)
-    page = Number(page)
-    const pagination = {} as any
-
-    if (!isNaN(pageSize) && !isNaN(page)) {
-      page -= 1
-      const skip = (page < 0 ? 0 : page) * pageSize
-      pagination.skip = skip
-      pagination.take = pageSize
-    }
-    const users = await this.prisma.user.findMany({
-      ...pagination,
-      orderBy: { id: 'asc' },
-      include: {
-        role: {
-          select: {
-            name: true,
-            id: true
-          }
-        }
-      }
-    })
+    const users = await this.getFullDataUsers(pageSize, page)
     return {
-      data: users,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        users
+      },
       success: true,
       message: 'Lista de todos los usuarios'
+    }
+  }
+
+  async findInactives (pageSize = 0, page = 0): Promise<any> {
+    const where = { status: 0 }
+    const users = await this.getFullDataUsers(pageSize, page, where)
+    return {
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        users
+      },
+      success: true,
+      message: 'Lista de usuarios inactivos'
     }
     // return this.prisma.$queryRaw`select * from "public"."User"`
   }
 
   async findActives (pageSize = 0, page = 0): Promise<any> {
+    const where = { status: 1 }
+    const users = await this.getFullDataUsers(pageSize, page, where)
+    return {
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        users
+      },
+      success: true,
+      message: 'Lista de usuarios actives'
+    }
+    // return this.prisma.$queryRaw`select * from "public"."User"`
+  }
+
+  async getFullDataUsers (pageSize, page, where = {}) {
     pageSize = Number(pageSize)
     page = Number(page)
     const pagination = {} as any
@@ -135,9 +139,10 @@ export class UserService {
       pagination.skip = skip
       pagination.take = pageSize
     }
-    const users = await this.prisma.user.findMany({
+
+    const usersDB = await this.prisma.user.findMany({
+      where,
       ...pagination,
-      where: { status: 1 },
       orderBy: { id: 'asc' },
       include: {
         role: {
@@ -148,12 +153,43 @@ export class UserService {
         }
       }
     })
-    return {
-      data: users,
-      success: true,
-      message: 'Lista de usuarios actives'
+
+    if (usersDB.length === 0) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'No existen usuarios que coincidan con este nombre'
+        },
+        HttpStatus.NOT_FOUND
+      )
     }
-    // return this.prisma.$queryRaw`select * from "public"."User"`
+
+    const groupIds = usersDB.reduce((pVal, cVal) => {
+      pVal.push(...(cVal.groups_id as Array<number>))
+      return pVal
+    }, [])
+    console.log({ groupIds })
+
+    const groups = await this.prisma.group.findMany({
+      where: {
+        id: {
+          in: groupIds as Array<number>
+        }
+      },
+      select: {
+        id: true,
+        name: true
+      }
+    })
+
+    console.log({ groups })
+    const users = usersDB.map((u:any) => {
+      u.groups = groups.filter(g => (u.groups_id as Array<number>).includes(g.id))
+      return u
+    })
+
+    return users
   }
 
   async findById (id: number): Promise<any> {
@@ -205,47 +241,21 @@ export class UserService {
   }
 
   async find ({ pageSize, page, name }): Promise<any> {
-    pageSize = Number(pageSize)
-    page = Number(page)
-    const pagination = {} as any
-
-    if (!isNaN(pageSize) && !isNaN(page)) {
-      page -= 1
-      const skip = (page < 0 ? 0 : page) * pageSize
-      pagination.skip = skip
-      pagination.take = pageSize
-    }
-
-    const users = await this.prisma.user.findMany({
-      where: {
-        name: {
-          contains: name,
-          mode: 'insensitive'
-        }
-      },
-      ...pagination,
-      include: {
-        role: {
-          select: {
-            name: true,
-            id: true
-          }
-        }
+    const where = {
+      name: {
+        contains: name,
+        mode: 'insensitive'
       }
-    })
-    if (users.length === 0) {
-      throw new HttpException(
-        {
-          data: [],
-          success: false,
-          message: 'No existen usuarios que coincidan con este nombre'
-        },
-        HttpStatus.NO_CONTENT
-      )
     }
+    const users = await this.getFullDataUsers(pageSize, page, where)
 
     return {
-      data: users,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        users
+      },
       success: true,
       message: 'Lista de usuarios'
     }

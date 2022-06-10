@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query, HttpCode } from '@nestjs/common'
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { GroupService } from './groups.service'
 import { group } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
@@ -42,6 +42,13 @@ export class GroupController {
   async findActives(@Query() queryParams: any): Promise<group[]> {
     console.log(queryParams)
     return this.groupService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
+  }
+
+  @Get('inactives')
+  @ApiQuery({ name: 'page', type: Number, required: false })
+  @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  async findInactives(@Query() queryParams: any): Promise<group[]> {
+    return this.groupService.findInactives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
   @Get('search')

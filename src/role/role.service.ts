@@ -159,7 +159,12 @@ export class RoleService {
       }
     })
     return {
-      data: roles,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        roles
+      },
       success: true,
       message: 'Lista de todos los usuarios'
     }
@@ -181,7 +186,39 @@ export class RoleService {
       where: { status: 1 }
     })
     return {
-      data: roles,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        roles
+      },
+      success: true,
+      message: 'Lista de usuarios activos'
+    }
+  }
+
+  async findInactives (pageSize = 0, page = 0): Promise<any> {
+    pageSize = Number(pageSize)
+    page = Number(page)
+    const pagination = {} as any
+
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
+      pagination.skip = skip
+      pagination.take = pageSize
+    }
+    const roles = await this.prisma.role.findMany({
+      ...pagination,
+      where: { status: 0 }
+    })
+    return {
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        roles
+      },
       success: true,
       message: 'Lista de usuarios activos'
     }
@@ -230,7 +267,12 @@ export class RoleService {
       )
     }
     return {
-      data: roles,
+      data: {
+        page,
+        pageSize,
+        length: 100,
+        roles
+      },
       success: true,
       message: 'Lista de Roles'
     }

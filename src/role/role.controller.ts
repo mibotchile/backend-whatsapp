@@ -47,6 +47,14 @@ export class RoleController {
     return this.roleService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
+  @Get('inactives')
+  @ApiQuery({ name: 'page', type: Number, required: false })
+  @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  async findInactives(@Query() queryParams: any): Promise<role[]> {
+    console.log(queryParams)
+    return this.roleService.findInactives(Number(queryParams.pageSize), Number(queryParams.page))
+  }
+
   @Get('search')
   @ApiQuery({ name: 'name', type: String, required: false })
   async find(@Query() queryParams: any): Promise<role[]> {
