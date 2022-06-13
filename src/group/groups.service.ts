@@ -89,11 +89,15 @@ export class GroupService {
       ...pagination,
       orderBy: { id: 'asc' }
     })
+    const aggrgations = await this.prisma.group.aggregate({
+      _count: { id: true }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         groups
       },
       success: true,
@@ -101,6 +105,11 @@ export class GroupService {
     }
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
+
+  // async findMany(){
+
+  //   this.prisma.$queryRawUnsafe(`SELECT * , count(id) FROM group WHERE `)
+  // }
 
   async findActives (pageSize = 0, page = 0): Promise<any> {
     pageSize = Number(pageSize)
@@ -118,11 +127,16 @@ export class GroupService {
       where: { status: 1 },
       orderBy: { id: 'asc' }
     })
+    const aggrgations = await this.prisma.group.aggregate({
+      _count: { id: true },
+      where: { status: 1 }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         groups
       },
       success: true,
@@ -147,11 +161,16 @@ export class GroupService {
       where: { status: 0 },
       orderBy: { id: 'asc' }
     })
+    const aggrgations = await this.prisma.group.aggregate({
+      _count: { id: true },
+      where: { status: 0 }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         groups
       },
       success: true,
@@ -202,11 +221,21 @@ export class GroupService {
         HttpStatus.OK
       )
     }
+    const aggrgations = await this.prisma.group.aggregate({
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive'
+        }
+      },
+      _count: { id: true }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         groups
       },
       success: true,

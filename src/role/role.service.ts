@@ -158,11 +158,15 @@ export class RoleService {
         users: true
       }
     })
+    const aggrgations = await this.prisma.role.aggregate({
+      _count: { id: true }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         roles
       },
       success: true,
@@ -185,11 +189,16 @@ export class RoleService {
       ...pagination,
       where: { status: 1 }
     })
+    const aggrgations = await this.prisma.role.aggregate({
+      _count: { id: true },
+      where: { status: 1 }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         roles
       },
       success: true,
@@ -212,11 +221,16 @@ export class RoleService {
       ...pagination,
       where: { status: 0 }
     })
+    const aggrgations = await this.prisma.role.aggregate({
+      _count: { id: true },
+      where: { status: 0 }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         roles
       },
       success: true,
@@ -266,11 +280,22 @@ export class RoleService {
         HttpStatus.NO_CONTENT
       )
     }
+
+    const aggrgations = await this.prisma.role.aggregate({
+      _count: { id: true },
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive'
+        }
+      }
+    })
+    const length = aggrgations._count.id
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         roles
       },
       success: true,

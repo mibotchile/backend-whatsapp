@@ -83,12 +83,12 @@ export class UserService {
   }
 
   async findAll ({ pageSize, page }): Promise<any> {
-    const users = await this.getFullDataUsers(pageSize, page)
+    const { users, length } = await this.getFullDataUsers(pageSize, page)
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         users
       },
       success: true,
@@ -98,12 +98,12 @@ export class UserService {
 
   async findInactives (pageSize = 0, page = 0): Promise<any> {
     const where = { status: 0 }
-    const users = await this.getFullDataUsers(pageSize, page, where)
+    const { users, length } = await this.getFullDataUsers(pageSize, page, where)
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         users
       },
       success: true,
@@ -114,12 +114,12 @@ export class UserService {
 
   async findActives (pageSize = 0, page = 0): Promise<any> {
     const where = { status: 1 }
-    const users = await this.getFullDataUsers(pageSize, page, where)
+    const { users, length } = await this.getFullDataUsers(pageSize, page, where)
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         users
       },
       success: true,
@@ -164,12 +164,17 @@ export class UserService {
         HttpStatus.NOT_FOUND
       )
     }
+    const aggregations = await this.prisma.user.aggregate({
+      _count: { id: true },
+      where
+    })
+    const length = aggregations._count.id
 
     const groupIds = usersDB.reduce((pVal, cVal) => {
       pVal.push(...(cVal.groups_id as Array<number>))
       return pVal
     }, [])
-    console.log({ groupIds })
+    // console.log({ groupIds })
 
     const groups = await this.prisma.group.findMany({
       where: {
@@ -183,13 +188,13 @@ export class UserService {
       }
     })
 
-    console.log({ groups })
+    // console.log({ groups })
     const users = usersDB.map((u:any) => {
       u.groups = groups.filter(g => (u.groups_id as Array<number>).includes(g.id))
       return u
     })
 
-    return users
+    return { users, length }
   }
 
   async findById (id: number): Promise<any> {
@@ -247,13 +252,13 @@ export class UserService {
         mode: 'insensitive'
       }
     }
-    const users = await this.getFullDataUsers(pageSize, page, where)
+    const { users, length } = await this.getFullDataUsers(pageSize, page, where)
 
     return {
       data: {
         page,
         pageSize,
-        length: 100,
+        length,
         users
       },
       success: true,
