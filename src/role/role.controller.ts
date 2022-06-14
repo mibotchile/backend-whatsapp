@@ -22,7 +22,7 @@ export class RoleController {
     description: 'Create new role'
   })
   async create(@Body() data: any): Promise<role> {
-    data.created_by = httpContext.get('USER')
+    data.created_by = httpContext.get('USER').email
     data.updated_by = ''
     return this.roleService.create(data)
   }
@@ -31,8 +31,6 @@ export class RoleController {
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findAll(@Query() queryParams: any): Promise<role[]> {
-    console.log(queryParams)
-
     return this.roleService.findAll({
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
@@ -43,7 +41,6 @@ export class RoleController {
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findActives(@Query() queryParams: any): Promise<role[]> {
-    console.log(queryParams)
     return this.roleService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
@@ -51,7 +48,6 @@ export class RoleController {
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findInactives(@Query() queryParams: any): Promise<role[]> {
-    console.log(queryParams)
     return this.roleService.findInactives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
@@ -64,7 +60,6 @@ export class RoleController {
 
   @Get(':id')
   async findById(@Param('id') id: string): Promise<role> {
-    console.log(id)
     return this.roleService.findById(Number(id))
   }
 
@@ -72,7 +67,7 @@ export class RoleController {
   @ApiBody({ type: RoleDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<role> {
     delete data.created_by
-    data.updated_by = httpContext.get('USER')
+    data.updated_by = httpContext.get('USER').email
     return this.roleService.update(+id, data)
   }
 

@@ -20,8 +20,7 @@ export class UserController {
   @ApiBody({ type: UserDto, description: 'Create new user' })
   async create(@Body() data: any): Promise<user> {
     data.groups_id = data.groups_id ? data.groups_id : []
-
-    data.created_by = httpContext.get('USER')
+    data.created_by = httpContext.get('USER').email
     data.updated_by = ''
     return this.userService.create(data)
   }
@@ -59,7 +58,6 @@ export class UserController {
 
   @Get('id/:id')
   async findById(@Param('id') id: string): Promise<user> {
-    console.log(id)
     return this.userService.findById(Number(id))
   }
 
@@ -79,7 +77,7 @@ export class UserController {
   @Put(':id')
   @ApiBody({ type: UserDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<user> {
-    data.updated_by = httpContext.get('USER')
+    data.updated_by = httpContext.get('USER').email
     delete data.created_by
     return this.userService.update(id, data)
   }

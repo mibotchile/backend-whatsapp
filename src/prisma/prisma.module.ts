@@ -8,8 +8,9 @@ const prismaClientProvider: FactoryProvider<Promise<PrismaClient>> = {
   provide: PrismaClient,
   scope: Scope.REQUEST,
   inject: [REQUEST, PrismaClientManager],
-  useFactory: async (request: Request, manager: PrismaClientManager) =>
-    await manager.getClient(request)
+  useFactory: async (request: Request, manager: PrismaClientManager) => {
+    return await manager.getClient(request)
+  }
 }
 
 @Module({

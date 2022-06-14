@@ -20,7 +20,7 @@ export class GroupController {
   @ApiBody({ type: GroupDto, description: 'Create new group' })
   async create(@Body() data: any): Promise<group> {
     data.tags = data.tags ? data.tags : []
-    data.created_by = httpContext.get('USER')
+    data.created_by = httpContext.get('USER').email
     data.updated_by = ''
     return this.groupService.create(data)
   }
@@ -29,7 +29,6 @@ export class GroupController {
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findAll(@Query() queryParams: any): Promise<group[]> {
-    console.log(queryParams)
     return this.groupService.findAll({
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
@@ -60,14 +59,13 @@ export class GroupController {
 
   @Get('/id/:id')
   async findById(@Param('id') id: string): Promise<group> {
-    console.log(id)
     return this.groupService.findById(Number(id))
   }
 
   @Put(':id')
   @ApiBody({ type: GroupDto })
   async update(@Param('id') id: string, @Body() data: any): Promise<group> {
-    data.updated_by = httpContext.get('USER')
+    data.updated_by = httpContext.get('USER').email
     delete data.created_by
     return this.groupService.update(+id, data)
   }

@@ -106,10 +106,43 @@ export class GroupService {
     // return this.prisma.$queryRaw`select * from "public"."Group"`
   }
 
-  // async findMany(){
+  async finder (pageSize = 0, page = 0, where = {}) {
+    pageSize = Number(pageSize)
+    page = Number(page)
+    const pagination = {} as any
 
-  //   this.prisma.$queryRawUnsafe(`SELECT * , count(id) FROM group WHERE `)
-  // }
+    if (!isNaN(pageSize) && !isNaN(page)) {
+      page -= 1
+      const skip = (page < 0 ? 0 : page) * pageSize
+      pagination.skip = skip
+      pagination.take = pageSize
+    }
+    const groups = await this.prisma.group.findMany({
+      ...pagination,
+      where: { status: 1 },
+      orderBy: { id: 'asc' },
+      include: {
+        _count: {
+          select: {
+            id: true
+          }
+        }
+      }
+    })
+    if (groups.length === 0) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'No existen grupos que coincidan con este nombre'
+        },
+        HttpStatus.OK
+      )
+    }
+    const length = groups[0]
+
+    return { groups, length }
+  }
 
   async findActives (pageSize = 0, page = 0): Promise<any> {
     pageSize = Number(pageSize)

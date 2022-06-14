@@ -32,12 +32,20 @@ export class RolesGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest()
-    const routeName = request.route.path.split('/')[1]
-    if (routeName === 'status') return true
-    if (routeName === 'health') return true
+    // console.log(request.route)
+    // console.log(request.params)
+
+    const routePath = request.route.path.split('/')
+    if (routePath[1] === 'status') return true
+    if (routePath[1] === 'health') return true
+    if (routePath[1] === 'user' && routePath[2] === 'uid') {
+      if (request.params.uid === httpContext.get('USER').uid) {
+        return true
+      }
+    }
 
     const role = httpContext.get('ROLE')
-    const permissions = this.getPermissions(role.config, routeName)
+    const permissions = this.getPermissions(role.config, routePath[1])
     // console.log(permissions)
 
     let permissionRequired
@@ -66,7 +74,7 @@ export class RolesGuard implements CanActivate {
         {
           error: 'HttpStatus.FORBIDDEN',
           success: false,
-          message: `No tiene permisos para ${action} ${routeName} `
+          message: `No tiene permisos para ${action} ${routePath[1]} `
         },
         HttpStatus.FORBIDDEN
       )

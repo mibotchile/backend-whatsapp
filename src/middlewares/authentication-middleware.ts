@@ -51,7 +51,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
         .verifyIdToken(token)
 
       res.locals.user = userInfo
-      httpContext.set('USER', userInfo.email)
+      httpContext.set('USER', userInfo)
 
       const users = await this.prisma.user.findMany({ where: { email: userInfo.email }, include: { role: true } })
 
