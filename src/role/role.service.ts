@@ -39,6 +39,7 @@ export class RoleService {
         HttpStatus.NOT_ACCEPTABLE
       )
     }
+    data.config = this.roleConfigValidator(data.config)
 
     const roles = await this.prisma.role.findMany({
       where: {
@@ -130,6 +131,7 @@ export class RoleService {
     if (data.default) {
       await this.prisma.role.updateMany({ data: { default: false } })
     }
+    data.config = this.roleConfigValidator(data.config)
     const dataRes = await this.prisma.role.update({
       data,
       where: { id }
@@ -313,5 +315,13 @@ export class RoleService {
       success: true,
       message: 'Usuario desactivado exitosamente'
     }
+  }
+
+  roleConfigValidator(config) {
+    config = config.map(c => {
+      c.tabs = c.tabs.filter(t => t.permissions.length !== 0)
+      return c
+    })
+    return config
   }
 }
