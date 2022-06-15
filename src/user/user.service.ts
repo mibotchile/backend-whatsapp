@@ -158,10 +158,10 @@ export class UserService {
       throw new HttpException(
         {
           data: [],
-          success: false,
-          message: 'No existen usuarios que coincidan con este nombre'
+          success: true,
+          message: 'No existen usuarios que coincidan'
         },
-        HttpStatus.NOT_FOUND
+        HttpStatus.OK
       )
     }
     const aggregations = await this.prisma.user.aggregate({
