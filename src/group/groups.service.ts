@@ -1,9 +1,22 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common'
 import { PrismaClient, Prisma } from '@prisma/client'
+import { Group } from './group.entity'
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
+import { Repository, getRepository, EntityManager, Index } from 'typeorm'
+import * as httpContext from 'express-http-context'
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class GroupService {
-  constructor (private prisma: PrismaClient) {}
+  private connection
+  constructor (private prisma: PrismaClient, @InjectConnection() connection, @InjectRepository(Group) private groupsRepository: Repository<Group>) {
+    this.connection = connection
+    console.log(connection)
+    const index = this.connection.entityMetadatas.findIndex(e => e.name === 'Group')
+    this.connection.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
+    this.connection.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.group'
+    console.log('group service ')
+  }
+
   async create (data: Prisma.groupCreateInput): Promise<any> {
     // console.log(data)
     const groups = await this.prisma.group.findMany({
@@ -72,6 +85,11 @@ export class GroupService {
       success: true,
       message: 'Grupo actualozado exitosamente'
     }
+  }
+
+  async testt() {
+    console.log('repositoryyy   ----------------------group', this.groupsRepository)
+    return this.groupsRepository.find()
   }
 
   async findAll ({ pageSize, page }): Promise<any> {

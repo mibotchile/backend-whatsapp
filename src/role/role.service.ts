@@ -1,9 +1,24 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaClient, Prisma } from '@prisma/client'
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
+import { DataSource, Repository } from 'typeorm'
+import { Role } from './role.entity'
+import * as httpContext from 'express-http-context'
 
 @Injectable()
 export class RoleService {
-  constructor (private prisma: PrismaClient) {}
+  constructor (private prisma: PrismaClient, @InjectConnection('default')
+  private dataSource: DataSource, @InjectRepository(Role) private rolesRepo:Repository<Role>) {
+    const index = this.dataSource.entityMetadatas.findIndex(e => e.name === 'Role')
+    this.dataSource.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
+    this.dataSource.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.role'
+  }
+
+  async testt() {
+    // console.log('repositoryyy   ----------------------group', this.groupsRepository)
+    return this.rolesRepo.find()
+  }
+
   async create (data: Prisma.roleCreateInput): Promise<any> {
     if (!data.name) {
       throw new HttpException(

@@ -4,6 +4,7 @@ import { group } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { GroupDto } from './group.dto'
 import * as httpContext from 'express-http-context'
+import { Group } from './group.entity'
 
 @Controller('group')
 @ApiTags('Groups')
@@ -33,6 +34,13 @@ export class GroupController {
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
     })
+  }
+
+  @Get('testt')
+  @ApiQuery({ name: 'page', type: Number, required: false })
+  @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  async testt(@Query() queryParams: any): Promise<Group[]> {
+    return this.groupService.testt()
   }
 
   @Get('actives')

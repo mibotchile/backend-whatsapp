@@ -37,6 +37,11 @@ export class RoleController {
     })
   }
 
+  @Get('testt')
+  async testt(): Promise<any> {
+    return this.roleService.testt()
+  }
+
   @Get('actives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })

@@ -15,11 +15,24 @@ import { HealthController } from './health.controller'
 import { statusMonitorConfig } from './config/status-monitor.config'
 import { RolesGuard } from './guards/roles.guard'
 import { APP_GUARD } from '@nestjs/core'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Group } from './group/group.entity'
+import { Role } from './role/role.entity'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      entities: [Group, Role],
+      autoLoadEntities: false
     }),
     StatusMonitorModule.setUp(statusMonitorConfig),
     GroupModule,
@@ -30,11 +43,12 @@ import { APP_GUARD } from '@nestjs/core'
     ProjectModule
   ],
   controllers: [HealthController],
-  providers: [AppService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard
-    }]
+  providers: [AppService
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard
+    // }
+  ]
 })
 // export class AppModule {}
 export class AppModule implements NestModule {
@@ -43,9 +57,9 @@ export class AppModule implements NestModule {
       .apply(MibotSessionMiddleware)
       .exclude('/status', '/health/(.*)')
       .forRoutes('*')
-    consumer
-      .apply(AuthenticationMiddleware)
-      .exclude('/status', '/health/(.*)')
-      .forRoutes('*')
+    // consumer
+    //   .apply(AuthenticationMiddleware)
+    //   .exclude('/status', '/health/(.*)')
+    //   .forRoutes('*')
   }
 }

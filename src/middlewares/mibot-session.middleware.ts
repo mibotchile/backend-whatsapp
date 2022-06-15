@@ -26,6 +26,8 @@ export class MibotSessionMiddleware implements NestMiddleware {
     res.locals.PROJECT_UID = mibotSession.project_uid
     res.locals.CLIENT_UID = mibotSession.client_uid
     httpContext.set('PROJECT_UID', mibotSession.project_uid)
+    console.log(httpContext.get('PROJECT_UID'))
+
     httpContext.set('CLIENT_UID', mibotSession.client_uid)
     next()
   }
