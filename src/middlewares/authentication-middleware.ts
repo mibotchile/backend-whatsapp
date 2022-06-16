@@ -39,7 +39,6 @@ export class AuthenticationMiddleware implements NestMiddleware {
     }
 
     const token = req.headers.authorization.split(' ')[1]
-    // console.log('Token:', token);
 
     if (validator.isJWT(token) !== true) {
       console.log('Token invalid!')
@@ -56,10 +55,6 @@ export class AuthenticationMiddleware implements NestMiddleware {
       const project_uid = httpContext.get('PROJECT_UID')
 
       const [user] = await this.dataSource.query(`SELECT u.*,r.name as role_name,r.config as role_config FROM project_${project_uid}.user u INNER JOIN project_${project_uid}.role r ON r.id=u.role_id WHERE u.email='${userInfo.email}'`)
-      //   const user = await this.userService.findByEmail(userInfo.email)
-      console.log(user)
-
-      // console.log({ users })
 
       if (!user) {
         res.status(406).json(
@@ -69,19 +64,10 @@ export class AuthenticationMiddleware implements NestMiddleware {
             message: 'Este usuario no esta registrado en este servicio'
           }
         )
-        // throw new HttpException(
-        //   {
-        //     data: [],
-        //     success: false,
-        //     message: 'this user does not have permission to enter'
-        //   },
-        //   HttpStatus.NOT_ACCEPTABLE
-        // )
       } else {
         httpContext.set('ROLE', { name: user.role_name, config: user.role_config })
         next()
       }
-      // if(decodedToken.email)
     } catch (error) {
       console.log(error)
 
