@@ -10,7 +10,6 @@ node version -> 16.15.0
 
 ```bash
 $ npm install
-$ npx prisma generate
 ```
 
 ## API Definition  ```/api```

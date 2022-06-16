@@ -3,8 +3,6 @@ import { ConfigModule } from '@nestjs/config'
 import { GroupModule } from './group/group.module'
 import { ChannelModule } from './channel/channel.module'
 import { resolve } from 'node:path'
-import { PrismaModule } from './prisma/prisma.module'
-import { AppService } from './app.service'
 import { RoleModule } from './role/role.module'
 import { UserModule } from './user/user.module'
 import { ProjectModule } from './projects/project.module'
@@ -15,28 +13,42 @@ import { HealthController } from './health.controller'
 import { statusMonitorConfig } from './config/status-monitor.config'
 import { RolesGuard } from './guards/roles.guard'
 import { APP_GUARD } from '@nestjs/core'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Group } from './group/group.entity'
+import { Role } from './role/role.entity'
+import { User } from './user/user.entity'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
     }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      entities: [Group, Role, User],
+      autoLoadEntities: false,
+      logging: true
+    }),
     StatusMonitorModule.setUp(statusMonitorConfig),
     GroupModule,
     ChannelModule,
-    PrismaModule,
     RoleModule,
     UserModule,
     ProjectModule
   ],
   controllers: [HealthController],
-  providers: [AppService,
+  providers: [
     {
       provide: APP_GUARD,
       useClass: RolesGuard
-    }]
+    }
+  ]
 })
-// export class AppModule {}
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
