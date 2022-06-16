@@ -1,15 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
-import * as httpContext from 'express-http-context'
 
-// @Entity('group')
-// @Entity('group', { schema: 'project_' + httpContext.get('PROJECT_UID') })
-@Entity('group', { schema: 'project_juasjuas' })
+@Entity('group', { schema: 'public' })
 export class Group {
-  constructor() {
-    console.log('Entidaddd   ...', 'project_' + httpContext.get('PROJECT_UID'))
-    console.log('calse grupo entidadi', this)
-  }
-
     @PrimaryGeneratedColumn()
       id: number
 
@@ -31,10 +23,10 @@ export class Group {
     @Column()
       updated_by: string
 
-    @Column({ default: new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now()) })
+    @Column()
       created_at: string
 
-    @Column({ default: new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now()) })
+    @Column()
       updated_at: string
 
     @Column({ default: 1 })

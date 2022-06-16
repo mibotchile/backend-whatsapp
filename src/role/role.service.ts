@@ -1,25 +1,19 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
-import { PrismaClient, Prisma } from '@prisma/client'
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, Repository } from 'typeorm'
+import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+import { DataSource, ILike, Not, Repository } from 'typeorm'
 import { Role } from './role.entity'
 import * as httpContext from 'express-http-context'
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class RoleService {
-  constructor (private prisma: PrismaClient, @InjectConnection('default')
+  constructor (@InjectDataSource('default')
   private dataSource: DataSource, @InjectRepository(Role) private rolesRepo:Repository<Role>) {
     const index = this.dataSource.entityMetadatas.findIndex(e => e.name === 'Role')
     this.dataSource.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
     this.dataSource.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.role'
   }
 
-  async testt() {
-    // console.log('repositoryyy   ----------------------group', this.groupsRepository)
-    return this.rolesRepo.find()
-  }
-
-  async create (data: Prisma.roleCreateInput): Promise<any> {
+  async create (data:Role): Promise<any> {
     if (!data.name) {
       throw new HttpException(
         {
@@ -55,12 +49,9 @@ export class RoleService {
       )
     }
 
-    const roles = await this.prisma.role.findMany({
+    const roles = await this.rolesRepo.find({
       where: {
-        name: {
-          equals: data.name,
-          mode: 'insensitive'
-        }
+        name: ILike(`%${data.name}%`)
       }
     })
     if (roles.length > 0) {
@@ -74,13 +65,11 @@ export class RoleService {
       )
     }
     if (data.default) {
-      await this.prisma.role.updateMany({ data: { default: false } })
+      await this.rolesRepo.createQueryBuilder().update().set({ default: false }).execute()
     }
-
+    data.config = this.roleConfigValidator(data.config)
     try {
-      const dataRes = await this.prisma.role.create({
-        data
-      })
+      const dataRes = await this.rolesRepo.insert(data)
       return {
         data: dataRes,
         success: true,
@@ -98,7 +87,7 @@ export class RoleService {
     }
   }
 
-  async update (id: number, data: Prisma.roleUpdateInput): Promise<any> {
+  async update (id: number, data: Role): Promise<any> {
     if (isNaN(id)) {
       throw new HttpException(
         {
@@ -121,13 +110,10 @@ export class RoleService {
     }
 
     if (data.name) {
-      const roles = await this.prisma.role.findMany({
+      const roles = await this.rolesRepo.find({
         where: {
-          name: {
-            equals: data.name as string,
-            mode: 'insensitive'
-          },
-          NOT: { id }
+          name: ILike(data.name),
+          id: Not(id)
         }
       })
 
@@ -143,12 +129,10 @@ export class RoleService {
       }
     }
     if (data.default) {
-      await this.prisma.role.updateMany({ data: { default: false } })
+      await this.rolesRepo.createQueryBuilder().update().set({ default: false }).execute()
     }
-    const dataRes = await this.prisma.role.update({
-      data,
-      where: { id }
-    })
+    data.config = this.roleConfigValidator(data.config)
+    const dataRes = await this.rolesRepo.update(id, data)
     return {
       data: dataRes,
       success: true,
@@ -167,16 +151,14 @@ export class RoleService {
       pagination.skip = skip
       pagination.take = pageSize
     }
-    const roles = await this.prisma.role.findMany({
+    const roles = await this.rolesRepo.find({
       ...pagination,
       include: {
         users: true
       }
     })
-    const aggrgations = await this.prisma.role.aggregate({
-      _count: { id: true }
-    })
-    const length = aggrgations._count.id
+
+    const length = await this.rolesRepo.createQueryBuilder().getCount()
     return {
       data: {
         page,
@@ -200,15 +182,12 @@ export class RoleService {
       pagination.skip = skip
       pagination.take = pageSize
     }
-    const roles = await this.prisma.role.findMany({
+    const roles = await this.rolesRepo.find({
       ...pagination,
       where: { status: 1 }
     })
-    const aggrgations = await this.prisma.role.aggregate({
-      _count: { id: true },
-      where: { status: 1 }
-    })
-    const length = aggrgations._count.id
+
+    const length = await this.rolesRepo.createQueryBuilder().where('Role.status=1').getCount()
     return {
       data: {
         page,
@@ -232,15 +211,12 @@ export class RoleService {
       pagination.skip = skip
       pagination.take = pageSize
     }
-    const roles = await this.prisma.role.findMany({
+    const roles = await this.rolesRepo.find({
       ...pagination,
       where: { status: 0 }
     })
-    const aggrgations = await this.prisma.role.aggregate({
-      _count: { id: true },
-      where: { status: 0 }
-    })
-    const length = aggrgations._count.id
+
+    const length = await this.rolesRepo.createQueryBuilder().where('Role.status=0').getCount()
     return {
       data: {
         page,
@@ -254,7 +230,7 @@ export class RoleService {
   }
 
   async findById (id: number): Promise<any> {
-    const role = await this.prisma.role.findUnique({
+    const role = await this.rolesRepo.findOne({
       where: { id }
     })
     return {
@@ -275,12 +251,9 @@ export class RoleService {
       pagination.skip = skip
       pagination.take = pageSize
     }
-    const roles = await this.prisma.role.findMany({
+    const roles = await this.rolesRepo.find({
       where: {
-        name: {
-          contains: name,
-          mode: 'insensitive'
-        }
+        name: ILike(`%${name}%`)
       },
       ...pagination
     })
@@ -296,16 +269,7 @@ export class RoleService {
       )
     }
 
-    const aggrgations = await this.prisma.role.aggregate({
-      _count: { id: true },
-      where: {
-        name: {
-          contains: name,
-          mode: 'insensitive'
-        }
-      }
-    })
-    const length = aggrgations._count.id
+    const length = await this.rolesRepo.createQueryBuilder().where(`Role.name ILIKE '%${name}%'`).getCount()
     return {
       data: {
         page,
@@ -319,14 +283,19 @@ export class RoleService {
   }
 
   async remove (id: number) {
-    const roleDeleted = await this.prisma.role.update({
-      data: { status: 0 },
-      where: { id }
-    })
+    const roleDeleted = await this.rolesRepo.update(id, { status: 0 })
     return {
       data: roleDeleted,
       success: true,
       message: 'Usuario desactivado exitosamente'
     }
+  }
+
+  roleConfigValidator(config) {
+    config = config.map(c => {
+      c.tabs = c.tabs.filter(t => t.permissions.length !== 0)
+      return c
+    })
+    return config
   }
 }

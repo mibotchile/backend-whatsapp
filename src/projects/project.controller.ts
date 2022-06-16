@@ -1,4 +1,4 @@
-import { Controller, Post, Res } from '@nestjs/common'
+import { Controller, Param, Post, Res } from '@nestjs/common'
 import { ProjectService } from './project.service'
 import { ApiHeader, ApiTags } from '@nestjs/swagger'
 
@@ -13,8 +13,8 @@ import { ApiHeader, ApiTags } from '@nestjs/swagger'
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Post()
-  async create(@Res() res): Promise<any> {
-    return this.projectService.create(res)
+  @Post('/:uid')
+  async create(@Param('uid') uid:string, @Res() res): Promise<any> {
+    return this.projectService.create(uid, res)
   }
 }

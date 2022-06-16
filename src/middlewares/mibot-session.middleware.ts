@@ -22,6 +22,18 @@ export class MibotSessionMiddleware implements NestMiddleware {
       })
       return
     }
+    const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
+    if (req.body) {
+      switch (req.method) {
+        case 'POST':
+          req.body.created_at = now
+          req.body.updated_at = now
+          break
+        case 'PUT':
+          req.body.updated_at = now
+          break
+      }
+    }
 
     res.locals.PROJECT_UID = mibotSession.project_uid
     res.locals.CLIENT_UID = mibotSession.client_uid

@@ -1,13 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { Request } from 'express'
 import { Observable } from 'rxjs'
-import { PrismaClient } from '@prisma/client'
 import * as httpContext from 'express-http-context'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor (private readonly prisma:PrismaClient) {}
-
   private getPermissions(roleConfig, routeName): string[] {
     let permissions = []
     for (const rc of roleConfig) {
@@ -38,6 +35,7 @@ export class RolesGuard implements CanActivate {
     const routePath = request.route.path.split('/')
     if (routePath[1] === 'status') return true
     if (routePath[1] === 'health') return true
+    if (routePath[1] === 'project') return true
     if (routePath[1] === 'user' && routePath[2] === 'uid') {
       if (request.params.uid === httpContext.get('USER').uid) {
         return true

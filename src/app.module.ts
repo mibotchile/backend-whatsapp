@@ -3,8 +3,6 @@ import { ConfigModule } from '@nestjs/config'
 import { GroupModule } from './group/group.module'
 import { ChannelModule } from './channel/channel.module'
 import { resolve } from 'node:path'
-import { PrismaModule } from './prisma/prisma.module'
-import { AppService } from './app.service'
 import { RoleModule } from './role/role.module'
 import { UserModule } from './user/user.module'
 import { ProjectModule } from './projects/project.module'
@@ -18,6 +16,7 @@ import { APP_GUARD } from '@nestjs/core'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Group } from './group/group.entity'
 import { Role } from './role/role.entity'
+import { User } from './user/user.entity'
 
 @Module({
   imports: [
@@ -31,35 +30,34 @@ import { Role } from './role/role.entity'
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [Group, Role],
-      autoLoadEntities: false
+      entities: [Group, Role, User],
+      autoLoadEntities: false,
+      logging: true
     }),
     StatusMonitorModule.setUp(statusMonitorConfig),
     GroupModule,
     ChannelModule,
-    PrismaModule,
     RoleModule,
     UserModule,
     ProjectModule
   ],
   controllers: [HealthController],
-  providers: [AppService
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RolesGuard
-    // }
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    }
   ]
 })
-// export class AppModule {}
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(MibotSessionMiddleware)
       .exclude('/status', '/health/(.*)')
       .forRoutes('*')
-    // consumer
-    //   .apply(AuthenticationMiddleware)
-    //   .exclude('/status', '/health/(.*)')
-    //   .forRoutes('*')
+    consumer
+      .apply(AuthenticationMiddleware)
+      .exclude('/status', '/health/(.*)')
+      .forRoutes('*')
   }
 }

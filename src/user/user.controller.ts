@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { UserService } from './user.service'
-import { user } from '@prisma/client'
 import { ApiBody, ApiHeader, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UserDto, UserResponse } from './user.dto'
 import * as httpContext from 'express-http-context'
+import { User } from './user.entity'
 
 @Controller('user')
 @ApiTags('Users')
@@ -18,7 +18,7 @@ export class UserController {
 
   @Post()
   @ApiBody({ type: UserDto, description: 'Create new user' })
-  async create(@Body() data: any): Promise<user> {
+  async create(@Body() data: any): Promise<User> {
     data.groups_id = data.groups_id ? data.groups_id : []
     data.created_by = httpContext.get('USER').email
     data.updated_by = ''
@@ -28,7 +28,7 @@ export class UserController {
   @Get()
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findAll(@Query() queryParams: any): Promise<user[]> {
+  async findAll(@Query() queryParams: any): Promise<User[]> {
     return this.userService.findAll({
       pageSize: Number(queryParams.pageSize),
       page: Number(queryParams.page)
@@ -38,31 +38,31 @@ export class UserController {
   @Get('actives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findActives(@Query() queryParams: any): Promise<user[]> {
+  async findActives(@Query() queryParams: any): Promise<User[]> {
     return this.userService.findActives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
   @Get('inactives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findInactives(@Query() queryParams: any): Promise<user[]> {
+  async findInactives(@Query() queryParams: any): Promise<User[]> {
     return this.userService.findInactives(Number(queryParams.pageSize), Number(queryParams.page))
   }
 
   @Get('search')
   @ApiQuery({ name: 'name', type: String, required: false })
-  async find(@Query() queryParams: any): Promise<user> {
+  async find(@Query() queryParams: any): Promise<User> {
     if (!queryParams.name)queryParams.name = ''
     return this.userService.find(queryParams)
   }
 
   @Get('id/:id')
-  async findById(@Param('id') id: string): Promise<user> {
+  async findById(@Param('id') id: string): Promise<User> {
     return this.userService.findById(Number(id))
   }
 
   @Get('uid/:uid')
-  async findByUid(@Param('uid') uid: string): Promise<user> {
+  async findByUid(@Param('uid') uid: string): Promise<User> {
     return this.userService.findByUid(uid)
   }
 
@@ -70,13 +70,13 @@ export class UserController {
     type: UserResponse
   })
   @Get(':id/groups')
-  async findGroupsById(@Param('id') id: string): Promise<user> {
+  async findGroupsById(@Param('id') id: string): Promise<User> {
     return this.userService.findGroupsById(Number(id))
   }
 
   @Put(':id')
   @ApiBody({ type: UserDto })
-  async update(@Param('id') id: string, @Body() data: any): Promise<user> {
+  async update(@Param('id') id: string, @Body() data: any): Promise<User> {
     data.updated_by = httpContext.get('USER').email
     delete data.created_by
     return this.userService.update(id, data)

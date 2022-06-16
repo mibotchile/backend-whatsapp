@@ -3,11 +3,12 @@ import validator from 'validator'
 import * as fs from 'fs'
 import { ForbiddenException, Injectable, NestMiddleware } from '@nestjs/common'
 import * as httpContext from 'express-http-context'
-import { PrismaClient } from '@prisma/client'
+import { InjectDataSource } from '@nestjs/typeorm'
+import { DataSource } from 'typeorm'
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware {
-  constructor (private readonly prisma:PrismaClient) {
+  constructor (@InjectDataSource('default') private dataSource:DataSource) {
     if (admin.apps.length === 0) {
       const credentialsCert = JSON.parse(
         fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, {
@@ -52,12 +53,15 @@ export class AuthenticationMiddleware implements NestMiddleware {
 
       res.locals.user = userInfo
       httpContext.set('USER', userInfo)
+      const project_uid = httpContext.get('PROJECT_UID')
 
-      const users = await this.prisma.user.findMany({ where: { email: userInfo.email }, include: { role: true } })
+      const [user] = await this.dataSource.query(`SELECT u.*,r.name as role_name,r.config as role_config FROM project_${project_uid}.user u INNER JOIN project_${project_uid}.role r ON r.id=u.role_id WHERE u.email='${userInfo.email}'`)
+      //   const user = await this.userService.findByEmail(userInfo.email)
+      console.log(user)
 
       // console.log({ users })
 
-      if (users.length === 0) {
+      if (!user) {
         res.status(406).json(
           {
             data: [],
@@ -74,7 +78,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
         //   HttpStatus.NOT_ACCEPTABLE
         // )
       } else {
-        httpContext.set('ROLE', users[0].role)
+        httpContext.set('ROLE', { name: user.role_name, config: user.role_config })
         next()
       }
       // if(decodedToken.email)
