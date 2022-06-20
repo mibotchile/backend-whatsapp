@@ -143,7 +143,7 @@ export class UserService {
       order: { id: 'asc' },
       relations: {
         role: true
-    }
+      }
     })
 
     if (usersDB.length === 0) {
@@ -242,10 +242,7 @@ export class UserService {
 
   async find ({ pageSize, page, name }): Promise<any> {
     const where = {
-      name: {
-        contains: name,
-        mode: 'insensitive'
-      }
+      name: ILike(`%${name}%`)
     }
     const { users, length } = await this.getFullDataUsers(pageSize, page, where)
 

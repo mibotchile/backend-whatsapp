@@ -56,6 +56,17 @@ export class RoleService {
       }
     })
     if (roles.length > 0) {
+      if (roles[0].status === 0) {
+        await this.rolesRepo.update(roles[0].id, { status: 1 })
+        throw new HttpException(
+          {
+            data: [],
+            success: false,
+            message: 'Existe un grupo con el mismo nombre desactivado y se activo'
+          },
+          HttpStatus.OK
+        )
+      }
       throw new HttpException(
         {
           data: [],
@@ -119,6 +130,18 @@ export class RoleService {
       })
 
       if (roles.length > 0) {
+        if (roles[0].status === 0) {
+          await this.rolesRepo.update(roles[0].id, { status: 1 })
+          throw new HttpException(
+            {
+              data: [],
+              success: false,
+              message: 'Existe un grupo con el mismo nombre desactivado y se activo'
+            },
+            HttpStatus.OK
+          )
+        }
+
         throw new HttpException(
           {
             data: [],
