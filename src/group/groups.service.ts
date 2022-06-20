@@ -22,6 +22,17 @@ export class GroupService {
       }
     })
     if (groups.length > 0) {
+      if (groups[0].status === 0) {
+        await this.groupsRepository.update(groups[0].id, { status: 1 })
+        throw new HttpException(
+          {
+            data: [],
+            success: false,
+            message: 'Existe un grupo con el mismo nombre desactivado y se activo'
+          },
+          HttpStatus.OK
+        )
+      }
       throw new HttpException(
         {
           data: [],
@@ -52,6 +63,17 @@ export class GroupService {
       })
 
       if (groups.length > 0) {
+        if (groups[0].status === 0) {
+          await this.groupsRepository.update(groups[0].id, { status: 1 })
+          throw new HttpException(
+            {
+              data: [],
+              success: false,
+              message: 'Existe un grupo con el mismo nombre desactivado y se activo'
+            },
+            HttpStatus.OK
+          )
+        }
         throw new HttpException(
           {
             data: [],
