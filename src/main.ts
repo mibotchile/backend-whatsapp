@@ -7,12 +7,21 @@ import { FileLoggerService } from './logger/file-logger.service'
 import * as httpContext from 'express-http-context'
 import { Transport } from '@nestjs/microservices'
 import { ClientModule } from './messages/client/client.module'
+import * as fs from 'node:fs'
 
 async function bootstrap() {
   console.log('ENV: ', process.env.ENVIROMENT)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
+
+  const httpsOptions = {} as any
+  if ((process.env.SSL && process.env.SSL === 'true') || process.env.NODE_ENV === 'production') {
+    console.log('SSL ENABLED')
+    httpsOptions.key = fs.readFileSync(process.env.SSL_KEY)
+    httpsOptions.cert = fs.readFileSync(process.env.SSL_CERT)
+  }
   const app = await NestFactory.create(AppModule, {
-    logger: new FileLoggerService()
+    logger: new FileLoggerService(),
+    httpsOptions
   })
   app.use(cors({ credentials: true, origin: true }))
   app.use(httpContext.middleware)

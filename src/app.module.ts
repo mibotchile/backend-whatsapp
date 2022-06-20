@@ -31,7 +31,7 @@ import { User } from './user/user.entity'
       database: process.env.DB_NAME,
       entities: [Group, Role, User],
       autoLoadEntities: false,
-      logging: true
+      logging: false
     }),
     StatusMonitorModule.setUp(statusMonitorConfig),
     GroupModule,
