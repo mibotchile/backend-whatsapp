@@ -1,7 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { GroupModule } from './group/group.module'
-import { ChannelModule } from './channel/channel.module'
 import { resolve } from 'node:path'
 import { RoleModule } from './role/role.module'
 import { UserModule } from './user/user.module'
@@ -36,7 +35,6 @@ import { User } from './user/user.entity'
     }),
     StatusMonitorModule.setUp(statusMonitorConfig),
     GroupModule,
-    ChannelModule,
     RoleModule,
     UserModule,
     ProjectModule

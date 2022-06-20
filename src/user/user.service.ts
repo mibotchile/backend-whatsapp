@@ -143,13 +143,7 @@ export class UserService {
       order: { id: 'asc' },
       relations: {
         role: true
-      },
-      select: {
-        id: true,
-        uid: true,
-        email: true,
-        groups_id: true
-      }
+    }
     })
 
     if (usersDB.length === 0) {
