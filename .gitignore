@@ -42,7 +42,10 @@ lerna-debug.log*
 /src/config/google-credentials/*
 !/src/config/google-credentials/sample.json
 
+
 logs/
+request/
+configChannel.json
 
 
 

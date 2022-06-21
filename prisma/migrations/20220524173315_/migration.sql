@@ -49,7 +49,7 @@ CREATE TABLE "channel" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "phone_number" VARCHAR(50) NOT NULL,
-    "config_id" INTEGER NOT NULL,
+    "config_id" INTEGER,
     "created_by" VARCHAR(120) NOT NULL,
     "updated_by" VARCHAR(120) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -58,10 +58,10 @@ CREATE TABLE "channel" (
     CONSTRAINT "channel_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "channel_config" (
+create TABLE "channel_config" (
     "id" SERIAL NOT NULL,
     "channel_id" INTEGER NOT NULL,
-    "name" VARCHAR(50) NOT NULL,
+    "channel_number" VARCHAR(50) NOT NULL,
     "menus" JSONB NOT NULL,
     "messages" JSONB NOT NULL,
     "quizes" JSONB NOT NULL,

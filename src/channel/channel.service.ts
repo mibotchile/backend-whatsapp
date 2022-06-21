@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common'
 import { Channel } from './channel.entity'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, ILike, Not, Repository } from 'typeorm'
+import { DataSource, ILike, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
 import * as twilio from 'twilio'
 import { ChannelConfig } from './channel_config.entity'
@@ -47,24 +47,24 @@ export class ChannelService {
     return {
       data: data_res,
       success: true,
-      message: 'grupo creado exitosamente'
+      message: 'canal creado exitosamente'
     }
   }
 
-  async createConfig (data: ChannelConfig): Promise<any> {
-    const configs = await this.channelConfigRepository.find({
+  async update (id:number, data: Channel): Promise<any> {
+    const channels = await this.channelRepository.find({
       where: {
-        channel_id: data.channel_id
+        name: ILike(data.name)
       }
     })
-    if (configs.length > 0) {
-      if (configs[0].status === 0) {
-        await this.channelConfigRepository.update(configs[0].id, { status: 1 })
+    if (channels.length > 0) {
+      if (channels[0].status === 0) {
+        await this.channelRepository.update(channels[0].id, { status: 1 })
         throw new HttpException(
           {
             data: [],
             success: false,
-            message: 'Existe una configuracion con el mismo channel_id desactivado y se activo'
+            message: 'Existe un canal con el mismo nombre desactivado y se activo'
           },
           HttpStatus.OK
         )
@@ -73,11 +73,48 @@ export class ChannelService {
         {
           data: [],
           success: false,
-          message: 'Ya existe una configuracion para este canal'
+          message: 'Ya existe un canal con el mismo nombre'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
     }
+
+    const data_res = await this.channelRepository.update(id, data)
+    return {
+      data: data_res,
+      success: true,
+      message: 'canal actualizado exitosamente'
+    }
+  }
+
+  async createConfig (data: ChannelConfig): Promise<any> {
+    // const configs = await this.channelConfigRepository.find({
+    //   where: {
+    //     channel_id: data.channel_id
+    //   }
+    // })
+    // if (configs.length > 0) {
+    //   if (configs[0].status === 0) {
+    //     await this.channelConfigRepository.update(configs[0].id, { status: 1 })
+    //     throw new HttpException(
+    //       {
+    //         data: [],
+    //         success: false,
+    //         message: 'Existe una configuracion con el mismo channel_id desactivado y se activo'
+    //       },
+    //       HttpStatus.OK
+    //     )
+    //   }
+    //   throw new HttpException(
+    //     {
+    //       data: [],
+    //       success: false,
+    //       message: 'Ya existe una configuracion para este canal'
+    //     },
+    //     HttpStatus.NOT_ACCEPTABLE
+    //   )
+    // }
+    if (!data.channel_id) data.channel_id = 1
     if (!data.menus) data.menus = []
     if (!data.quizes)data.quizes = []
     if (!data.questions)data.questions = []
@@ -87,7 +124,43 @@ export class ChannelService {
     return {
       data: data_res,
       success: true,
-      message: 'canal creado exitosamente'
+      message: 'configuracion de canal creada exitosamente'
+    }
+  }
+
+  async updateConfig (phoneNumber:string, data: ChannelConfig): Promise<any> {
+    // const configs = await this.channelConfigRepository.find({
+    //   where: {
+    //     channel_id: data.channel_id
+    //   }
+    // })
+    // if (configs.length > 0) {
+    //   if (configs[0].status === 0) {
+    //     await this.channelConfigRepository.update(configs[0].id, { status: 1 })
+    //     throw new HttpException(
+    //       {
+    //         data: [],
+    //         success: false,
+    //         message: 'Existe una configuracion con el mismo channel_id desactivado y se activo'
+    //       },
+    //       HttpStatus.OK
+    //     )
+    //   }
+    //   throw new HttpException(
+    //     {
+    //       data: [],
+    //       success: false,
+    //       message: 'Ya existe una configuracion para este canal'
+    //     },
+    //     HttpStatus.NOT_ACCEPTABLE
+    //   )
+    // }
+
+    const data_res = await this.channelConfigRepository.update({ channel_number: phoneNumber }, data)
+    return {
+      data: data_res,
+      success: true,
+      message: 'configuracion de canal actualizado exitosamente'
     }
   }
 

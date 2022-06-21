@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common'
-import { ApiHeader, ApiTags } from '@nestjs/swagger'
+import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common'
+import { ApiBody, ApiHeader, ApiTags } from '@nestjs/swagger'
 import { ChannelService } from './channel.service'
 import { ChannelConfig } from './channel_config.entity'
 import * as httpContext from 'express-http-context'
 import { Channel } from 'amqp-connection-manager'
+import { ChannelDto } from './channel.dto'
+import { ChannelConfigDto } from './channel_config.dto'
 
 @Controller('channel')
 @ApiTags('Channels')
@@ -21,20 +23,39 @@ export class ChannelController {
     return this.channelService.findNumbers()
   }
 
-  @Post('createConfig')
+  @Post('config')
+  @ApiBody({ type: ChannelConfigDto })
   async createConfig(@Body() data: ChannelConfig): Promise<any> {
     data.created_by = httpContext.get('USER').email
     data.updated_by = ''
     return this.channelService.createConfig(data)
   }
 
+  @Put('config/:phoneNumber')
+  @ApiBody({ type: ChannelConfigDto })
+  async updateConfig(@Param('phoneNumber') phoneNumber: string, @Body() data: ChannelConfig): Promise<any> {
+    delete data.created_by
+    data.updated_by = httpContext.get('USER').email
+    return this.channelService.updateConfig(phoneNumber, data)
+  }
+
   @Post()
+  @ApiBody({ type: ChannelDto })
   async create(@Body() data: Channel): Promise<any> {
     console.log(data)
 
     data.created_by = httpContext.get('USER').email
     data.updated_by = ''
     return this.channelService.create(data)
+  }
+
+  @Put(':id')
+  @ApiBody({ type: ChannelDto })
+  async update(@Param('id') id: string, @Body() data: Channel): Promise<any> {
+    console.log(data)
+    data.created_by = httpContext.get('USER').email
+    data.updated_by = ''
+    return this.channelService.update(Number(id), data)
   }
 
   @Get('phoneNumber/:number')
