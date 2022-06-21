@@ -48,12 +48,29 @@ CREATE TABLE "user" (
 CREATE TABLE "channel" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "description" TEXT NOT NULL,
-    "tags" JSONB NOT NULL,
+    "phone_number" VARCHAR(50) NOT NULL,
+    "config_id" INTEGER NOT NULL,
     "created_by" VARCHAR(120) NOT NULL,
     "updated_by" VARCHAR(120) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "status" SMALLINT NOT NULL DEFAULT 1,
     CONSTRAINT "channel_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "channel_config" (
+    "id" SERIAL NOT NULL,
+    "channel_id" INTEGER NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "menus" JSONB NOT NULL,
+    "messages" JSONB NOT NULL,
+    "quizes" JSONB NOT NULL,
+    "questions" JSONB NOT NULL,
+    "steps" JSONB NOT NULL,
+    "created_by" VARCHAR(120) NOT NULL,
+    "updated_by" VARCHAR(120) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "status" SMALLINT NOT NULL DEFAULT 1,
+    CONSTRAINT "channel_config_pkey" PRIMARY KEY ("id")
 );

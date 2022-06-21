@@ -17,6 +17,8 @@ import { Group } from './group/group.entity'
 import { Role } from './role/role.entity'
 import { User } from './user/user.entity'
 import { ChannelModule } from './channel/channel.module'
+import { ChannelConfig } from './channel/channel_config.entity'
+import { Channel } from './channel/channel.entity'
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import { ChannelModule } from './channel/channel.module'
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [Group, Role, User],
+      entities: [Group, Role, User, Channel, ChannelConfig],
       autoLoadEntities: false,
       logging: false
     }),

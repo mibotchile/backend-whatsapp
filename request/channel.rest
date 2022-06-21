@@ -1,0 +1,137 @@
+POST http://localhost:3030/channel/createConfig
+content-type: application/json
+mibot_session: {"project_uid":"vnbLnzdM0b3BDClTPVPL","client_uid":"lEvxdkHyFXdOX4ieEMHs"}
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImY5MGZiMWFlMDQ4YTU0OGZiNjgxYWQ2MDkyYjBiODY5ZWE0NjdhYzYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiRmVybmFuZG8gUm9kcmlndWV6IiwiZW1haWwiOiJmZXJuYW5kb0BvbmJvdGdvLmNvbSIsInBhc3N3b3JkIjoib25ib3RnbzE1OSIsInJvbCI6InVzZXIiLCJkaXNwbGF5TmFtZSI6IkZlcm5hbmRvIFJvZHJpZ3VleiIsInVpZF9jbGllbnQiOm51bGwsInNlcnZpY2VzIjp7InRlcnJlbm8iOmZhbHNlLCJtaWJvdGFpciI6dHJ1ZSwidm9pY2Vib3QiOnRydWV9LCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdmFsaGFsbGEtb25ib3RnbyIsImF1ZCI6InZhbGhhbGxhLW9uYm90Z28iLCJhdXRoX3RpbWUiOjE2NTU4NDY2NjQsInVzZXJfaWQiOiJNeUhkZmhPZFJ3WURwUUxPaGFQb0hXWGNYVXIxIiwic3ViIjoiTXlIZGZoT2RSd1lEcFFMT2hhUG9IV1hjWFVyMSIsImlhdCI6MTY1NTg0NjY2NCwiZXhwIjoxNjU1ODUwMjY0LCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJmZXJuYW5kb0BvbmJvdGdvLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.CP_CBk9YwiGYwB8L8jVkuP-UH6FQUr79g5FQOBJ4SbDSXcypfKfVty2N7jHQSWzyopUCgrxoEqYnXicHyiFgoeyDOAnzefQiohpXYfKqqbtVA1jjwfZQZkG--3U4lUmUmndzJYO-tVlCWHqvonU4djhrZb9gC70W6V4_qvSq5P2ZDmNhltUqbZC_cQkT4h_UAEJaei9gVksBaSFAP-AxoaUlNQMulvHgrBHLA8EoQ1x5_t3qrnlwzUrKYd8zgW8nlph4y8Z0y6XJsyNySYfMLpNi5bx9lsyHeEh-e4-h_5cnRI_308fvYPZsXDwS3Rkkk_G5M5fXhiFjgTGPa9bB4Q
+
+{
+	"channel_id":1,
+	"channel_number":"+19206787641",
+    "menus": [
+        {
+            "id": 1,
+            "title": "titulo del menu",
+            "options": [
+                {
+                    "id": 1,
+                    "value": "opcion 1",
+                    "action": "msg2"
+                },
+                {
+                    "id": 2,
+                    "value": "opcion 2",
+                    "action": "msg3"
+                },
+                {
+                    "id": 3,
+                    "value": "opcion 3",
+                    "action": "2menu"
+                },
+                {
+                    "id": 4,
+                    "value": "opcion 4",
+                    "action": "msg4"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "title": "titulo del menu de la opcion 3",
+            "items": [
+                {
+                    "id": 1,
+                    "value": "opcion 1"
+                },
+                {
+                    "id": 2,
+                    "value": "opcion 2"
+                },
+                {
+                    "id": 3,
+                    "value": "opcion 3"
+                },
+                {
+                    "id": 4,
+                    "value": "opcion 4"
+                }
+            ]
+        }
+    ],
+    "messages": [
+        {
+            "id": 1,
+            "message": "hola gracias por escoger la opcion 4"
+        },
+        {
+            "id": 2,
+            "message": "hola gracias por escoger la opcion 1"
+        },
+        {
+            "id": 3,
+            "message": "hola gracias por escoger la opcion 2"
+        },
+        {
+            "id": 4,
+            "message": "Bienvenido, cual es tu nombre"
+        },
+        {
+            "id": 5,
+            "message": "Hola {{}} en que puedo aydarte"
+        }
+    ],
+    "questions": [
+        {
+            "id": 1,
+            "question": "¿Cual es tu email?",
+            "response_type": "string|email|url|phone_number|dni|date",
+            "error_message": "por favor se escriba su email"
+        },
+        {
+            "id": 2,
+            "question": "¿Cual es tu numero de celualar?",
+            "response_type": "string|email|url|phone_number|dni|date",
+            "error_message": "por favor se escriba su celular"
+        }
+    ],
+    "quizes": [
+        {
+            "id": 1,
+            "questions": [
+                2,
+                1
+            ]
+        }
+    ],
+    "steps": [
+        {
+            "step": 1,
+            "action": "message4",
+            "status": 1
+        },
+        {
+            "step": 2,
+            "action": "menu1",
+            "status": 1
+        },
+        {
+            "step": 3,
+            "action": "question1",
+            "status": 1
+        }
+    ]
+
+
+}
+###
+
+POST http://localhost:3030/channel
+content-type: application/json
+mibot_session: {"project_uid":"vnbLnzdM0b3BDClTPVPL","client_uid":"lEvxdkHyFXdOX4ieEMHs"}
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImY5MGZiMWFlMDQ4YTU0OGZiNjgxYWQ2MDkyYjBiODY5ZWE0NjdhYzYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiRmVybmFuZG8gUm9kcmlndWV6IiwiZW1haWwiOiJmZXJuYW5kb0BvbmJvdGdvLmNvbSIsInBhc3N3b3JkIjoib25ib3RnbzE1OSIsInJvbCI6InVzZXIiLCJkaXNwbGF5TmFtZSI6IkZlcm5hbmRvIFJvZHJpZ3VleiIsInVpZF9jbGllbnQiOm51bGwsInNlcnZpY2VzIjp7InRlcnJlbm8iOmZhbHNlLCJtaWJvdGFpciI6dHJ1ZSwidm9pY2Vib3QiOnRydWV9LCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdmFsaGFsbGEtb25ib3RnbyIsImF1ZCI6InZhbGhhbGxhLW9uYm90Z28iLCJhdXRoX3RpbWUiOjE2NTU4NDY2NjQsInVzZXJfaWQiOiJNeUhkZmhPZFJ3WURwUUxPaGFQb0hXWGNYVXIxIiwic3ViIjoiTXlIZGZoT2RSd1lEcFFMT2hhUG9IV1hjWFVyMSIsImlhdCI6MTY1NTg0NjY2NCwiZXhwIjoxNjU1ODUwMjY0LCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJmZXJuYW5kb0BvbmJvdGdvLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.CP_CBk9YwiGYwB8L8jVkuP-UH6FQUr79g5FQOBJ4SbDSXcypfKfVty2N7jHQSWzyopUCgrxoEqYnXicHyiFgoeyDOAnzefQiohpXYfKqqbtVA1jjwfZQZkG--3U4lUmUmndzJYO-tVlCWHqvonU4djhrZb9gC70W6V4_qvSq5P2ZDmNhltUqbZC_cQkT4h_UAEJaei9gVksBaSFAP-AxoaUlNQMulvHgrBHLA8EoQ1x5_t3qrnlwzUrKYd8zgW8nlph4y8Z0y6XJsyNySYfMLpNi5bx9lsyHeEh-e4-h_5cnRI_308fvYPZsXDwS3Rkkk_G5M5fXhiFjgTGPa9bB4Q
+
+
+{
+    "name":"default channel",
+    "phone_number":"+19206787641",
+    "config_id":"1",
+    "status":1
+}

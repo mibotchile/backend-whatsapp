@@ -1,0 +1,114 @@
+{
+    "menus": [
+        {
+            "id": 1,
+            "title": "titulo del menu",
+            "options": [
+                {
+                    "id": 1,
+                    "value": "opcion 1",
+                    "action": "msg2"
+                },
+                {
+                    "id": 2,
+                    "value": "opcion 2",
+                    "action": "msg3"
+                },
+                {
+                    "id": 3,
+                    "value": "opcion 3",
+                    "action": "2menu"
+                },
+                {
+                    "id": 4,
+                    "value": "opcion 4",
+                    "action": "msg4"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "title": "titulo del menu de la opcion 3",
+            "items": [
+                {
+                    "id": 1,
+                    "value": "opcion 1"
+                },
+                {
+                    "id": 2,
+                    "value": "opcion 2"
+                },
+                {
+                    "id": 3,
+                    "value": "opcion 3"
+                },
+                {
+                    "id": 4,
+                    "value": "opcion 4"
+                }
+            ]
+        }
+    ],
+    "messages": [
+        {
+            "id": 1,
+            "message": "hola gracias por escoger la opcion 4"
+        },
+        {
+            "id": 2,
+            "message": "hola gracias por escoger la opcion 1"
+        },
+        {
+            "id": 3,
+            "message": "hola gracias por escoger la opcion 2"
+        },
+        {
+            "id": 4,
+            "message": "Bienvenido, cual es tu nombre"
+        },
+        {
+            "id": 5,
+            "message": "Hola {{}} en que puedo aydarte"
+        }
+    ],
+    "questions": [
+        {
+            "id": 1,
+            "question": "¿Cual es tu email?",
+            "response_type": "string|email|url|phone_number|dni|date",
+            "error_message": "por favor se escriba su email"
+        },
+        {
+            "id": 2,
+            "question": "¿Cual es tu numero de celualar?",
+            "response_type": "string|email|url|phone_number|dni|date",
+            "error_message": "por favor se escriba su celular"
+        }
+    ],
+    "quizes": [
+        {
+            "id": 1,
+            "questions": [
+                2,
+                1
+            ]
+        }
+    ],
+    "steps": [
+        {
+            "step": 1,
+            "action": "message4",
+            "status": 1
+        },
+        {
+            "step": 2,
+            "action": "menu1",
+            "status": 1
+        },
+        {
+            "step": 3,
+            "action": "question1",
+            "status": 1
+        }
+    ]
+}

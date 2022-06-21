@@ -6,16 +6,13 @@ export class Channel {
       id: number
 
     @Column()
+      phone_number: string
+
+    @Column()
       name: string
 
     @Column()
-      description: string
-
-    @Column('jsonb')
-      tags: string[]
-
-    @Column({ default: false })
-      default: boolean
+      config_id: number
 
     @Column()
       created_by: string
