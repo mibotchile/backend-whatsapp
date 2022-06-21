@@ -16,6 +16,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Group } from './group/group.entity'
 import { Role } from './role/role.entity'
 import { User } from './user/user.entity'
+import { ChannelModule } from './channel/channel.module'
 
 @Module({
   imports: [
@@ -37,14 +38,15 @@ import { User } from './user/user.entity'
     GroupModule,
     RoleModule,
     UserModule,
-    ProjectModule
+    ProjectModule,
+    ChannelModule
   ],
   controllers: [HealthController],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard
-    }
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard
+    // }
   ]
 })
 export class AppModule implements NestModule {
@@ -53,9 +55,9 @@ export class AppModule implements NestModule {
       .apply(MibotSessionMiddleware)
       .exclude('/status', '/health/(.*)')
       .forRoutes('*')
-    consumer
-      .apply(AuthenticationMiddleware)
-      .exclude('/status', '/health/(.*)')
-      .forRoutes('*')
+    // consumer
+    //   .apply(AuthenticationMiddleware)
+    //   .exclude('/status', '/health/(.*)')
+    //   .forRoutes('*')
   }
 }

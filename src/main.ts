@@ -13,16 +13,17 @@ async function bootstrap() {
   console.log('ENV: ', process.env.ENVIROMENT)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
 
-  const httpsOptions = {} as any
+  const appOptions = {
+    logger: new FileLoggerService()
+  } as any
   if ((process.env.SSL && process.env.SSL === 'true') || process.env.NODE_ENV === 'production') {
     console.log('SSL ENABLED')
-    httpsOptions.key = fs.readFileSync(process.env.SSL_KEY)
-    httpsOptions.cert = fs.readFileSync(process.env.SSL_CERT)
+    appOptions.httpsOptions = {
+      key: fs.readFileSync(process.env.SSL_KEY),
+      cert: fs.readFileSync(process.env.SSL_CERT)
+    }
   }
-  const app = await NestFactory.create(AppModule, {
-    logger: new FileLoggerService(),
-    httpsOptions
-  })
+  const app = await NestFactory.create(AppModule, appOptions)
   app.use(cors({ credentials: true, origin: true }))
   app.use(httpContext.middleware)
 
