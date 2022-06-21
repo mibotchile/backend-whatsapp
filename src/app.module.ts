@@ -43,10 +43,10 @@ import { ChannelModule } from './channel/channel.module'
   ],
   controllers: [HealthController],
   providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RolesGuard
-    // }
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    }
   ]
 })
 export class AppModule implements NestModule {
@@ -55,9 +55,9 @@ export class AppModule implements NestModule {
       .apply(MibotSessionMiddleware)
       .exclude('/status', '/health/(.*)')
       .forRoutes('*')
-    // consumer
-    //   .apply(AuthenticationMiddleware)
-    //   .exclude('/status', '/health/(.*)')
-    //   .forRoutes('*')
+    consumer
+      .apply(AuthenticationMiddleware)
+      .exclude('/status', '/health/(.*)')
+      .forRoutes('*')
   }
 }
