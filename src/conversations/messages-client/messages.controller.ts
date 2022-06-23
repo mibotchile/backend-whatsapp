@@ -3,17 +3,17 @@ import { EventPattern } from '@nestjs/microservices'
 import { ConversationManagerService } from '../conversation-manager/conversation-manager.service'
 import { MessageGateway } from '../messages-gateway/message.gateway'
 
-interface MessageInfo{
-    'MediaContentType0': string,
-        'ProfileName': string,
-        'WaId': string,
-        'SmsStatus': string,
-        'Body': string,
-        'To': string,
-        'MessageSid': string,
-        'AccountSid': string
-        'From':string,
-}
+// interface MessageInfo{
+//     'MediaContentType0': string,
+//         'ProfileName': string,
+//         'WaId': string,
+//         'SmsStatus': string,
+//         'Body': string,
+//         'To': string,
+//         'MessageSid': string,
+//         'AccountSid': string
+//         'From':string,
+// }
 
 @Controller('client')
 export class ClientController {

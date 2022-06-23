@@ -1,7 +1,6 @@
-import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common'
+import { Injectable, Scope } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, ILike, In, Not, Repository } from 'typeorm'
-import * as httpContext from 'express-http-context'
+import { DataSource, Repository } from 'typeorm'
 import { PointerConversation } from './pointer-conversation.entity'
 import { ChannelConfig } from 'src/channel/channel_config.entity'
 import * as twilio from 'twilio'
@@ -82,13 +81,20 @@ export class ConversationManagerService {
 
   async messageClietHandler(message:string, waId:string, channel_number:string) {
     console.log('Handler')
+    const config = await this.findConfigByChannelNumber('+55455555')
     const pointer:string = await this.findPointerByWaId(waId)
-    const subpointers = pointer ? pointer.split('>') : ['step.1']
-    const stepOrder = Number(subpointers[0].replace('step.', ''))
+    let subpointers = pointer ? pointer.split('>') : ['step.1']
+    let stepOrder = Number(subpointers[0].replace('step.', ''))
     // if (currentStep.action.includes('menu')) {
     //   this.findMenuById()
     // }
-    const config = await this.findConfigByChannelNumber('+55455555')
+
+    if (!this.existStep(stepOrder, config)) {
+      this.deletePointer(waId)
+      await this.createPointer(waId, 'step.1')
+      subpointers = ['step.1']
+      stepOrder = 1
+    }
 
     const responseTo:string = subpointers[subpointers.length - 1]
     let action:string
@@ -111,11 +117,9 @@ export class ConversationManagerService {
         subpointers.push(action)
         newPointer = subpointers.join('>')
       } else {
-        console.log('entro en aquiiiiiiiiiiiiiiiii')
-
+        // console.log('question else')
         const step = this.findStepById(stepOrder + 1, config)
         action = step.action
-        console.log('entro en aquiiiiiiiiiiiiiiiii')
       }
     }
 
@@ -132,8 +136,9 @@ export class ConversationManagerService {
     }
 
     if (action.includes('menu')) {
-      if (subpointers.length === 2) subpointers.pop() // esto sucede cuando la opcion escogida continen com action otro menu
+      console.log('lengthhhhhhhh-> ', subpointers.length)
       if (subpointers.length === 1) subpointers[0] = `step.${stepOrder + 1}` // esto sucede cuando el step contiene como action un menu
+      if (subpointers.length === 2) subpointers.pop() // esto sucede cuando la opcion escogida continen com action otro menu
       subpointers.push(action)
       newPointer = subpointers.join('>')
       if (responseTo.includes('question')) { // esto sucede cuando se termina un quiz (osea el quiestio id es el ultimo) y el siguiente paso tiene como action un menu
@@ -163,8 +168,8 @@ export class ConversationManagerService {
         await this.updatePointer(waId, newPointer)
       }
     }
-    // console.log(action)
-    // console.log(messageToSend)
+    console.log({ action })
+    console.log({ messageToSend })
 
     await this.sendMessage(messageToSend, waId)
     console.log({ stepOrder })
@@ -221,17 +226,17 @@ export class ConversationManagerService {
             {
               id: 1,
               value: 'opcion 1',
-              action: 'message.1'
+              action: 'message.2'
             },
             {
               id: 2,
               value: 'opcion 2',
-              action: 'message.1'
+              action: 'message.3'
             },
             {
               id: 3,
               value: 'opcion 3',
-              action: 'message.1'
+              action: 'message.5'
             },
             {
               id: 4,
@@ -257,6 +262,10 @@ export class ConversationManagerService {
         {
           id: 4,
           message: 'Bienvenido '
+        },
+        {
+          id: 5,
+          message: 'hola gracias por escoger la opcion 3'
         }
       ],
       quizes: [
@@ -324,6 +333,10 @@ export class ConversationManagerService {
     return quiz.questions.some(q => q.id === questionId)
   }
 
+  existStep(stepOrder:number, config:Config) {
+    return config.steps.some(s => s.order === stepOrder)
+  }
+
   findQuestionFromQuiz(questionId:number, quiz:Quiz):Question {
     return quiz.questions.find(q => q.id === questionId)
   }
@@ -355,7 +368,7 @@ export class ConversationManagerService {
       case 'menu':
         const menu = this.findMenuById(Number(itemId), config)
         const options = menu.options.map(o => o.id + ' ' + o.value)
-        messageResponse = `${menu.title} \n ${options.join('\n')}`
+        messageResponse = `${menu.title} \n${options.join('\n')}`
         break
       case 'question':
         const question = this.findQuestionFromQuiz(Number(itemId), quiz)
