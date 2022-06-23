@@ -49,7 +49,6 @@ CREATE TABLE "channel" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "phone_number" VARCHAR(50) NOT NULL,
-    "config_id" INTEGER,
     "created_by" VARCHAR(120) NOT NULL,
     "updated_by" VARCHAR(120) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

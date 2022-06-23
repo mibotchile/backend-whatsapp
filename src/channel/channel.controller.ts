@@ -58,7 +58,7 @@ export class ChannelController {
     return this.channelService.update(Number(id), data)
   }
 
-  @Get('phoneNumber/:number')
+  @Get('config/number/:number')// cambio
   async findByNumber(@Param('number') number: string): Promise<any> {
     return this.channelService.findConfigByPhoneNumber(number)
   }

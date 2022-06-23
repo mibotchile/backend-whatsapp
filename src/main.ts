@@ -6,7 +6,7 @@ import * as cors from 'cors'
 import { FileLoggerService } from './logger/file-logger.service'
 import * as httpContext from 'express-http-context'
 import { Transport } from '@nestjs/microservices'
-import { ClientModule } from './messages/client/client.module'
+import { ClientModule } from './conversations/messages-client/messages.module'
 import * as fs from 'node:fs'
 
 async function bootstrap() {
@@ -46,8 +46,8 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBIT_URL],
-      queue: 'whatsapp.messages.dev',
-      noAck: false,
+      queue: 'whatsapp.messages.dev2',
+      // noAck: false,
       queueOptions: {
         durable: true
       }

@@ -12,9 +12,6 @@ export class Channel {
       name: string
 
     @Column()
-      config_id: number
-
-    @Column()
       created_by: string
 
     @Column()
