@@ -111,8 +111,11 @@ export class ConversationManagerService {
         subpointers.push(action)
         newPointer = subpointers.join('>')
       } else {
-        const step = this.findStepById(stepOrder, config)
+        console.log('entro en aquiiiiiiiiiiiiiiiii')
+
+        const step = this.findStepById(stepOrder + 1, config)
         action = step.action
+        console.log('entro en aquiiiiiiiiiiiiiiiii')
       }
     }
 
@@ -153,18 +156,18 @@ export class ConversationManagerService {
     if (action.includes('close')) {
       messageToSend = 'Gracias por comunicarse con nosotros'
       this.deletePointer(waId)
+    } else {
+      if (stepOrder === 1) {
+        await this.createPointer(waId, newPointer)
+      } else {
+        await this.updatePointer(waId, newPointer)
+      }
     }
-    console.log(action)
-    console.log(messageToSend)
+    // console.log(action)
+    // console.log(messageToSend)
 
     await this.sendMessage(messageToSend, waId)
     console.log({ stepOrder })
-
-    if (stepOrder === 1) {
-      await this.createPointer(waId, newPointer)
-    } else {
-      await this.updatePointer(waId, newPointer)
-    }
   }
 
   async updatePointer(waId:string, newPointer:string) {

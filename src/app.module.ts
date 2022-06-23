@@ -23,7 +23,7 @@ import { Channel } from './channel/channel.entity'
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
+      envFilePath: resolve(process.cwd(), `.env${process.env.NODE_ENV ? ('.' + process.env.NODE_ENV) : ''}`)
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
