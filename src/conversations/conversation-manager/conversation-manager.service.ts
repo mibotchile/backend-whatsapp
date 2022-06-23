@@ -119,6 +119,13 @@ export class ConversationManagerService {
     if (responseTo.includes('step')) {
       const step = this.findStepById(stepOrder, config)
       action = step.action
+
+      if (step.action.includes('quiz')) {
+        quiz = this.findQuizById(Number(step.action.split('.')[1]), config)
+        const question = this.findQuestionFromQuiz(1, quiz)
+        action = `question.${question.id}`
+        newPointer = `step.${stepOrder}>${step.action}>question.1`
+      }
     }
 
     if (action.includes('menu')) {
@@ -154,9 +161,9 @@ export class ConversationManagerService {
     console.log({ stepOrder })
 
     if (stepOrder === 1) {
-      await this.updatePointer(waId, newPointer)
-    } else {
       await this.createPointer(waId, newPointer)
+    } else {
+      await this.updatePointer(waId, newPointer)
     }
   }
 
@@ -350,6 +357,10 @@ export class ConversationManagerService {
       case 'question':
         const question = this.findQuestionFromQuiz(Number(itemId), quiz)
         messageResponse = question.question
+        break
+      case 'quiz':
+        const question1 = this.findQuestionFromQuiz(1, quiz)
+        messageResponse = question1.question
         break
       case 'message':
         const message = this.findMessageById(Number(itemId), config)

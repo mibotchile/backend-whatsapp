@@ -46,7 +46,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBIT_URL],
-      queue: 'whatsapp.messages.dev2',
+      queue: process.env.RABBIT_QUEUE,
       // noAck: false,
       queueOptions: {
         durable: true
