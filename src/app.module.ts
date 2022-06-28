@@ -34,7 +34,7 @@ import { Channel } from './channel/channel.entity'
       database: process.env.DB_NAME,
       entities: [Group, Role, User, Channel, ChannelConfig],
       autoLoadEntities: false,
-      logging: false
+      logging: process.env.TYPEORM_LOGS === 'true'
     }),
     StatusMonitorModule.setUp(statusMonitorConfig),
     GroupModule,

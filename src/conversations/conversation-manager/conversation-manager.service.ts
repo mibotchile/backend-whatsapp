@@ -4,74 +4,25 @@ import { DataSource, Repository } from 'typeorm'
 import { PointerConversation } from './pointer-conversation.entity'
 import { ChannelConfig } from 'src/channel/channel_config.entity'
 import * as twilio from 'twilio'
-
-interface Option{
-    id:number,
-    value:string,
-    action:string
-}
-
-interface Menu{
-    id:number,
-    title:string,
-    options:Option[]
-}
-
-interface Message{
-    id:number,
-    message:string
-}
-interface Question{
-    id:number,
-    question:string,
-    response_type:'string'|'email'|'url'|'phone_number'|'dni'|'date',
-    error_message:string
-}
-interface Quiz{
-    id:number,
-    questions:Question[]
-}
-
-interface Step{
-   // id:number,
-    order:number,
-    action:string
-    status:number|boolean,
-
-}
-
-interface Redirect{
-   // id:number,
-   id:number,
-    to:string
-
-}
-
-interface Config{
-    id:number,
-    menus:Menu[],
-    quizes:Quiz[],
-    messages:Message[],
-    steps:Step[],
-    redirects:Redirect[]
-
-}
+import { Config, Message, Menu, Option, Question, Quiz, Redirect } from '../conversation.types'
+import { ResponseValidatorRepository } from '../response-validator/response-validator.repository'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ConversationManagerService {
-  constructor (@InjectDataSource('default')
-    private dataSource: DataSource, @InjectRepository(PointerConversation) private pointerRepo:Repository<PointerConversation>, @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>) {
+  constructor(
+        @InjectDataSource('default')
+        private dataSource: DataSource,
+        @InjectRepository(PointerConversation) private pointerRepo: Repository<PointerConversation>,
+        @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
+  ) {
     this.dataSource.entityMetadatas.forEach((em, index) => {
       this.dataSource.entityMetadatas[index].schema = 'project_' + 'vnblnzdm0b3bdcltpvpl' // httpContext.get('PROJECT_UID').toLowerCase()
       this.dataSource.entityMetadatas[index].tablePath = 'project_' + 'vnblnzdm0b3bdcltpvpl' + '.' + em.tableName
     })
   }
 
-  async sendMessage(message:string, waId:string) {
-    const twilioClient = twilio(
-      process.env.ACCOUNT_SID,
-      process.env.AUTH_TOKEN
-    )
+  async sendMessage(message: string, waId: string) {
+    const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
     await twilioClient.messages.create({
       from: 'whatsapp:+14155238886',
       body: message,
@@ -79,15 +30,12 @@ export class ConversationManagerService {
     })
   }
 
-  async messageClietHandler(message:string, waId:string, channel_number:string) {
-    console.log('Handler')
+  async messageClietHandler(message: string, waId: string, channel_number: string) {
+    // console.log('Handler')
     const config = await this.findConfigByChannelNumber('+55455555')
-    const pointer:string = await this.findPointerByWaId(waId)
+    const pointer: string = await this.findPointerByWaId(waId)
     let subpointers = pointer ? pointer.split('>') : ['step.1']
     let stepOrder = Number(subpointers[0].replace('step.', ''))
-    // if (currentStep.action.includes('menu')) {
-    //   this.findMenuById()
-    // }
 
     if (!this.existStep(stepOrder, config)) {
       this.deletePointer(waId)
@@ -96,14 +44,18 @@ export class ConversationManagerService {
       stepOrder = 1
     }
 
-    const responseTo:string = subpointers[subpointers.length - 1]
-    let action:string
-    let quiz:Quiz
-    let newPointer:string
+    const responseTo: string = subpointers[subpointers.length - 1]
+    let action: string
+    let quiz: Quiz
+    let newPointer: string
 
     if (responseTo.includes('menu')) {
       const menuId = responseTo.split('.')[1]
       const menu = this.findMenuById(Number(menuId), config)
+      if (!this.isValidOption(message, menu)) {
+        this.sendMessage('Por favor elija una opcion valida', waId)
+        return
+      }
       const optionSelected = this.findOptionFromMenu(Number(message), menu)
       action = optionSelected.action
     }
@@ -111,6 +63,11 @@ export class ConversationManagerService {
     if (responseTo.includes('question')) {
       quiz = this.findQuizById(Number(subpointers[subpointers.length - 2].split('.')[1]), config)
       const questionId = Number(responseTo.split('.')[1])
+      const question = this.findQuestionFromQuiz(questionId, quiz)
+      if (!this.isValidQuestionResponse(question, message)) {
+        this.sendMessage(question.error_message, waId)
+        return
+      }
       if (this.existQuestionInQuiz(questionId + 1, quiz)) {
         action = `question.${questionId + 1}`
         subpointers.pop()
@@ -128,11 +85,26 @@ export class ConversationManagerService {
       action = step.action
 
       if (step.action.includes('quiz')) {
-        quiz = this.findQuizById(Number(step.action.split('.')[1]), config)
+        const quizId = Number(step.action.split('.')[1])
+        quiz = this.findQuizById(quizId, config)
         const question = this.findQuestionFromQuiz(1, quiz)
         action = `question.${question.id}`
         newPointer = `step.${stepOrder}>${step.action}>question.1`
       }
+    }
+    let messageToSend: string
+
+    if (action.includes('message')) {
+      messageToSend = this.builResponseByAction(action, { config })
+      await this.sendMessage(messageToSend, waId)
+      newPointer = `step.${stepOrder + 1}`
+      if (stepOrder === 1) {
+        await this.createPointer(waId, newPointer)
+      } else {
+        await this.updatePointer(waId, newPointer)
+      }
+      await this.messageClietHandler(message, waId, channel_number)
+      return
     }
 
     if (action.includes('menu')) {
@@ -141,16 +113,12 @@ export class ConversationManagerService {
       if (subpointers.length === 2) subpointers.pop() // esto sucede cuando la opcion escogida continen com action otro menu
       subpointers.push(action)
       newPointer = subpointers.join('>')
-      if (responseTo.includes('question')) { // esto sucede cuando se termina un quiz (osea el quiestio id es el ultimo) y el siguiente paso tiene como action un menu
+      if (responseTo.includes('question')) {
+        // esto sucede cuando se termina un quiz (osea el quiestio id es el ultimo) y el siguiente paso tiene como action un menu
         newPointer = `step.${stepOrder + 1}>${action}`
       }
     }
 
-    if (action.includes('message')) {
-      newPointer = `step.${stepOrder + 1}`
-    }
-
-    let messageToSend:string
     if (action.includes('redirect')) {
       messageToSend = 'En breve un asesor se comunicara con usted'
       newPointer = `step.${stepOrder + 1}`
@@ -175,19 +143,35 @@ export class ConversationManagerService {
     console.log({ stepOrder })
   }
 
-  async updatePointer(waId:string, newPointer:string) {
+  async updatePointer(waId: string, newPointer: string) {
     await this.pointerRepo.update({ phone_number: waId }, { pointer: newPointer })
   }
 
-  async createPointer(waId:string, newPointer:string) {
+  //   async redirectClient(waId:string, redirect:Redirect) {
+  //     await this.pointerRepo.update({ phone_number: waId }, { pointer: newPointer })
+  //   }
+
+  isValidOption(optionSelected:string, menu:Menu) {
+    const optionId = Number(optionSelected.trim())
+    if (isNaN(optionId)) return false
+    return menu.options.some(o => o.id === optionId)
+  }
+
+  isValidQuestionResponse(question:Question, response:string) {
+    const validator = ResponseValidatorRepository.findById(Number(question.response_type))
+    const regex = new RegExp(validator.regex)
+    return regex.test(response)
+  }
+
+  async createPointer(waId: string, newPointer: string) {
     await this.pointerRepo.insert({ phone_number: waId, pointer: newPointer })
   }
 
-  async deletePointer(waId:string) {
+  async deletePointer(waId: string) {
     await this.pointerRepo.update({ phone_number: waId }, { status: 0 })
   }
 
-  async findConfigByChannelNumber(phoneNumber:string):Promise<Config> {
+  async findConfigByChannelNumber(phoneNumber: string): Promise<Config> {
     // const configs = await this.channelConfigRepo.find({ where: { channel_number: phoneNumber } })
     // return configs[0]
     return {
@@ -209,7 +193,7 @@ export class ConversationManagerService {
             },
             {
               id: 3,
-              value: 'opcion 3',
+              value: 'mostrar otro menu',
               action: 'menu.2'
             },
             {
@@ -225,23 +209,23 @@ export class ConversationManagerService {
           options: [
             {
               id: 1,
-              value: 'opcion 1',
+              value: 'opcion 1 del menu 2',
               action: 'message.2'
             },
             {
               id: 2,
-              value: 'opcion 2',
+              value: 'opcion 2 del menu 2',
               action: 'message.3'
             },
             {
               id: 3,
-              value: 'opcion 3',
+              value: 'opcion 3 del menu 2',
               action: 'message.5'
             },
             {
               id: 4,
-              value: 'opcion 4',
-              action: 'message.1'
+              value: 'opcion 4 del menu 2',
+              action: 'redirect.1'
             }
           ]
         }
@@ -249,15 +233,15 @@ export class ConversationManagerService {
       messages: [
         {
           id: 1,
-          message: 'hola gracias por escoger la opcion 4'
+          message: 'gracias por escoger la opcion 4'
         },
         {
           id: 2,
-          message: 'hola gracias por escoger la opcion 1'
+          message: 'opcion 1 seleccionada'
         },
         {
           id: 3,
-          message: 'hola gracias por escoger la opcion 2'
+          message: 'escogi la opcion 2'
         },
         {
           id: 4,
@@ -275,14 +259,14 @@ export class ConversationManagerService {
             {
               id: 1,
               question: '¿Cual es tu email?',
-              response_type: 'email', // "string|email|url|phone_number|dni|date",
-              error_message: 'por favor se escriba su email'
+              response_type: 1, // "string|email|url|phone_number|dni|date",
+              error_message: 'por favor se escrba un email valido'
             },
             {
               id: 2,
               question: '¿Cual es tu numero de celualar?',
-              response_type: 'phone_number', // "string|email|url|phone_number|dni|date",
-              error_message: 'por favor se escriba su celular'
+              response_type: 4, // "string|email|url|phone_number|dni|date",
+              error_message: 'por favor se escriba un numero de celular valido'
             }
           ]
         }
@@ -322,53 +306,57 @@ export class ConversationManagerService {
     }
   }
 
-  async findPointerByWaId(waId:string):Promise<string> {
+  async findPointerByWaId(waId: string): Promise<string> {
     const pointers = await this.pointerRepo.find({ where: { phone_number: waId, status: 1 } })
     return pointers.length === 0 ? '' : pointers[0].pointer
     // return 'step2>menu1>option3>menu2'
     // return 'step3>quiz2>question5'
   }
 
-  existQuestionInQuiz(questionId:number, quiz:Quiz) {
-    return quiz.questions.some(q => q.id === questionId)
+  existQuestionInQuiz(questionId: number, quiz: Quiz) {
+    return quiz.questions.some((q) => q.id === questionId)
   }
 
-  existStep(stepOrder:number, config:Config) {
-    return config.steps.some(s => s.order === stepOrder)
+  existStep(stepOrder: number, config: Config) {
+    return config.steps.some((s) => s.order === stepOrder)
   }
 
-  findQuestionFromQuiz(questionId:number, quiz:Quiz):Question {
-    return quiz.questions.find(q => q.id === questionId)
+  findQuestionFromQuiz(questionId: number, quiz: Quiz): Question {
+    return quiz.questions.find((q) => q.id === questionId)
   }
 
-  findQuizById(quizId:number, config:Config):Quiz {
-    return config.quizes.find(q => q.id === quizId)
+  findQuizById(quizId: number, config: Config): Quiz {
+    return config.quizes.find((q) => q.id === quizId)
   }
 
-  findStepById(stepOrder:number, config:Config) {
-    return config.steps.find(s => s.order === stepOrder)
+  findStepById(stepOrder: number, config: Config) {
+    return config.steps.find((s) => s.order === stepOrder)
   }
 
-  findMenuById(menuId:number, config:Config):Menu {
-    return config.menus.find(m => m.id === menuId)
+  findMenuById(menuId: number, config: Config): Menu {
+    return config.menus.find((m) => m.id === menuId)
   }
 
-  findOptionFromMenu(optionId:number, menu:Menu):Option {
-    return menu.options.find(o => o.id === optionId)
+  findOptionFromMenu(optionId: number, menu: Menu): Option {
+    return menu.options.find((o) => o.id === optionId)
   }
 
-  findMessageById(messageId:number, config:Config):Message {
-    return config.messages.find(m => m.id === messageId)
+  findMessageById(messageId: number, config: Config): Message {
+    return config.messages.find((m) => m.id === messageId)
   }
 
-  builResponseByAction(action:string, { config, quiz }:{config?:Config, quiz?:Quiz}) : string {
+  findRedirectById(redirectId: number, config: Config): Redirect {
+    return config.redirects.find((r) => r.id === redirectId)
+  }
+
+  builResponseByAction(action: string, { config, quiz }: { config?: Config; quiz?: Quiz }): string {
     const [itemType, itemId] = action.split('.')
     let messageResponse = ''
     switch (itemType) {
       case 'menu':
         const menu = this.findMenuById(Number(itemId), config)
-        const options = menu.options.map(o => o.id + ' ' + o.value)
-        messageResponse = `${menu.title} \n${options.join('\n')}`
+        const options = menu.options.map((o) => `*${o.id}.* ${o.value}`)
+        messageResponse = `*${menu.title}*\n\n${options.join('\n')}`
         break
       case 'question':
         const question = this.findQuestionFromQuiz(Number(itemId), quiz)

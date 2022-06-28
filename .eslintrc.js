@@ -25,6 +25,7 @@ module.exports = {
     'no-useless-constructor': 'off',
     camelcase: 'off',
     'space-before-function-paren': 'off',
-    'no-case-declarations':'off'
+    'no-case-declarations':'off',
+    'no-useless-escape':'off'
   }
 }

@@ -6,13 +6,13 @@ import * as cors from 'cors'
 import { FileLoggerService } from './logger/file-logger.service'
 import * as httpContext from 'express-http-context'
 import { Transport } from '@nestjs/microservices'
-import { ClientModule } from './conversations/messages-client/messages.module'
+import { MessagesConsumerModule } from './conversations/messages-consumer/messages-consumer.module'
 import * as fs from 'node:fs'
 
 async function bootstrap() {
-  console.log('ENV: ', process.env.ENVIROMENT)
   console.log('NODE_ENV: ', process.env.NODE_ENV)
 
+  // main app
   const appOptions = {
     logger: new FileLoggerService()
   } as any
@@ -42,18 +42,20 @@ async function bootstrap() {
   app.use(json())
   await app.listen(process.env.APP_PORT || 3000)
 
-  const app2 = await NestFactory.createMicroservice(ClientModule, {
+  // consumer for whatsapp messages
+
+  const clientMessages = await NestFactory.createMicroservice(MessagesConsumerModule, {
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBIT_URL],
-      queue: process.env.RABBIT_QUEUE,
+      queue: process.env.RABBIT_WHATSAPP_MESSAGES_QUEUE,
       // noAck: false,
       queueOptions: {
         durable: true
       }
     }
   })
-  await app2.listen()
+  await clientMessages.listen()
 }
 
 bootstrap()

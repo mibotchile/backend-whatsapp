@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { MessageGateway } from '../messages-gateway/message.gateway'
-import { ClientController } from './messages.controller'
+import { ClientController } from './messages-consumer.controller'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { resolve } from 'node:path'
@@ -22,12 +22,11 @@ import { ConversationManagerService } from '../conversation-manager/conversation
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       entities: [PointerConversation, Channel, ChannelConfig],
-      autoLoadEntities: false,
-      logging: true
+      logging: process.env.TYPEORM_LOGS === 'true'
     }),
     TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig])
   ],
   controllers: [ClientController],
   providers: [MessageGateway, ConversationManagerService]
 })
-export class ClientModule {}
+export class MessagesConsumerModule {}

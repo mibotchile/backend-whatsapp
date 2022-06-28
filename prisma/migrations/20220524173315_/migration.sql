@@ -2,7 +2,7 @@
 CREATE TABLE "group" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "tags" JSONB NOT NULL,
     "default" BOOLEAN NOT NULL DEFAULT false,
     "created_by" VARCHAR(120) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE "group" (
 CREATE TABLE "role" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "config" JSONB NOT NULL,
     "default" BOOLEAN NOT NULL DEFAULT false,
     "created_by" VARCHAR(120) NOT NULL,
