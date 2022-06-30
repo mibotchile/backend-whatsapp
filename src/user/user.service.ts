@@ -4,34 +4,66 @@ import { DataSource, ILike, In, Not, Repository } from 'typeorm'
 import { User } from './user.entity'
 import * as httpContext from 'express-http-context'
 import { Group } from 'src/group/group.entity'
+import { Role } from 'src/role/role.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class UserService {
-  constructor (@InjectDataSource('default')
-    private dataSource: DataSource, @InjectRepository(User) private usersRepo:Repository<User>, @InjectRepository(Group) private groupsRepo: Repository<Group>) {
+  constructor (
+    @InjectDataSource('default') private dataSource: DataSource,
+    @InjectRepository(User) private usersRepo:Repository<User>,
+    @InjectRepository(Group) private groupsRepo: Repository<Group>,
+    @InjectRepository(Role) private rolesRepo: Repository<Role>) {
+    this.setSchema(httpContext.get('PROJECT_UID'))
+  }
+
+  setSchema(project_uid:string) {
+    const schema = (project_uid ? 'project_' + project_uid : 'public').toLowerCase()
+    console.log({ schema })
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
-      this.dataSource.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.' + em.tableName
+      this.dataSource.entityMetadatas[index].schema = schema
+      this.dataSource.entityMetadatas[index].tablePath = schema + '.' + em.tableName
     })
   }
 
   async create (data: User): Promise<any> {
     const users = await this.usersRepo.find({
-      where: {
-        name: ILike(data.name)
-      }
+      where: [
+        { name: ILike(data.name) },
+        { uid: ILike(data.uid) }
+      ]
     })
     if (users.length > 0) {
       throw new HttpException(
         {
           data: [],
           success: false,
-          message: 'Ya existe usuario con este nombre'
+          message: 'Ya existe usuario con este nombre o uid'
         },
         HttpStatus.NOT_ACCEPTABLE
       )
     }
+    const [defaultRole] = await this.rolesRepo.find({ where: { default: true } })
+    const [defaultGroup] = await this.groupsRepo.find({ where: { default: true } })
+    data.role_id = defaultRole.id
+    data.groups_id = [defaultGroup.id]
     const data_res = await this.usersRepo.insert(data)
+    return {
+      data: data_res,
+      success: true,
+      message: 'Usuario creado exitosamente'
+    }
+  }
+
+  async createMany (users: User[]): Promise<any> {
+    const [defaultRole] = await this.rolesRepo.find({ where: { default: true } })
+    const [defaultGroup] = await this.groupsRepo.find({ where: { default: true } })
+    users = users.map(u => {
+      u.role_id = defaultRole.id
+      u.groups_id = [defaultGroup.id]
+      return u
+    })
+
+    const data_res = await this.usersRepo.insert(users)
     return {
       data: data_res,
       success: true,

@@ -35,7 +35,7 @@ export interface Quiz{
 
 export interface Step{
    // id:number,
-    order:number,
+    step:number,
     action:string
     status:number|boolean,
 

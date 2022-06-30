@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { MessageGateway } from '../messages-gateway/message.gateway'
-import { ClientController } from './messages-consumer.controller'
+import { MessagesConsumerController } from './messages-consumer.controller'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { resolve } from 'node:path'
@@ -26,7 +26,7 @@ import { ConversationManagerService } from '../conversation-manager/conversation
     }),
     TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig])
   ],
-  controllers: [ClientController],
+  controllers: [MessagesConsumerController],
   providers: [MessageGateway, ConversationManagerService]
 })
 export class MessagesConsumerModule {}

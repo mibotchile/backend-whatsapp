@@ -117,7 +117,7 @@ export class ChannelService {
     if (!data.channel_id) data.channel_id = 1
     if (!data.menus) data.menus = []
     if (!data.quizes)data.quizes = []
-    if (!data.questions)data.questions = []
+    if (!data.redirects)data.redirects = []
     data.status = 1
 
     const data_res = await this.channelConfigRepository.insert(data)

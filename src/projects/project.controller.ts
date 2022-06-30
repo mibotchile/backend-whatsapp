@@ -15,6 +15,6 @@ export class ProjectController {
 
   @Post('/:uid')
   async create(@Param('uid') uid:string, @Res() res): Promise<any> {
-    return this.projectService.create(uid, res)
+    return this.projectService.create(uid)
   }
 }

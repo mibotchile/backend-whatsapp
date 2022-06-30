@@ -7,7 +7,7 @@ import { DataSource } from 'typeorm'
 @Injectable()
 export class ProjectService {
   constructor (@InjectDataSource('default') private dataSource:DataSource) {}
-  async create (uid:string, res): Promise<any> {
+  async create (uid:string): Promise<any> {
     const schema = `project_${uid.toLowerCase()}`
     let schemas = await this.dataSource.query('SELECT schema_name FROM information_schema.schemata where schema_name like \'project_%\'')
     schemas = schemas.map((s) => s.schema_name)
@@ -35,13 +35,10 @@ export class ProjectService {
     await this.dataSource.query(`CREATE UNIQUE INDEX ${schema}_user_uid_email ON ${schema}."user" USING btree (uid, email)`)
     await this.dataSource.query(`COMMENT ON INDEX ${schema}.${schema}_user_uid_email IS 'Llave unica para no permitir duplicidad de email y uid'`)
     await this.dataSource.query(`COMMENT ON COLUMN ${schema}.user.groups_id IS 'array de grupos a los que tiene acceso'`)
-    // global.schemas.push(schema)
-    // console.log(global.schemas)
+    return true
+  }
 
-    res.json({
-      data: [],
-      success: true,
-      message: 'Proyecto creado exitosamente'
-    })
+  async findAll (): Promise<any> {
+    return await this.dataSource.query('SELECT schema_name FROM information_schema.schemata where schema_name like \'project_%\'')
   }
 }

@@ -1,3 +1,4 @@
+import { Menu, Message, Question, Quiz, Redirect, Step } from 'src/conversations/conversation.types'
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('channel_config', { schema: 'public' })
@@ -12,19 +13,22 @@ export class ChannelConfig {
       channel_number: string
 
     @Column('jsonb')
-      menus: string[]
+      menus: Menu[]
 
     @Column('jsonb')
-      messages: string[]
+      messages: Message[]
 
     @Column('jsonb')
-      quizes: string[]
+      quizes: Quiz[]
 
     @Column('jsonb')
-      questions: string[]
+      questions: Question[]
 
     @Column('jsonb')
-      steps: string[]
+      steps: Step[]
+
+    @Column('jsonb')
+      redirects: Redirect[]
 
     @Column()
       created_by: string

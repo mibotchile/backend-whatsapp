@@ -32,7 +32,7 @@ export class ConversationManagerService {
 
   async messageClietHandler(message: string, waId: string, channel_number: string) {
     // console.log('Handler')
-    const config = await this.findConfigByChannelNumber('+55455555')
+    const config = await this.findConfigByChannelNumber('+19206787641')
     const pointer: string = await this.findPointerByWaId(waId)
     let subpointers = pointer ? pointer.split('>') : ['step.1']
     let stepOrder = Number(subpointers[0].replace('step.', ''))
@@ -172,138 +172,138 @@ export class ConversationManagerService {
   }
 
   async findConfigByChannelNumber(phoneNumber: string): Promise<Config> {
-    // const configs = await this.channelConfigRepo.find({ where: { channel_number: phoneNumber } })
-    // return configs[0]
-    return {
-      id: 1,
-      menus: [
-        {
-          id: 1,
-          title: 'titulo del menu 1',
-          options: [
-            {
-              id: 1,
-              value: 'opcion 1',
-              action: 'message.2'
-            },
-            {
-              id: 2,
-              value: 'opcion 2',
-              action: 'message.3'
-            },
-            {
-              id: 3,
-              value: 'mostrar otro menu',
-              action: 'menu.2'
-            },
-            {
-              id: 4,
-              value: 'opcion 4',
-              action: 'message.1'
-            }
-          ]
-        },
-        {
-          id: 2,
-          title: 'titulo del menu de la opcion 3',
-          options: [
-            {
-              id: 1,
-              value: 'opcion 1 del menu 2',
-              action: 'message.2'
-            },
-            {
-              id: 2,
-              value: 'opcion 2 del menu 2',
-              action: 'message.3'
-            },
-            {
-              id: 3,
-              value: 'opcion 3 del menu 2',
-              action: 'message.5'
-            },
-            {
-              id: 4,
-              value: 'opcion 4 del menu 2',
-              action: 'redirect.1'
-            }
-          ]
-        }
-      ],
-      messages: [
-        {
-          id: 1,
-          message: 'gracias por escoger la opcion 4'
-        },
-        {
-          id: 2,
-          message: 'opcion 1 seleccionada'
-        },
-        {
-          id: 3,
-          message: 'escogi la opcion 2'
-        },
-        {
-          id: 4,
-          message: 'Bienvenido '
-        },
-        {
-          id: 5,
-          message: 'hola gracias por escoger la opcion 3'
-        }
-      ],
-      quizes: [
-        {
-          id: 1,
-          questions: [
-            {
-              id: 1,
-              question: '¿Cual es tu email?',
-              response_type: 1, // "string|email|url|phone_number|dni|date",
-              error_message: 'por favor se escrba un email valido'
-            },
-            {
-              id: 2,
-              question: '¿Cual es tu numero de celualar?',
-              response_type: 4, // "string|email|url|phone_number|dni|date",
-              error_message: 'por favor se escriba un numero de celular valido'
-            }
-          ]
-        }
-      ],
-      redirects: [
-        {
-          id: 1,
-          to: 'grupo.5'
-        },
-        {
-          id: 2,
-          to: 'whatsapp+51956326148'
-        }
-      ],
-      steps: [
-        {
-          order: 1,
-          action: 'message.4',
-          status: 1
-        },
-        {
-          order: 2,
-          action: 'quiz.1',
-          status: 1
-        },
-        {
-          order: 3,
-          action: 'menu.1',
-          status: 1
-        },
-        {
-          order: 4,
-          action: 'close',
-          status: 1
-        }
-      ]
-    }
+    const configs = await this.channelConfigRepo.find({ where: { channel_number: phoneNumber } })
+    return configs[0]
+    // return {
+    //   id: 1,
+    //   menus: [
+    //     {
+    //       id: 1,
+    //       title: 'titulo del menu 1',
+    //       options: [
+    //         {
+    //           id: 1,
+    //           value: 'opcion 1',
+    //           action: 'message.2'
+    //         },
+    //         {
+    //           id: 2,
+    //           value: 'opcion 2',
+    //           action: 'message.3'
+    //         },
+    //         {
+    //           id: 3,
+    //           value: 'mostrar otro menu',
+    //           action: 'menu.2'
+    //         },
+    //         {
+    //           id: 4,
+    //           value: 'opcion 4',
+    //           action: 'message.1'
+    //         }
+    //       ]
+    //     },
+    //     {
+    //       id: 2,
+    //       title: 'titulo del menu de la opcion 3',
+    //       options: [
+    //         {
+    //           id: 1,
+    //           value: 'opcion 1 del menu 2',
+    //           action: 'message.2'
+    //         },
+    //         {
+    //           id: 2,
+    //           value: 'opcion 2 del menu 2',
+    //           action: 'message.3'
+    //         },
+    //         {
+    //           id: 3,
+    //           value: 'opcion 3 del menu 2',
+    //           action: 'message.5'
+    //         },
+    //         {
+    //           id: 4,
+    //           value: 'opcion 4 del menu 2',
+    //           action: 'redirect.1'
+    //         }
+    //       ]
+    //     }
+    //   ],
+    //   messages: [
+    //     {
+    //       id: 1,
+    //       message: 'gracias por escoger la opcion 4'
+    //     },
+    //     {
+    //       id: 2,
+    //       message: 'opcion 1 seleccionada'
+    //     },
+    //     {
+    //       id: 3,
+    //       message: 'escogi la opcion 2'
+    //     },
+    //     {
+    //       id: 4,
+    //       message: 'Bienvenido '
+    //     },
+    //     {
+    //       id: 5,
+    //       message: 'hola gracias por escoger la opcion 3'
+    //     }
+    //   ],
+    //   quizes: [
+    //     {
+    //       id: 1,
+    //       questions: [
+    //         {
+    //           id: 1,
+    //           question: '¿Cual es tu email?',
+    //           response_type: 1, // "string|email|url|phone_number|dni|date",
+    //           error_message: 'por favor se escrba un email valido'
+    //         },
+    //         {
+    //           id: 2,
+    //           question: '¿Cual es tu numero de celualar?',
+    //           response_type: 4, // "string|email|url|phone_number|dni|date",
+    //           error_message: 'por favor se escriba un numero de celular valido'
+    //         }
+    //       ]
+    //     }
+    //   ],
+    //   redirects: [
+    //     {
+    //       id: 1,
+    //       to: 'grupo.5'
+    //     },
+    //     {
+    //       id: 2,
+    //       to: 'whatsapp+51956326148'
+    //     }
+    //   ],
+    //   steps: [
+    //     {
+    //       order: 1,
+    //       action: 'message.4',
+    //       status: 1
+    //     },
+    //     {
+    //       order: 2,
+    //       action: 'quiz.1',
+    //       status: 1
+    //     },
+    //     {
+    //       order: 3,
+    //       action: 'menu.1',
+    //       status: 1
+    //     },
+    //     {
+    //       order: 4,
+    //       action: 'close',
+    //       status: 1
+    //     }
+    //   ]
+    // }
   }
 
   async findPointerByWaId(waId: string): Promise<string> {
@@ -318,7 +318,7 @@ export class ConversationManagerService {
   }
 
   existStep(stepOrder: number, config: Config) {
-    return config.steps.some((s) => s.order === stepOrder)
+    return config.steps.some((s) => s.step === stepOrder)
   }
 
   findQuestionFromQuiz(questionId: number, quiz: Quiz): Question {
@@ -330,7 +330,7 @@ export class ConversationManagerService {
   }
 
   findStepById(stepOrder: number, config: Config) {
-    return config.steps.find((s) => s.order === stepOrder)
+    return config.steps.find((s) => s.step === stepOrder)
   }
 
   findMenuById(menuId: number, config: Config): Menu {

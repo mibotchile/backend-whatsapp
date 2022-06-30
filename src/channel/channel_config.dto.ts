@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { AnyRecord } from 'dns'
+import { Menu, Message, Quiz, Redirect, Step } from 'src/conversations/conversation.types'
 
 export class ChannelConfigDto {
   public id: number
@@ -14,19 +14,19 @@ public channel_number: string
 public tags: string
 
 @ApiProperty({ example: [] })
-  menus: AnyRecord[]
+  menus: Menu[]
 
 @ApiProperty()
-  messages: string[]
+  messages: Message[]
 
 @ApiProperty()
-  quizes: string[]
+  quizes: Quiz[]
 
 @ApiProperty()
-  questions: string[]
+  redirects: Redirect[]
 
 @ApiProperty({ required: true })
-  steps: string[]
+  steps: Step[]
 
 @ApiProperty({ default: 1 })
   status: number

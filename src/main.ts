@@ -8,6 +8,7 @@ import * as httpContext from 'express-http-context'
 import { Transport } from '@nestjs/microservices'
 import { MessagesConsumerModule } from './conversations/messages-consumer/messages-consumer.module'
 import * as fs from 'node:fs'
+import { AIMConsumerModule } from './aim-consumer/aim-consumer.module'
 
 async function bootstrap() {
   console.log('NODE_ENV: ', process.env.NODE_ENV)
@@ -44,7 +45,7 @@ async function bootstrap() {
 
   // consumer for whatsapp messages
 
-  const clientMessages = await NestFactory.createMicroservice(MessagesConsumerModule, {
+  const messagesConsumer = await NestFactory.createMicroservice(MessagesConsumerModule, {
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBIT_URL],
@@ -55,7 +56,22 @@ async function bootstrap() {
       }
     }
   })
-  await clientMessages.listen()
+  await messagesConsumer.listen()
+
+  // consumer for create or update projects and users
+
+  const aimConsumer = await NestFactory.createMicroservice(AIMConsumerModule, {
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBIT_URL],
+      queue: process.env.RABBIT_AIM_ACTIONS_QUEUE,
+      noAck: false,
+      queueOptions: {
+        durable: true
+      }
+    }
+  })
+  await aimConsumer.listen()
 }
 
 bootstrap()

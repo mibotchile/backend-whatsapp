@@ -1,13 +1,18 @@
-import { Role } from 'src/role/role.entity'
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity('user', { schema: 'public' })
-export class User {
+@Entity('orphan_user', { schema: 'public' })
+export class OrphanUser {
     @PrimaryGeneratedColumn()
       id?: number
 
     @Column()
       uid: string
+
+    @Column()
+      project_uid: string
+
+    @Column()
+      client_uid: string
 
     @Column()
       name: string
@@ -20,10 +25,6 @@ export class User {
 
     @Column()
       role_id: number
-
-    @ManyToOne(() => Role, (role) => role.id)
-    @JoinColumn({ name: 'role_id', referencedColumnName: 'id' })
-      role?:Role
 
     @Column()
       created_by: string

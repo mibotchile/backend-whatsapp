@@ -15,8 +15,8 @@ import { MessageGateway } from '../messages-gateway/message.gateway'
 //         'From':string,
 // }
 
-@Controller('client')
-export class ClientController {
+@Controller('messagesConsumer')
+export class MessagesConsumerController {
   constructor(
     @Inject(forwardRef(() => MessageGateway))
     private readonly messageWs: MessageGateway, private conversatioManagerService:ConversationManagerService
