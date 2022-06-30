@@ -44,23 +44,6 @@ CREATE TABLE "user" (
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "orphan_user" (
-    "id" SERIAL NOT NULL,
-    "uid" VARCHAR(50) NOT NULL,
-    "project_uid" VARCHAR(50) NOT NULL,
-    "client_ui" VARCHAR(50) NOT NULL,
-    "name" VARCHAR(50) NOT NULL,
-    "email" VARCHAR(100) NOT NULL,
-    "groups_id" JSONB NOT NULL,
-    "role_id" INTEGER NOT NULL,
-    "created_by" VARCHAR(120) NOT NULL,
-    "updated_by" VARCHAR(120) NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-    "status" SMALLINT NOT NULL DEFAULT 1,
-    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateTable
 CREATE TABLE "channel" (
     "id" SERIAL NOT NULL,

@@ -22,9 +22,6 @@ export class ChannelConfig {
       quizes: Quiz[]
 
     @Column('jsonb')
-      questions: Question[]
-
-    @Column('jsonb')
       steps: Step[]
 
     @Column('jsonb')
