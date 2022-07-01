@@ -34,6 +34,7 @@ export class RolesGuard implements CanActivate {
 
     const routePath = request.route.path.split('/')
     if (routePath[1] === 'status') return true
+    if (routePath[1] === 'responseValidator') return true
     if (routePath[1] === 'health') return true
     if (routePath[1] === 'project') return true
     if (routePath[1] === 'user' && routePath[2] === 'uid') {
