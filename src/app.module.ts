@@ -19,6 +19,7 @@ import { User } from './user/user.entity'
 import { ChannelModule } from './channel/channel.module'
 import { ChannelConfig } from './channel/channel_config.entity'
 import { Channel } from './channel/channel.entity'
+import { ResponseValidatorModule } from './conversations/response-validator/response-validator.module'
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { Channel } from './channel/channel.entity'
     RoleModule,
     UserModule,
     ProjectModule,
-    ChannelModule
+    ChannelModule,
+    ResponseValidatorModule
   ],
   controllers: [HealthController],
   providers: [
