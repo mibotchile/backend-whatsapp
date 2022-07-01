@@ -32,7 +32,7 @@ export class ResponseValidatorRepository {
       regex: '^([0-9]){8}$'
     },
     {
-      id: 5,
+      id: 6,
       name: 'Fecha (DD-MM-AAAA) o (DD/MM/AAAA)',
       regex: '^([0-9]{1,2}\\/[0-9]{1,2}\\/[0-9]{4})|([0-9]{1,2}\\-[0-9]{1,2}\\-[0-9]{4})$'
     }
