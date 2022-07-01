@@ -88,7 +88,8 @@ export class ConversationManagerService {
         newPointer = subpointers.join('>')
       } else {
         // console.log('question else')
-        const step = this.findStepById(stepOrder + 1, config)
+        stepOrder += 1
+        const step = this.findStepById(stepOrder, config)
         action = step.action
       }
     }

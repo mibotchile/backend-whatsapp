@@ -1,4 +1,4 @@
-import { Menu, Message, Question, Quiz, Redirect, Step } from 'src/conversations/conversation.types'
+import { Menu, Message, Quiz, Redirect, Step } from 'src/conversations/conversation.types'
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('channel_config', { schema: 'public' })
