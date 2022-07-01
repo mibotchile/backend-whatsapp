@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Config } from '../conversation.types'
 
 @Entity('pointer_conversation', { schema: 'public' })
 export class PointerConversation {
@@ -10,6 +11,9 @@ export class PointerConversation {
 
     @Column()
       pointer: string
+
+    @Column({ type: 'jsonb' })
+      config: Config
 
     // @Column()
     //   created_by: string
