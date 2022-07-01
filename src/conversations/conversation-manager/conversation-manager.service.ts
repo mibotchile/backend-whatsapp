@@ -100,9 +100,9 @@ export class ConversationManagerService {
       if (step.action.includes('quiz')) {
         const quizId = Number(step.action.split('.')[1])
         quiz = this.findQuizById(quizId, config)
-        const question = this.findQuestionFromQuiz(0, quiz)
+        const question = quiz.questions[0]
         action = `question.${question.id}`
-        newPointer = `step.${stepOrder}>${step.action}>question.0`
+        newPointer = `step.${stepOrder}>${step.action}>question.${question.id}`
       }
     }
     console.log({ action })
@@ -347,6 +347,10 @@ export class ConversationManagerService {
 
   findQuestionFromQuiz(questionId: number, quiz: Quiz): Question {
     return quiz.questions.find((q) => q.id === questionId)
+  }
+
+  findFirstQuestionFromQuiz(quiz: Quiz): Question {
+    return quiz.questions[0]
   }
 
   findQuizById(quizId: number, config: Config): Quiz {
