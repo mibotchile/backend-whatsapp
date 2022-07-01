@@ -73,3 +73,12 @@ create TABLE "channel_config" (
     "status" SMALLINT NOT NULL DEFAULT 1,
     CONSTRAINT "channel_config_pkey" PRIMARY KEY ("id")
 );
+
+CREATE TABLE "pointer_conversation" (
+    "id" SERIAL NOT NULL,
+    "phone_number" VARCHAR(50) NOT NULL,
+    "pointer" VARCHAR(120) NULL,
+    "config" JSONB,
+    "status" SMALLINT NOT NULL DEFAULT 1,
+    CONSTRAINT "pointer_coversation_pkey" PRIMARY KEY ("id")
+);

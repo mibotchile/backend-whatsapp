@@ -10,14 +10,17 @@ import { ResponseValidatorRepository } from '../response-validator/response-vali
 @Injectable({ scope: Scope.REQUEST })
 export class ConversationManagerService {
   constructor(
-        @InjectDataSource('default')
-        private dataSource: DataSource,
+        @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(PointerConversation) private pointerRepo: Repository<PointerConversation>,
         @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
   ) {
+    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
+  }
+
+  setSchema(schema:string) {
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = 'project_' + 'vnblnzdm0b3bdcltpvpl' // httpContext.get('PROJECT_UID').toLowerCase()
-      this.dataSource.entityMetadatas[index].tablePath = 'project_' + 'vnblnzdm0b3bdcltpvpl' + '.' + em.tableName
+      this.dataSource.entityMetadatas[index].schema = schema // httpContext.get('PROJECT_UID').toLowerCase()
+      this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
     })
   }
 
@@ -33,6 +36,7 @@ export class ConversationManagerService {
   async messageClietHandler(message: string, waId: string, channel_number: string) {
     // console.log('Handler')
     const config = await this.findConfigByChannelNumber('+19206787641')
+    // console.log(JSON.stringify(config, null, '\t'))
     const pointer: string = await this.findPointerByWaId(waId)
     let subpointers = pointer ? pointer.split('>') : ['step.1']
     let stepOrder = Number(subpointers[0].replace('step.', ''))
@@ -45,6 +49,8 @@ export class ConversationManagerService {
     }
 
     const responseTo: string = subpointers[subpointers.length - 1]
+    console.log({ responseTo })
+
     let action: string
     let quiz: Quiz
     let newPointer: string
@@ -92,10 +98,14 @@ export class ConversationManagerService {
         newPointer = `step.${stepOrder}>${step.action}>question.1`
       }
     }
+    console.log({ action })
+
     let messageToSend: string
 
     if (action.includes('message')) {
       messageToSend = this.builResponseByAction(action, { config })
+      console.log({ messageToSend })
+
       await this.sendMessage(messageToSend, waId)
       newPointer = `step.${stepOrder + 1}`
       if (stepOrder === 1) {
@@ -103,8 +113,12 @@ export class ConversationManagerService {
       } else {
         await this.updatePointer(waId, newPointer)
       }
-      await this.messageClietHandler(message, waId, channel_number)
-      return
+      if (!this.existStep(stepOrder + 1, config)) {
+        action = 'close'
+      } else {
+        await this.messageClietHandler(message, waId, channel_number)
+        return
+      }
     }
 
     if (action.includes('menu')) {
