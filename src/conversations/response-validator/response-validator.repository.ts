@@ -23,8 +23,8 @@ export class ResponseValidatorRepository {
     },
     {
       id: 4,
-      name: 'numero de celular',
-      regex: '^9([0-9]){8}$'
+      name: 'numer',
+      regex: '^[0-9]$'// '^9([0-9]){8}$'
     },
     {
       id: 5,
