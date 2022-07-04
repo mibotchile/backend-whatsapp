@@ -1,4 +1,4 @@
-import { Injectable, Scope } from '@nestjs/common'
+import { Injectable, Scope, Inject, forwardRef } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
 import { PointerConversation } from './pointer-conversation.entity'
@@ -6,10 +6,12 @@ import { ChannelConfig } from 'src/channel/channel_config.entity'
 import * as twilio from 'twilio'
 import { Config, Message, Menu, Option, Question, Quiz, Redirect } from '../conversation.types'
 import { ResponseValidatorRepository } from '../response-validator/response-validator.repository'
+import { MessageGateway } from '../messages-gateway/message.gateway'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ConversationManagerService {
   constructor(
+    @Inject(forwardRef(() => MessageGateway)) private readonly messageWs: MessageGateway,
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(PointerConversation) private pointerRepo: Repository<PointerConversation>,
         @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
@@ -26,11 +28,13 @@ export class ConversationManagerService {
 
   async sendMessage(message: string, waId: string) {
     const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
+
     await twilioClient.messages.create({
       from: 'whatsapp:+14155238886',
       body: message,
       to: `whatsapp:+${waId}`
     })
+    this.messageWs.sendMessageReceived({ Body: message })
   }
 
   async messageClietHandler(message: string, waId: string, channel_number: string) {
@@ -392,7 +396,7 @@ export class ConversationManagerService {
         messageResponse = question.question
         break
       case 'quiz':
-        const question1 = this.findQuestionFromQuiz(0, quiz)
+        const question1 = quiz.questions[0]
         messageResponse = question1.question
         break
       case 'message':

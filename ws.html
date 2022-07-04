@@ -5,25 +5,30 @@
 
     <body>
         <div class="msgs"></div>
+        <button onclick="emitEvent()">Emit</button>
         <script>
             const socket = io('http://localhost:3003')
             console.log(socket)
-            const messageBox = document.querySelector('msgs')
+            const messageBox = document.querySelector('.msgs')
 
             socket.on('whatsapp_message_received', function (data) {
                 console.log(data)
-                messageBox.innerHTML += `${data}<hr>`
+                messageBox.innerHTML += `${data.Body}<hr>`
             })
             socket.on('connect', function () {
                 console.log('Connected')
                 console.log('Connected')
 
-                // socket.emit('events', { test: 'test' })
+                socket.emit('connected')
                 // socket.emit('identity', 0, (response) => console.log('Identity:', response))
             })
             //   socket.on('events', function (data) {
             //     console.log('event', data)
             //   })
+
+            function emitEvent() {
+                socket.emit('events', { test: 'test' })
+            }
             socket.on('exception', function (data) {
                 console.log('event', data)
             })

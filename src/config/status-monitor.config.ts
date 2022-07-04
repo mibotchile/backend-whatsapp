@@ -2,7 +2,7 @@ import { StatusMonitorConfiguration } from 'nest-status-monitor'
 
 export const statusMonitorConfig:StatusMonitorConfiguration = {
   pageTitle: 'Nest.js Monitoring Page',
-  port: 3030,
+  port: Number(process.env.PORT),
   path: '/status',
   ignoreStartsWith: '/health/alive',
   spans: [

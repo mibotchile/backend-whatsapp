@@ -18,8 +18,8 @@ import { MessageGateway } from '../messages-gateway/message.gateway'
 @Controller('messagesConsumer')
 export class MessagesConsumerController {
   constructor(
-    @Inject(forwardRef(() => MessageGateway))
-    private readonly messageWs: MessageGateway, private conversatioManagerService:ConversationManagerService
+    @Inject(forwardRef(() => MessageGateway)) private readonly messageWs: MessageGateway,
+    private conversatioManagerService:ConversationManagerService
   ) {}
 
   @EventPattern('whatsapp_message_received')
