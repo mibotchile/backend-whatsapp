@@ -4,7 +4,7 @@ import { Config } from '../conversation.types'
 @Entity('pointer_conversation', { schema: 'public' })
 export class PointerConversation {
     @PrimaryGeneratedColumn()
-      id: number
+      id?: number
 
     @Column()
       phone_number: string
@@ -14,6 +14,9 @@ export class PointerConversation {
 
     @Column({ type: 'jsonb' })
       config: Config
+
+    @Column()
+      conversation_id:number
 
     // @Column()
     //   created_by: string

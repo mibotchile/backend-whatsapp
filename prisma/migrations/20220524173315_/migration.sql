@@ -79,6 +79,7 @@ CREATE TABLE "pointer_conversation" (
     "phone_number" VARCHAR(50) NOT NULL,
     "pointer" VARCHAR(120) NULL,
     "config" JSONB,
+    "conversation_id" INTEGER NOT NULL,
     "status" SMALLINT NOT NULL DEFAULT 1,
     CONSTRAINT "pointer_coversation_pkey" PRIMARY KEY ("id")
 );

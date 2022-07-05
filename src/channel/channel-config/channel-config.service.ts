@@ -4,7 +4,7 @@ import { DataSource, Repository } from 'typeorm'
 import { ChannelConfig } from 'src/channel/channel-config/channel_config.entity'
 
 @Injectable({ scope: Scope.REQUEST })
-export class ConversationManagerService {
+export class ChannelConfigService {
   constructor(
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
@@ -19,7 +19,7 @@ export class ConversationManagerService {
     })
   }
 
-  async findConfigByChannelNumber(phoneNumber: string): Promise<ChannelConfig> {
+  async findByChannelNumber(phoneNumber: string): Promise<ChannelConfig> {
     const configs = await this.channelConfigRepo.find({ where: { channel_number: phoneNumber } })
     return configs[0]
   }

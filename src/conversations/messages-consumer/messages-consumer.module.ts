@@ -11,6 +11,10 @@ import { ConversationManagerService } from '../conversation-manager/conversation
 import { TwilioService } from '../twilio/twilio.service'
 import { ConversationService } from '../conversation/conversation.service'
 import { Conversation } from '../conversation/conversation.entity'
+import { MessageService } from '../messages/message.service'
+import { Message } from '../messages/message.entity'
+import { PointerConversationService } from '../conversation-manager/pointer-conversation.service'
+import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
 
 @Module({
   imports: [
@@ -24,12 +28,19 @@ import { Conversation } from '../conversation/conversation.entity'
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [PointerConversation, Channel, ChannelConfig, Conversation],
+      entities: [PointerConversation, Channel, ChannelConfig, Conversation, Message],
       logging: process.env.TYPEORM_LOGS === 'true'
     }),
-    TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation])
+    TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation, Message])
   ],
   controllers: [MessagesConsumerController],
-  providers: [MessageGateway, ConversationManagerService, TwilioService, ConversationService]
+  providers: [
+    MessageGateway,
+    ConversationManagerService,
+    TwilioService,
+    ConversationService,
+    MessageService,
+    PointerConversationService,
+    ChannelConfigService]
 })
 export class MessagesConsumerModule {}

@@ -20,19 +20,26 @@ export class PointerConversationService {
     })
   }
 
-  async updatePointer(waId: string, newPointer: string) {
+  async update(waId: string, newPointer: string) {
+    console.log({ waId })
+    console.log({ newPointer })
+
+    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     await this.pointerRepo.update({ phone_number: waId }, { pointer: newPointer })
   }
 
-  async createPointer(waId: string, newPointer: string, config:Config) {
-    await this.pointerRepo.insert({ phone_number: waId, pointer: newPointer, config })
+  async create(waId: string, newPointer: string, config:Config, conversationId:number) {
+    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
+    await this.pointerRepo.insert({ phone_number: waId, pointer: newPointer, config, conversation_id: conversationId })
   }
 
-  async deletePointer(waId: string) {
+  async delete(waId: string) {
+    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     await this.pointerRepo.update({ phone_number: waId }, { status: 0 })
   }
 
-  async findPointerByWaId(waId: string): Promise<PointerConversation> {
+  async findByWaId(waId: string): Promise<PointerConversation> {
+    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     const pointers = await this.pointerRepo.find({ where: { phone_number: waId, status: 1 } })
     return pointers[0]
     // return 'step2>menu1>option3>menu2'

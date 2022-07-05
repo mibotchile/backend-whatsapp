@@ -13,27 +13,40 @@ export class MessageGateway {
 
   rooms:any[] = []
   constructor(
-    private twilioService:TwilioService
+      private twilioService:TwilioService
   ) {
     console.log('[WEBSOCKET PORT] =======>  ', process.env.WEBSOCKET_PORT)
   }
 
-  @SubscribeMessage('send_message')
+    @SubscribeMessage('send_message')
   async sendMessage(client: Socket, { conversationId, clientNumber, channelNumber, message }:any): Promise<any> {
     console.log(conversationId)
 
     // const clientNumber = clientNumber // 51938432015
     // const channelNumber = channelNumber// +519655655656
     // const message = message // mensaje a enviar
-    await this.twilioService.sendMessage(message, channelNumber, clientNumber, true)
+
+    await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId, true)
   }
 
   @SubscribeMessage('connected')
-  handleConnect(client:Socket, { conversationId }) {
-    this.rooms[client.id] = { conversationId }
-  }
+    handleConnect(client:Socket, { conversationId }) {
+      this.rooms[client.id] = { conversationId }
+    }
 
   sendMessageReceived(data) {
     this.server.emit('whatsapp_message_received', data)
+  }
+
+  emitNewMessage(data) {
+    this.server.emit('whatsapp_message_received', data)
+  }
+
+  //   emitCountMessages(data) {
+  //     this.server.emit('whatsapp_message_received', data)
+  //   }
+
+  changeMessageStatus(data) {
+    this.server.emit('whatsapp_message_status', data)
   }
 }

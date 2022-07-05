@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 @Entity('conversation', { schema: 'public' })
 export class Conversation {
     @PrimaryGeneratedColumn()
-      id: number
+      id?: number
 
     @Column()
       channel_number:string

@@ -1,65 +1,76 @@
-import { Injectable, Scope, Inject, forwardRef } from '@nestjs/common'
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, Repository } from 'typeorm'
-import { PointerConversation } from './pointer-conversation.entity'
-import { ChannelConfig } from 'src/channel/channel-config/channel_config.entity'
-import * as twilio from 'twilio'
-import { Config, Menu, Question, Quiz } from '../conversation.types'
-import { ResponseValidatorRepository } from '../response-validator/response-validator.repository'
-import { MessageGateway } from '../messages-gateway/message.gateway'
+import { Injectable, Scope } from '@nestjs/common'
+import { Config, Quiz } from '../conversation.types'
 import { ChannelConfigUtils } from './channel-config.utils'
+import { ConversationService } from '../conversation/conversation.service'
+import { TwilioService } from '../twilio/twilio.service'
+import { PointerConversationService } from './pointer-conversation.service'
+import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
+import { MessageService } from '../messages/message.service'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ConversationManagerService {
   private configUtils:ChannelConfigUtils
   constructor(
-    @Inject(forwardRef(() => MessageGateway)) private readonly messageWs: MessageGateway,
-        @InjectDataSource('default') private dataSource: DataSource,
-        @InjectRepository(PointerConversation) private pointerRepo: Repository<PointerConversation>,
-        @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
+    private conversationService:ConversationService,
+    private twilioService:TwilioService,
+    private pointerService:PointerConversationService,
+    private channelConfigService:ChannelConfigService,
+    private messageService:MessageService
   ) {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     this.configUtils = new ChannelConfigUtils()
   }
 
-  setSchema(schema:string) {
-    this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = schema // httpContext.get('PROJECT_UID').toLowerCase()
-      this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
-    })
-  }
-
-  async sendMessage(message: string, waId: string, emitEvent = false) {
-    const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
-
-    await twilioClient.messages.create({
-      from: 'whatsapp:+14155238886',
-      body: message,
-      to: `whatsapp:+${waId}`
-    })
-    if (emitEvent) {
-      this.messageWs.sendMessageReceived({ Body: message })
-    }
-  }
-
-  async messageClientHandler(message: string, waId: string, channel_number: string) {
+  async messageClientHandler(messageInfo:any, waId: string, channel_number: string, saveMessage = true) {
+    const message = messageInfo.Body
+    channel_number = '+19206787642'
     // console.log('Handler')
     // console.log(JSON.stringify(config, null, '\t'))
-    const pointerDB = await this.findPointerByWaId(waId)
+    const pointerDB = await this.pointerService.findByWaId(waId)
     let subpointers = pointerDB ? pointerDB.pointer.split('>') : ['step.1']
     let config
+    let conversationId = 1
+    const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
     if (!pointerDB) {
-      config = await this.findConfigByChannelNumber('+19206787642')
+      config = await this.channelConfigService.findByChannelNumber('+19206787642')
       subpointers = ['step.1']
+      const conversation = await this.conversationService.save({
+        channel_number,
+        client_number: waId,
+        client_name: 'nose',
+        manager: 'system',
+        created_by: 'System',
+        updated_by: '',
+        created_at: now,
+        updated_at: now,
+        status: 1
+      })
+      conversationId = Number(conversation.identifiers[0].id)
+
+      console.log('CONVERSATION ----------------------', JSON.stringify(conversation))
     } else {
       config = pointerDB.config
+      conversationId = Number(pointerDB.conversation_id)
+    }
+    if (saveMessage) {
+      await this.messageService.save({
+        sid: messageInfo.MessageSid,
+        conversation_id: conversationId,
+        content_type: 'text',
+        message,
+        media_url: '',
+        from_client: true,
+        message_status: 'received',
+        created_at: now,
+        created_by: 'system',
+        status: 1
+      })
     }
 
     let stepOrder = Number(subpointers[0].replace('step.', ''))
 
     if (!this.configUtils.existStep(stepOrder, config)) {
-      this.deletePointer(waId)
-      await this.createPointer(waId, 'step.1', config)
+      await this.pointerService.delete(waId)
+      await this.pointerService.create(waId, 'step.1', config, conversationId)
       subpointers = ['step.1']
       stepOrder = 1
     }
@@ -74,8 +85,8 @@ export class ConversationManagerService {
     if (responseTo.includes('menu')) {
       const menuId = responseTo.split('.')[1]
       const menu = this.configUtils.findMenuById(Number(menuId), config)
-      if (!this.isValidOption(message, menu)) {
-        this.sendMessage('Por favor elija una opcion valida', waId)
+      if (!this.configUtils.isValidOption(message, menu)) {
+        await this.twilioService.sendMessage('Por favor elija una opcion valida', channel_number, waId, conversationId)
         return
       }
       const optionSelected = this.configUtils.findOptionFromMenu(Number(message), menu)
@@ -86,8 +97,8 @@ export class ConversationManagerService {
       quiz = this.configUtils.findQuizById(Number(subpointers[subpointers.length - 2].split('.')[1]), config)
       const questionId = Number(responseTo.split('.')[1])
       const question = this.configUtils.findQuestionFromQuiz(questionId, quiz)
-      if (!this.isValidQuestionResponse(question, message)) {
-        this.sendMessage(question.error_message, waId)
+      if (!this.configUtils.isValidQuestionResponse(question, message)) {
+        await this.twilioService.sendMessage(question.error_message, channel_number, waId, conversationId)
         return
       }
       if (this.configUtils.existQuestionInQuiz(questionId + 1, quiz)) {
@@ -123,17 +134,17 @@ export class ConversationManagerService {
       messageToSend = this.builResponseByAction(action, { config })
       console.log({ messageToSend })
 
-      await this.sendMessage(messageToSend, waId)
+      await await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
       newPointer = `step.${stepOrder + 1}`
       if (stepOrder === 1) {
-        await this.createPointer(waId, newPointer, config)
+        await this.pointerService.create(waId, newPointer, config, conversationId)
       } else {
-        await this.updatePointer(waId, newPointer)
+        await this.pointerService.update(waId, newPointer)
       }
       if (!this.configUtils.existStep(stepOrder + 1, config)) {
         action = 'close'
       } else {
-        await this.messageClientHandler(message, waId, channel_number)
+        await this.messageClientHandler(messageInfo, waId, channel_number, false)
         return
       }
     }
@@ -159,63 +170,24 @@ export class ConversationManagerService {
 
     if (action.includes('close')) {
       messageToSend = 'Gracias por comunicarse con nosotros'
-      this.deletePointer(waId)
+      await this.pointerService.delete(waId)
     } else {
       if (stepOrder === 1) {
-        await this.createPointer(waId, newPointer, config)
+        await this.pointerService.create(waId, newPointer, config, conversationId)
       } else {
-        await this.updatePointer(waId, newPointer)
+        await this.pointerService.update(waId, newPointer)
       }
     }
     console.log({ action })
     console.log({ messageToSend })
 
-    await this.sendMessage(messageToSend, waId)
+    await await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
     console.log({ stepOrder })
-  }
-
-  async updatePointer(waId: string, newPointer: string) {
-    await this.pointerRepo.update({ phone_number: waId }, { pointer: newPointer })
   }
 
   //   async redirectClient(waId:string, redirect:Redirect) {
   //     await this.pointerRepo.update({ phone_number: waId }, { pointer: newPointer })
   //   }
-
-  isValidOption(optionSelected:string, menu:Menu) {
-    const optionId = Number(optionSelected.trim())
-    if (isNaN(optionId)) return false
-    return menu.options.some(o => o.id === optionId)
-  }
-
-  isValidQuestionResponse(question:Question, response:string) {
-    const validator = ResponseValidatorRepository.findById(Number(question.response_type))
-    if (!validator) {
-      return true
-    }
-    const regex = new RegExp(validator.regex)
-    return regex.test(response)
-  }
-
-  async createPointer(waId: string, newPointer: string, config:Config) {
-    await this.pointerRepo.insert({ phone_number: waId, pointer: newPointer, config })
-  }
-
-  async deletePointer(waId: string) {
-    await this.pointerRepo.update({ phone_number: waId }, { status: 0 })
-  }
-
-  async findConfigByChannelNumber(phoneNumber: string): Promise<Config> {
-    const configs = await this.channelConfigRepo.find({ where: { channel_number: phoneNumber } })
-    return configs[0]
-  }
-
-  async findPointerByWaId(waId: string): Promise<PointerConversation> {
-    const pointers = await this.pointerRepo.find({ where: { phone_number: waId, status: 1 } })
-    return pointers[0]
-    // return 'step2>menu1>option3>menu2'
-    // return 'step3>quiz2>question5'
-  }
 
   builResponseByAction(action: string, { config, quiz }: { config?: Config; quiz?: Quiz }): string {
     const [itemType, itemId] = action.split('.')

@@ -3,7 +3,10 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 @Entity('message', { schema: 'public' })
 export class Message {
     @PrimaryGeneratedColumn()
-      id: number
+      id?: number
+
+      @Column()
+        sid: string
 
     @Column()
       conversation_id:number
@@ -21,7 +24,7 @@ export class Message {
       from_client: boolean
 
     @Column()
-      message_status: boolean
+      message_status: string
 
     @Column()
       created_at: string

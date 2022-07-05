@@ -20,11 +20,11 @@ export class ConversationService {
   }
 
   async save(data:Conversation) {
-    await this.conversationRepo.insert(data)
+    return await this.conversationRepo.insert(data)
   }
 
   async update(id:number, data:Conversation) {
-    await this.conversationRepo.update(id, data)
+    return await this.conversationRepo.update(id, data)
   }
 
   async updateManager(id:number, typeManager:'system'|'user'|'group', managerId?:number) {
