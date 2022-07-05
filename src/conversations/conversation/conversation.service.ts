@@ -1,13 +1,11 @@
-import { Injectable, Scope, Inject, forwardRef } from '@nestjs/common'
+import { Injectable, Scope } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, ILike, Repository } from 'typeorm'
-import { MessageGateway } from '../messages-gateway/message.gateway'
 import { Conversation } from './conversation.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ConversationService {
   constructor(
-    @Inject(forwardRef(() => MessageGateway)) private readonly messageWs: MessageGateway,
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(Conversation) private conversationRepo: Repository<Conversation>
   ) {

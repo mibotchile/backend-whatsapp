@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common'
 import { ApiBody, ApiHeader, ApiTags } from '@nestjs/swagger'
 import { ChannelService } from './channel.service'
-import { ChannelConfig } from './channel_config.entity'
+import { ChannelConfig } from './channel-config/channel_config.entity'
 import * as httpContext from 'express-http-context'
 import { Channel } from 'amqp-connection-manager'
 import { ChannelDto } from './channel.dto'
-import { ChannelConfigDto } from './channel_config.dto'
+import { ChannelConfigDto } from './channel-config/channel_config.dto'
 
 @Controller('channel')
 @ApiTags('Channels')

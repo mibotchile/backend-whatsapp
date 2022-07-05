@@ -17,10 +17,13 @@ import { Group } from './group/group.entity'
 import { Role } from './role/role.entity'
 import { User } from './user/user.entity'
 import { ChannelModule } from './channel/channel.module'
-import { ChannelConfig } from './channel/channel_config.entity'
+import { ChannelConfig } from './channel/channel-config/channel_config.entity'
 import { Channel } from './channel/channel.entity'
 import { ResponseValidatorModule } from './conversations/response-validator/response-validator.module'
 import { ConversationModule } from './conversations/conversation/conversation.module'
+import { Conversation } from './conversations/conversation/conversation.entity'
+import { Message } from './conversations/messages/message.entity'
+import { MessageModule } from './conversations/messages/message.module'
 
 @Module({
   imports: [
@@ -34,7 +37,7 @@ import { ConversationModule } from './conversations/conversation/conversation.mo
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [Group, Role, User, Channel, ChannelConfig],
+      entities: [Group, Role, User, Channel, ChannelConfig, Conversation, Message],
       autoLoadEntities: false,
       logging: process.env.TYPEORM_LOGS === 'true'
     }),
@@ -45,7 +48,8 @@ import { ConversationModule } from './conversations/conversation/conversation.mo
     ProjectModule,
     ChannelModule,
     ResponseValidatorModule,
-    ConversationModule
+    ConversationModule,
+    MessageModule
   ],
   controllers: [HealthController],
   providers: [

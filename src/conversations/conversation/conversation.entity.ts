@@ -6,6 +6,9 @@ export class Conversation {
       id: number
 
     @Column()
+      channel_number:string
+
+    @Column()
       client_number:string
 
     @Column()

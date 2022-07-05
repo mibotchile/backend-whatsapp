@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('message', { schema: 'public' })
-export class PointerConversation {
+export class Message {
     @PrimaryGeneratedColumn()
       id: number
 
@@ -19,6 +19,9 @@ export class PointerConversation {
 
     @Column()
       from_client: boolean
+
+    @Column()
+      message_status: boolean
 
     @Column()
       created_at: string

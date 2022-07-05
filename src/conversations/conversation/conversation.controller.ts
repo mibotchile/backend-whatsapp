@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
 import { ConversationService } from './conversation.service'
-import { ApiBody, ApiHeader, ApiQuery, ApiTags, PickType } from '@nestjs/swagger'
+import { ApiBody, ApiHeader, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { Conversation } from './conversation.entity'
 import * as httpContext from 'express-http-context'
@@ -37,19 +37,54 @@ export class ConversationController {
   //     })
   //   }
 
+  @Get()
+  @ApiResponse({ description: 'Retorna todas las conversaciones' })
+  //   @ApiQuery({ name: 'page', type: Number, required: false })
+  //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  async findAll(@Query() queryParams: any): Promise<Conversation[]> {
+    return this.conversationService.findAll()
+  }
+
   @Get('groupManager')
-  @ApiQuery({ name: 'page', type: Number, required: false })
-  @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  @ApiResponse({ description: 'Retorna las conversaciones que tienen como manager un grupo' })
+  //   @ApiQuery({ name: 'page', type: Number, required: false })
+  //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findWithGroupManager(@Query() queryParams: any): Promise<Conversation[]> {
     return this.conversationService.findByManager('group')
   }
 
   @Get('userManager')
-  @ApiQuery({ name: 'page', type: Number, required: false })
-  @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  @ApiResponse({ description: 'Retorna las conversaciones que tienen como manager un usuario' })
+  //   @ApiQuery({ name: 'page', type: Number, required: false })
+  //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findWithUserManager(@Query() queryParams: any): Promise<Conversation[]> {
     return this.conversationService.findByManager('user')
   }
+
+  @Get('client/:clientNumber')
+  @ApiResponse({ description: 'Retorna las conversaciones de un cliente' })
+  //   @ApiQuery({ name: 'page', type: Number, required: false })
+  //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  async findByClientNumber(@Query() queryParams: any): Promise<Conversation[]> {
+    return this.conversationService.findByManager('user')
+  }
+
+  @Get('user/:userId')
+  @ApiResponse({ description: 'Retorna las conversaciones de un usuario en especifico' })
+  //   @ApiQuery({ name: 'page', type: Number, required: false })
+  //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  async findByUserId(@Query() queryParams: any): Promise<Conversation[]> {
+    return this.conversationService.findByManager('user')
+  }
+
+  @Get('group/:groupId')
+  @ApiResponse({ description: 'Retorna las conversaciones de un grupo en especifico' })
+  //   @ApiQuery({ name: 'page', type: Number, required: false })
+  //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  async findGroupId(@Query() queryParams: any): Promise<Conversation[]> {
+    return this.conversationService.findByManager('user')
+  }
+
   //   @Get('actives')
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })

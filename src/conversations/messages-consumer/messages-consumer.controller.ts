@@ -25,7 +25,7 @@ export class MessagesConsumerController {
   @EventPattern('whatsapp_message_received')
   async handleMessagePrinted(data: Record<string, any>) {
     this.messageWs.sendMessageReceived(data)
-    this.conversatioManagerService.messageClietHandler(data.Body, data.WaId, data.To.replace('whatsapp:', ''))
+    this.conversatioManagerService.messageClientHandler(data.Body, data.WaId, data.To.replace('whatsapp:', ''))
     console.log(data)
   }
 

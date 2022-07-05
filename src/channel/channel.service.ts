@@ -4,11 +4,14 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, ILike, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
 import * as twilio from 'twilio'
-import { ChannelConfig } from './channel_config.entity'
+import { ChannelConfig } from './channel-config/channel_config.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ChannelService {
-  constructor (@InjectDataSource() private dataSource:DataSource, @InjectRepository(Channel) private channelRepository: Repository<Channel>, @InjectRepository(ChannelConfig) private channelConfigRepository: Repository<ChannelConfig>) {
+  constructor (
+    @InjectDataSource() private dataSource:DataSource,
+    @InjectRepository(Channel) private channelRepository: Repository<Channel>,
+    @InjectRepository(ChannelConfig) private channelConfigRepository: Repository<ChannelConfig>) {
     this.dataSource.entityMetadatas.forEach((em, index) => {
       this.dataSource.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
       this.dataSource.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.' + em.tableName
