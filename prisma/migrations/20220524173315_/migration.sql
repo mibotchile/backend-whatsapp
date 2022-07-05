@@ -83,3 +83,32 @@ CREATE TABLE "pointer_conversation" (
     "status" SMALLINT NOT NULL DEFAULT 1,
     CONSTRAINT "pointer_coversation_pkey" PRIMARY KEY ("id")
 );
+
+create TABLE "project_vnblnzdm0b3bdcltpvpl"."message" (
+    "id" SERIAL NOT NULL,
+    "sid" VARCHAR(50) NOT NULL,
+    "conversation_id" INTEGER NOT NULL,
+    "content_type" VARCHAR(50) NOT NULL,
+    "message" TEXT NOT NULL,
+    "media_url" TEXT NOT NULL,
+    "from_client" BOOLEAN NOT NULL DEFAULT false,
+    "message_status" VARCHAR(50) NOT NULL,
+    "created_by" VARCHAR(120) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "status" SMALLINT NOT NULL DEFAULT 1,
+    CONSTRAINT "message_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "project_vnblnzdm0b3bdcltpvpl"."conversation" (
+    "id" SERIAL NOT NULL,
+    "channel_number" VARCHAR(50) NOT NULL,
+    "client_number" VARCHAR(50) NOT NULL,
+    "client_name" VARCHAR(50) NOT NULL,
+    "manager" VARCHAR(50) NOT NULL,
+    "created_by" VARCHAR(120) NOT NULL,
+    "updated_by" VARCHAR(120) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "status" SMALLINT NOT NULL DEFAULT 1,
+    CONSTRAINT "conversation_pkey" PRIMARY KEY ("id")
+);

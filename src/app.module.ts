@@ -23,7 +23,7 @@ import { ResponseValidatorModule } from './conversations/response-validator/resp
 import { ConversationModule } from './conversations/conversation/conversation.module'
 import { Conversation } from './conversations/conversation/conversation.entity'
 import { Message } from './conversations/messages/message.entity'
-import { MessageModule } from './conversations/messages/message.module'
+import { MessageApiModule } from './conversations/messages/message-api.module'
 
 @Module({
   imports: [
@@ -49,7 +49,7 @@ import { MessageModule } from './conversations/messages/message.module'
     ChannelModule,
     ResponseValidatorModule,
     ConversationModule,
-    MessageModule
+    MessageApiModule
   ],
   controllers: [HealthController],
   providers: [
@@ -59,6 +59,7 @@ import { MessageModule } from './conversations/messages/message.module'
     }
   ]
 })
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer

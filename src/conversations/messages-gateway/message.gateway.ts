@@ -29,24 +29,24 @@ export class MessageGateway {
     await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId, true)
   }
 
-  @SubscribeMessage('connected')
-    handleConnect(client:Socket, { conversationId }) {
-      this.rooms[client.id] = { conversationId }
+    //   @SubscribeMessage('connected')
+    //     handleConnect(client:Socket, { conversationId }) {
+    //       this.rooms[client.id] = { conversationId }
+    //     }
+
+    sendMessageReceived(data) {
+      this.server.emit('whatsapp_message_received', data)
     }
 
-  sendMessageReceived(data) {
-    this.server.emit('whatsapp_message_received', data)
-  }
+    emitNewMessage(data) {
+      this.server.emit('whatsapp_message_received', data)
+    }
 
-  emitNewMessage(data) {
-    this.server.emit('whatsapp_message_received', data)
-  }
+    //   emitCountMessage(data) {
+    //     this.server.emit('whatsapp_message_received', data)
+    //   }
 
-  //   emitCountMessages(data) {
-  //     this.server.emit('whatsapp_message_received', data)
-  //   }
-
-  changeMessageStatus(data) {
-    this.server.emit('whatsapp_message_status', data)
-  }
+    changeMessageStatus(data) {
+      this.server.emit('whatsapp_message_status', data)
+    }
 }

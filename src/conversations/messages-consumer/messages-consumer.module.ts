@@ -32,14 +32,15 @@ import { ChannelConfigService } from 'src/channel/channel-config/channel-config.
       logging: process.env.TYPEORM_LOGS === 'true'
     }),
     TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation, Message])
+
   ],
   controllers: [MessagesConsumerController],
   providers: [
+    MessageService,
+    TwilioService,
     MessageGateway,
     ConversationManagerService,
-    TwilioService,
     ConversationService,
-    MessageService,
     PointerConversationService,
     ChannelConfigService]
 })

@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Param } from '@nestjs/common'
-import { MessageService } from './message.service'
+import { MessageApiService } from './message-api.service'
 import { ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger'
 
 import { Message } from './message.entity'
@@ -13,7 +13,7 @@ import { Message } from './message.entity'
   example: 'beareer slkjdjklskdlfkj'
 })
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly messageService: MessageApiService) {}
 
   //   @Post()
   //   @ApiBody({
