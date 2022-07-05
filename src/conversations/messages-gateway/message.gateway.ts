@@ -28,7 +28,6 @@ export class MessageGateway {
 
     await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId, true)
   }
-
     //   @SubscribeMessage('connected')
     //     handleConnect(client:Socket, { conversationId }) {
     //       this.rooms[client.id] = { conversationId }
@@ -40,6 +39,10 @@ export class MessageGateway {
 
     emitNewMessage(data) {
       this.server.emit('whatsapp_message_received', data)
+    }
+
+    emitNewConversation(data) {
+      this.server.emit('new_conversation', data)
     }
 
     //   emitCountMessage(data) {

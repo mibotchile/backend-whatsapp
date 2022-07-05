@@ -7,7 +7,7 @@
         <div class="msgs"></div>
         <button onclick="emitEvent()">Emit</button>
         <script>
-            const socket = io('192.168.1.35:3003')
+            const socket = io('http://localhost:3003')
             console.log(socket)
             const messageBox = document.querySelector('.msgs')
 

@@ -46,4 +46,9 @@ export class ConversationService {
       }
     })
   }
+
+  async findById(id:number):Promise<Conversation> {
+    const [conversation] = await this.conversationRepo.find({ where: { id } })
+    return conversation
+  }
 }

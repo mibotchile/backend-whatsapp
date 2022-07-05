@@ -1,4 +1,4 @@
-import { Injectable, Scope } from '@nestjs/common'
+import { Injectable, Inject, forwardRef } from '@nestjs/common'
 import { Config, Quiz } from '../conversation.types'
 import { ChannelConfigUtils } from './channel-config.utils'
 import { ConversationService } from '../conversation/conversation.service'
@@ -6,11 +6,13 @@ import { TwilioService } from '../twilio/twilio.service'
 import { PointerConversationService } from './pointer-conversation.service'
 import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
 import { MessageService } from '../messages/message.service'
+import { MessageGateway } from '../messages-gateway/message.gateway'
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class ConversationManagerService {
   private configUtils:ChannelConfigUtils
   constructor(
+    @Inject(forwardRef(() => MessageGateway)) private readonly messageWs: MessageGateway,
     private conversationService:ConversationService,
     private twilioService:TwilioService,
     private pointerService:PointerConversationService,
@@ -163,6 +165,11 @@ export class ConversationManagerService {
 
     if (action.includes('redirect')) {
       messageToSend = 'En breve un asesor se comunicara con usted'
+      const redirect = this.configUtils.findRedirectById(Number(action.split('.')[1]), config)
+      const [manager, managerId] = redirect.to.split('.')
+      this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))
+      const conversation = this.conversationService.findById(conversationId)
+      this.messageWs.emitNewConversation(conversation)
       newPointer = `step.${stepOrder + 1}`
     } else {
       messageToSend = this.builResponseByAction(action, { config, quiz })
