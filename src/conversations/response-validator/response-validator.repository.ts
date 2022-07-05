@@ -9,7 +9,7 @@ export class ResponseValidatorRepository {
     {
       id: 1,
       name: 'email',
-      regex: '^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$'
+      regex: '^([a-zA-Z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$'
     },
     {
       id: 2,

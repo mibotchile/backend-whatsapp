@@ -20,6 +20,7 @@ import { ChannelModule } from './channel/channel.module'
 import { ChannelConfig } from './channel/channel_config.entity'
 import { Channel } from './channel/channel.entity'
 import { ResponseValidatorModule } from './conversations/response-validator/response-validator.module'
+import { ConversationModule } from './conversations/conversation/conversation.module'
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { ResponseValidatorModule } from './conversations/response-validator/resp
     UserModule,
     ProjectModule,
     ChannelModule,
-    ResponseValidatorModule
+    ResponseValidatorModule,
+    ConversationModule
   ],
   controllers: [HealthController],
   providers: [

@@ -8,6 +8,7 @@ import { PointerConversation } from '../conversation-manager/pointer-conversatio
 import { Channel } from 'src/channel/channel.entity'
 import { ChannelConfig } from 'src/channel/channel_config.entity'
 import { ConversationManagerService } from '../conversation-manager/conversation-manager.service'
+import { TwilioService } from '../twilio/twilio.service'
 
 @Module({
   imports: [
@@ -27,6 +28,6 @@ import { ConversationManagerService } from '../conversation-manager/conversation
     TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig])
   ],
   controllers: [MessagesConsumerController],
-  providers: [MessageGateway, ConversationManagerService]
+  providers: [MessageGateway, ConversationManagerService, TwilioService]
 })
 export class MessagesConsumerModule {}

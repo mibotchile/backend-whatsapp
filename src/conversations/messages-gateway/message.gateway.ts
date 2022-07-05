@@ -1,4 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets'
+import { Server, Socket } from 'socket.io'
+import { TwilioService } from '../twilio/twilio.service'
 
 @WebSocketGateway(Number(process.env.WEBSOCKET_PORT),
   {
@@ -7,23 +9,28 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/web
   })
 export class MessageGateway {
   @WebSocketServer()
-    server
+    server:Server
 
-  constructor() {
-    console.log('ws posrtssss', process.env.WEBSOCKET_PORT)
+  rooms:any[] = []
+  constructor(
+    private twilioService:TwilioService
+  ) {
+    console.log('[WEBSOCKET PORT] =======>  ', process.env.WEBSOCKET_PORT)
   }
 
-  @SubscribeMessage('events')
-  handleMessage(client: any, payload: any): string {
-    console.log({ client })
-    console.log({ payload })
+  @SubscribeMessage('send_message')
+  async sendMessage(client: Socket, { conversationId, clientNumber, channelNumber, message }:any): Promise<any> {
+    console.log(conversationId)
 
-    return 'Hello world!'
+    // const clientNumber = clientNumber // 51938432015
+    // const channelNumber = channelNumber// +519655655656
+    // const message = message // mensaje a enviar
+    await this.twilioService.sendMessage(message, channelNumber, clientNumber, true)
   }
 
   @SubscribeMessage('connected')
-  handleConnect(client:any) {
-    console.log(client.id)
+  handleConnect(client:Socket, { conversationId }) {
+    this.rooms[client.id] = { conversationId }
   }
 
   sendMessageReceived(data) {
