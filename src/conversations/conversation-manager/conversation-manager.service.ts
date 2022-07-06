@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common'
+import { Injectable, Inject, forwardRef, Global } from '@nestjs/common'
 import { Config, Quiz } from '../conversation.types'
 import { ChannelConfigUtils } from './channel-config.utils'
 import { ConversationService } from '../conversation/conversation.service'
@@ -8,11 +8,13 @@ import { ChannelConfigService } from 'src/channel/channel-config/channel-config.
 import { MessageService } from '../messages/message.service'
 import { ConversationGateway } from '../conversation-gateway/conversation.gateway'
 
+@Global()
 @Injectable()
 export class ConversationManagerService {
   private configUtils:ChannelConfigUtils
   constructor(
     @Inject(forwardRef(() => ConversationGateway)) private readonly conversationGateway: ConversationGateway,
+    @Inject(forwardRef(() => ConversationService))
     private conversationService:ConversationService,
     private twilioService:TwilioService,
     private pointerService:PointerConversationService,

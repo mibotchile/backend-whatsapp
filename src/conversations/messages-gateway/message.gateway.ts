@@ -1,6 +1,7 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { TwilioService } from '../twilio/twilio.service'
+import { forwardRef, Inject } from '@nestjs/common'
 
 @WebSocketGateway(Number(process.env.WEBSOCKET_PORT),
   {
@@ -14,6 +15,7 @@ export class MessageGateway {
 
   rooms:any[] = []
   constructor(
+    @Inject(forwardRef(() => TwilioService))
       private twilioService:TwilioService
   ) {
     console.log('[WEBSOCKET MESSAGES PORT] =======>  ', process.env.WEBSOCKET_PORT)
@@ -21,6 +23,8 @@ export class MessageGateway {
 
     @SubscribeMessage('send_message')
   async sendMessage(client: Socket, { conversationId, clientNumber, channelNumber, message }:any): Promise<any> {
+    console.log('Enviando mensaje.................')
+
     console.log(conversationId)
 
     // const clientNumber = clientNumber // 51938432015

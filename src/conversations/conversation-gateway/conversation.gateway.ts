@@ -1,6 +1,8 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets'
+import { forwardRef, Inject } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { ConversationService } from '../conversation/conversation.service'
+import { ClientProxy } from '@nestjs/microservices'
 
 @WebSocketGateway(Number(process.env.WEBSOCKET_PORT),
   {
@@ -14,12 +16,23 @@ export class ConversationGateway {
     server:Server
 
   constructor(
-    private conversationService:ConversationService
+    @Inject(forwardRef(() => ConversationService))
+    private conversationService:ConversationService,
+    @Inject('SAMPLE_SERVICE') private readonly client: ClientProxy
   ) {
     console.log('[WEBSOCKET CONVERSATIONS PORT] =======>  ', process.env.WEBSOCKET_PORT)
   }
 
   rooms:any[] = []
+
+  async onApplicationBootstrap() {
+    try {
+      await this.client.connect()
+      console.log('[RABBITMQ CONECTADO] - [url] ' + process.env.RABBIT_URL)
+    } catch (error) {
+      console.log('error', error)
+    }
+  }
 
   @SubscribeMessage('redirect_conversation')
   async redirectConversation(client: Socket, { conversationId, manager, managerId }:any): Promise<any> {
@@ -39,6 +52,7 @@ export class ConversationGateway {
 
     await this.conversationService.updateManager(+conversationId, 'system', 0)
     const conversation = await this.conversationService.findById(conversationId)
+    this.client.emit<any>('continue_conversation', conversation)
     return conversation
     // return this.conversationGateway.emitNewConversation(conversation)
   }

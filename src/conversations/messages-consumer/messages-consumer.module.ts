@@ -16,12 +16,26 @@ import { Message } from '../messages/message.entity'
 import { PointerConversationService } from '../conversation-manager/pointer-conversation.service'
 import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
 import { ConversationGateway } from '../conversation-gateway/conversation.gateway'
+import { ClientsModule, Transport } from '@nestjs/microservices'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
     }),
+    ClientsModule.register([
+      {
+        name: 'SAMPLE_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBIT_URL],
+          queue: process.env.RABBIT_WHATSAPP_MESSAGES_QUEUE,
+          queueOptions: {
+            durable: true
+          }
+        }
+      }
+    ]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -33,7 +47,6 @@ import { ConversationGateway } from '../conversation-gateway/conversation.gatewa
       logging: process.env.TYPEORM_LOGS === 'true'
     }),
     TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation, Message])
-
   ],
   controllers: [MessagesConsumerController],
   providers: [

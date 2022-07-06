@@ -5,7 +5,19 @@
 
     <body>
         <div class="msgs"></div>
+        <br />
+        <hr />
+        <hr />
+        numero del cliente
+        <input type="number" id="client-number" />
+        <br />
+        <br />
+        mensaje
+        <input type="mensaje" id="message" />
+        <br />
+        <br />
         <button onclick="emitEvent()">test messages socket</button>
+        <hr />
         <button onclick="redirect()">Test Conversation socket</button>
         <script>
             const socket = io('http://localhost:3003/messages', {
@@ -19,7 +31,7 @@
 
             socket.on('whatsapp_message_received', function (data) {
                 console.log(data)
-                messageBox.innerHTML += `${data.Body}<hr>`
+                messageBox.innerHTML += `${data.message}<hr>`
             })
             socketConversations.on('redirect_conversation', function (data) {
                 console.log(data)
@@ -43,7 +55,9 @@
             })
 
             function emitEvent() {
-                socket.emit('test', { test: 'test' })
+                const cn = document.getElementById('client-number')
+                const msg = document.getElementById('message')
+                socket.emit('send_message', { conversationId: 2, clientNumber: cn.value, channelNumber: '555', message: msg.value })
             }
             function redirect() {
                 socketConversations.emit('redirect_conversation', { conversationId: 45, manager: 'user', managerId: 45 })

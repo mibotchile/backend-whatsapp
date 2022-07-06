@@ -1,9 +1,9 @@
-import { Injectable, Scope } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
 import { ChannelConfig } from 'src/channel/channel-config/channel_config.entity'
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class ChannelConfigService {
   constructor(
         @InjectDataSource('default') private dataSource: DataSource,

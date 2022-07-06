@@ -30,6 +30,12 @@ export class MessagesConsumerController {
     console.log(data)
   }
 
+  @EventPattern('continue_conversation')
+  async handleConversation(data: Record<string, any>) {
+    await this.conversatioManagerService.messageClientHandler({ Body: '' }, data.client_number, data.channel_number, false)
+    console.log(data)
+  }
+
   @EventPattern('whatsapp_message_status')
   async handleMessageStatus(data: Record<string, any>) {
     this.messageWs.changeMessageStatus({ sid: data.MessageSid, message_status: data.MessageStatus })
