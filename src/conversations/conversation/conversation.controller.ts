@@ -65,24 +65,24 @@ export class ConversationController {
   @ApiResponse({ description: 'Retorna las conversaciones de un cliente' })
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findByClientNumber(@Query() queryParams: any): Promise<Conversation[]> {
-    return this.conversationService.findByManager('user')
+  async findByClientNumber(@Query() queryParams: any, @Param('clientNumber') clientNumber:string): Promise<Conversation[]> {
+    return this.conversationService.findByClient(clientNumber)
   }
 
   @Get('user/:userId')
   @ApiResponse({ description: 'Retorna las conversaciones de un usuario en especifico' })
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findByUserId(@Query() queryParams: any): Promise<Conversation[]> {
-    return this.conversationService.findByManager('user')
+  async findByUserId(@Query() queryParams: any, @Param('userId') userId:string): Promise<Conversation[]> {
+    return this.conversationService.findByManagerWithId('user', Number(userId))
   }
 
   @Get('group/:groupId')
   @ApiResponse({ description: 'Retorna las conversaciones de un grupo en especifico' })
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
-  async findGroupId(@Query() queryParams: any): Promise<Conversation[]> {
-    return this.conversationService.findByManager('user')
+  async findGroupId(@Query() queryParams: any, @Param('groupId') groupId:string): Promise<Conversation[]> {
+    return this.conversationService.findByManagerWithId('group', Number(groupId))
   }
 
   //   @Get('actives')

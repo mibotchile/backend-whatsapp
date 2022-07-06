@@ -47,6 +47,22 @@ export class ConversationService {
     })
   }
 
+  async findByClient(clientNumber:string):Promise<Conversation[]> {
+    return await this.conversationRepo.find({
+      where: {
+        client_number: clientNumber
+      }
+    })
+  }
+
+  async findByManagerWithId(manager:string, managerId:number):Promise<Conversation[]> {
+    return await this.conversationRepo.find({
+      where: {
+        manager: `${manager}_${managerId}`
+      }
+    })
+  }
+
   async findById(id:number):Promise<Conversation> {
     const [conversation] = await this.conversationRepo.find({ where: { id } })
     return conversation
