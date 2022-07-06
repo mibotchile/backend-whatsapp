@@ -36,12 +36,12 @@ export class ConversationManagerService {
     let conversationManager:string
     const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
     if (!pointerDB) {
-      config = await this.channelConfigService.findByChannelNumber('+19206787642')
+      config = await this.channelConfigService.findByChannelNumber('+19206787641')
       subpointers = ['step.1']
       const conversation = await this.conversationService.save({
         channel_number,
         client_number: waId,
-        client_name: 'nose',
+        client_name: messageInfo.ProfileName ?? '',
         manager: 'system',
         created_by: 'System',
         updated_by: '',
@@ -160,12 +160,13 @@ export class ConversationManagerService {
 
     if (action.includes('menu')) {
       console.log('lengthhhhhhhh-> ', subpointers.length)
-      if (subpointers.length === 1) subpointers[0] = `step.${stepOrder + 1}` // esto sucede cuando el step contiene como action un menu
+      if (subpointers.length === 1) subpointers[0] = `step.${stepOrder}` // esto sucede cuando el step contiene como action un menu
+      //   if (subpointers.length === 1) subpointers[0] = `step.${stepOrder + 1}` // esto sucede cuando el step contiene como action un menu
       if (subpointers.length === 2) subpointers.pop() // esto sucede cuando la opcion escogida continen com action otro menu
       subpointers.push(action)
       newPointer = subpointers.join('>')
       if (responseTo.includes('question')) {
-        // esto sucede cuando se termina un quiz (osea el quiestio id es el ultimo) y el siguiente paso tiene como action un menu
+        // esto sucede cuando se termina un quiz (osea el quiestion id es el ultimo) y el siguiente paso tiene como action un menu
         newPointer = `step.${stepOrder + 1}>${action}`
       }
     }
