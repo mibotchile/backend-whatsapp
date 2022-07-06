@@ -26,7 +26,7 @@ export class ConversationManagerService {
 
   async messageClientHandler(messageInfo:any, waId: string, channel_number: string, saveMessage = true) {
     const message = messageInfo.Body
-    channel_number = '+19206787642'
+    channel_number = '+19206787641'
     // console.log('Handler')
     // console.log(JSON.stringify(config, null, '\t'))
     const pointerDB = await this.pointerService.findByWaId(waId)

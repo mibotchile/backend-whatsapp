@@ -11,14 +11,18 @@ export class TwilioService {
   async sendMessage(message: string, from: string, to: string, conversationId:number, emitEvent = false) {
     const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
     try {
-      const messageInfo = await twilioClient.messages.create({
+      const messageData = {
         from: 'whatsapp:+14155238886',
         // from: `whatsapp:${from}`,
         body: message,
-        to: `whatsapp:+${to}`,
-        statusCallback: `${process.env.TWILIO_URL_STATUS}/messageStatus`
+        to: `whatsapp:+${to}`
 
-      })
+      } as any
+      if (process.env.TWILIO_URL_STATUS) {
+        messageData.statusCallback = `${process.env.TWILIO_URL_STATUS}/messageStatus`
+      }
+
+      const messageInfo = await twilioClient.messages.create(messageData)
       const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
       this.messageService.save(
         {
