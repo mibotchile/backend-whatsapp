@@ -64,11 +64,11 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(MibotSessionMiddleware)
-      .exclude('/status', '/health/(.*)')
+      .exclude('/status', '/health/(.*)', '/socket.io/(.*)')
       .forRoutes('*')
     consumer
       .apply(AuthenticationMiddleware)
-      .exclude('/status', '/health/(.*)')
+      .exclude('/status', '/health/(.*)', '/socket.io/(.*)')
       .forRoutes('*')
   }
 }

@@ -48,12 +48,12 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, customOptions)
   app.use(urlencoded({ extended: true }))
   app.use(json())
-  if ((process.env.SSL && process.env.SSL === 'true') || process.env.NODE_ENV === 'production') {
-    const httpsServer = https.createServer(httpsOptions)
-    // console.log(httpsServer)
+  // if ((process.env.SSL && process.env.SSL === 'true') || process.env.NODE_ENV === 'production') {
+  const httpsServer = https.createServer(httpsOptions)
+  // console.log(httpsServer)
 
-    app.useWebSocketAdapter(new ExtendedSocketIoAdapter(httpsServer))
-  }
+  app.useWebSocketAdapter(new ExtendedSocketIoAdapter(httpsServer))
+  // }
 
   await app.listen(process.env.APP_PORT || 3000)
 
