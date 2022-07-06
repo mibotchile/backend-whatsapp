@@ -9,6 +9,8 @@ import { Transport } from '@nestjs/microservices'
 import { MessagesConsumerModule } from './conversations/messages-consumer/messages-consumer.module'
 import * as fs from 'node:fs'
 import { AIMConsumerModule } from './aim-consumer/aim-consumer.module'
+import { ExtendedSocketIoAdapter } from './io-adapter/io.adapter'
+import * as https from 'node:https'
 
 async function bootstrap() {
   console.log('NODE_ENV: ', process.env.NODE_ENV)
@@ -17,9 +19,14 @@ async function bootstrap() {
   const appOptions = {
     logger: new FileLoggerService()
   } as any
+  let httpsOptions = { } as any
   if ((process.env.SSL && process.env.SSL === 'true') || process.env.NODE_ENV === 'production') {
     console.log('SSL ENABLED')
     appOptions.httpsOptions = {
+      key: fs.readFileSync(process.env.SSL_KEY),
+      cert: fs.readFileSync(process.env.SSL_CERT)
+    }
+    httpsOptions = {
       key: fs.readFileSync(process.env.SSL_KEY),
       cert: fs.readFileSync(process.env.SSL_CERT)
     }
@@ -41,6 +48,13 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, customOptions)
   app.use(urlencoded({ extended: true }))
   app.use(json())
+  if ((process.env.SSL && process.env.SSL === 'true') || process.env.NODE_ENV === 'production') {
+    const httpsServer = https.createServer(httpsOptions)
+    // console.log(httpsServer)
+
+    app.useWebSocketAdapter(new ExtendedSocketIoAdapter(httpsServer))
+  }
+
   await app.listen(process.env.APP_PORT || 3000)
 
   // consumer for whatsapp messages

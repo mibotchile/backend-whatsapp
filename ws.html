@@ -20,10 +20,10 @@
         <hr />
         <button onclick="redirect()">Test Conversation socket</button>
         <script>
-            const socket = io('http://localhost:3003/messages', {
+            const socket = io('ws://localhost:3003/messages', {
                 withCredentials: true
             })
-            const socketConversations = io('http://localhost:3003/conversations', {
+            const socketConversations = io('ws://localhost:3003/conversations', {
                 withCredentials: true
             })
             // console.log(socket)
