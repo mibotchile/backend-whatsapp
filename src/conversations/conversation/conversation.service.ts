@@ -1,9 +1,9 @@
-import { Injectable, Scope } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, ILike, Repository } from 'typeorm'
 import { Conversation } from './conversation.entity'
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class ConversationService {
   constructor(
         @InjectDataSource('default') private dataSource: DataSource,

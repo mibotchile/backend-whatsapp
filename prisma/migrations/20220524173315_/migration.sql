@@ -84,7 +84,7 @@ CREATE TABLE "pointer_conversation" (
     CONSTRAINT "pointer_coversation_pkey" PRIMARY KEY ("id")
 );
 
-create TABLE "project_vnblnzdm0b3bdcltpvpl"."message" (
+CREATE TABLE "message" (
     "id" SERIAL NOT NULL,
     "sid" VARCHAR(50) NOT NULL,
     "conversation_id" INTEGER NOT NULL,
@@ -99,7 +99,7 @@ create TABLE "project_vnblnzdm0b3bdcltpvpl"."message" (
     CONSTRAINT "message_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "project_vnblnzdm0b3bdcltpvpl"."conversation" (
+CREATE TABLE "conversation" (
     "id" SERIAL NOT NULL,
     "channel_number" VARCHAR(50) NOT NULL,
     "client_number" VARCHAR(50) NOT NULL,

@@ -7,16 +7,19 @@ export class PointerConversation {
       id?: number
 
     @Column()
-      phone_number: string
+      phone_number?: string
 
     @Column()
-      pointer: string
+      pointer?: string
 
     @Column({ type: 'jsonb' })
-      config: Config
+      config?: Config
 
     @Column()
-      conversation_id:number
+      conversation_id?:number
+
+    @Column()
+      conversation_manager?:string
 
     // @Column()
     //   created_by: string
@@ -31,5 +34,5 @@ export class PointerConversation {
     //   updated_at: string
 
     @Column({ default: 1 })
-      status: number
+      status?: number
 }

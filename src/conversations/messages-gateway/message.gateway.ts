@@ -4,8 +4,9 @@ import { TwilioService } from '../twilio/twilio.service'
 
 @WebSocketGateway(Number(process.env.WEBSOCKET_PORT),
   {
-    cors: { origin: true, credentials: true },
-    allowEIO3: true
+    cors: { origin: ['http://localhost:8081'], credentials: true },
+    allowEIO3: true,
+    namespace: 'messages'
   })
 export class MessageGateway {
   @WebSocketServer()
@@ -15,7 +16,7 @@ export class MessageGateway {
   constructor(
       private twilioService:TwilioService
   ) {
-    console.log('[WEBSOCKET PORT] =======>  ', process.env.WEBSOCKET_PORT)
+    console.log('[WEBSOCKET MESSAGES PORT] =======>  ', process.env.WEBSOCKET_PORT)
   }
 
     @SubscribeMessage('send_message')

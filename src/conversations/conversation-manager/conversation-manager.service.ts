@@ -6,13 +6,13 @@ import { TwilioService } from '../twilio/twilio.service'
 import { PointerConversationService } from './pointer-conversation.service'
 import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
 import { MessageService } from '../messages/message.service'
-import { MessageGateway } from '../messages-gateway/message.gateway'
+import { ConversationGateway } from '../conversation-gateway/conversation.gateway'
 
 @Injectable()
 export class ConversationManagerService {
   private configUtils:ChannelConfigUtils
   constructor(
-    @Inject(forwardRef(() => MessageGateway)) private readonly messageWs: MessageGateway,
+    @Inject(forwardRef(() => ConversationGateway)) private readonly conversationGateway: ConversationGateway,
     private conversationService:ConversationService,
     private twilioService:TwilioService,
     private pointerService:PointerConversationService,
@@ -168,8 +168,8 @@ export class ConversationManagerService {
       const redirect = this.configUtils.findRedirectById(Number(action.split('.')[1]), config)
       const [manager, managerId] = redirect.to.split('.')
       this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))
-      const conversation = this.conversationService.findById(conversationId)
-      this.messageWs.emitNewConversation(conversation)
+      const conversation = await this.conversationService.findById(conversationId)
+      this.conversationGateway.emitNewConversation(conversation)
       newPointer = `step.${stepOrder + 1}`
     } else {
       messageToSend = this.builResponseByAction(action, { config, quiz })

@@ -15,6 +15,7 @@ import { MessageService } from '../messages/message.service'
 import { Message } from '../messages/message.entity'
 import { PointerConversationService } from '../conversation-manager/pointer-conversation.service'
 import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
+import { ConversationGateway } from '../conversation-gateway/conversation.gateway'
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ChannelConfigService } from 'src/channel/channel-config/channel-config.
     MessageService,
     TwilioService,
     MessageGateway,
+    ConversationGateway,
     ConversationManagerService,
     ConversationService,
     PointerConversationService,

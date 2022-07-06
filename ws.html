@@ -5,29 +5,48 @@
 
     <body>
         <div class="msgs"></div>
-        <button onclick="emitEvent()">Emit</button>
+        <button onclick="emitEvent()">test messages socket</button>
+        <button onclick="redirect()">Test Conversation socket</button>
         <script>
-            const socket = io('http://localhost:3003')
-            console.log(socket)
+            const socket = io('http://localhost:3003/messages', {
+                withCredentials: true
+            })
+            const socketConversations = io('http://localhost:3003/conversations', {
+                withCredentials: true
+            })
+            // console.log(socket)
             const messageBox = document.querySelector('.msgs')
 
             socket.on('whatsapp_message_received', function (data) {
                 console.log(data)
                 messageBox.innerHTML += `${data.Body}<hr>`
             })
+            socketConversations.on('redirect_conversation', function (data) {
+                console.log(data)
+                messageBox.innerHTML += `${data.Body}<hr>`
+            })
             socket.on('connect', function () {
-                console.log('Connected')
-                console.log('Connected')
+                console.log('Connected to messages')
 
                 //socket.emit('connected')
                 // socket.emit('identity', 0, (response) => console.log('Identity:', response))
             })
-            //   socket.on('events', function (data) {
-            //     console.log('event', data)
-            //   })
+            socket.on('events', function (data) {
+                console.log('event', data)
+            })
+
+            socketConversations.on('connect', function () {
+                console.log('Connected to Conversations')
+
+                //socket.emit('connected')
+                // socket.emit('identity', 0, (response) => console.log('Identity:', response))
+            })
 
             function emitEvent() {
-                socket.emit('events', { test: 'test' })
+                socket.emit('test', { test: 'test' })
+            }
+            function redirect() {
+                socketConversations.emit('redirect_conversation', { conversationId: 45, manager: 'user', managerId: 45 })
             }
             socket.on('exception', function (data) {
                 console.log('event', data)
