@@ -22,12 +22,22 @@ export class ConversationGateway {
   rooms:any[] = []
 
   @SubscribeMessage('redirect_conversation')
-  async sendMessage(client: Socket, { conversationId, manager, managerId }:any): Promise<any> {
+  async redirectConversation(client: Socket, { conversationId, manager, managerId }:any): Promise<any> {
     console.log({ conversationId })
     console.log({ manager })
     console.log({ managerId })
 
     await this.conversationService.updateManager(+conversationId, manager, managerId)
+    const conversation = await this.conversationService.findById(conversationId)
+    this.emitNewConversation(conversation)
+    return conversation
+  }
+
+  @SubscribeMessage('end_conversation')
+  async endConversation(client: Socket, { conversationId }:any): Promise<any> {
+    console.log({ conversationId })
+
+    await this.conversationService.updateManager(+conversationId, 'system', 0)
     const conversation = await this.conversationService.findById(conversationId)
     return conversation
     // return this.conversationGateway.emitNewConversation(conversation)

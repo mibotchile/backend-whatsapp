@@ -31,6 +31,7 @@ export class ConversationManagerService {
     let subpointers = pointerDB ? pointerDB.pointer.split('>') : ['step.1']
     let config
     let conversationId = 1
+    let conversationManager:string
     const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
     if (!pointerDB) {
       config = await this.channelConfigService.findByChannelNumber('+19206787642')
@@ -47,11 +48,12 @@ export class ConversationManagerService {
         status: 1
       })
       conversationId = Number(conversation.identifiers[0].id)
-
+      conversationManager = 'system'
       console.log('CONVERSATION ----------------------', JSON.stringify(conversation))
     } else {
       config = pointerDB.config
       conversationId = Number(pointerDB.conversation_id)
+      conversationManager = pointerDB.conversation_manager
     }
     if (saveMessage) {
       await this.messageService.save({
@@ -67,12 +69,15 @@ export class ConversationManagerService {
         status: 1
       })
     }
+    if (!conversationManager.toLowerCase().includes('system')) {
+      return
+    }
 
     let stepOrder = Number(subpointers[0].replace('step.', ''))
 
     if (!this.configUtils.existStep(stepOrder, config)) {
       await this.pointerService.delete(waId)
-      await this.pointerService.create(waId, 'step.1', config, conversationId)
+      await this.pointerService.create({ phone_number: waId, pointer: 'step.1', config, conversation_id: conversationId, conversation_manager: 'system', status: 1 })
       subpointers = ['step.1']
       stepOrder = 1
     }
@@ -139,9 +144,9 @@ export class ConversationManagerService {
       await await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
       newPointer = `step.${stepOrder + 1}`
       if (stepOrder === 1) {
-        await this.pointerService.create(waId, newPointer, config, conversationId)
+        await this.pointerService.create({ phone_number: waId, pointer: newPointer, config, conversation_id: conversationId, conversation_manager: 'system', status: 1 })
       } else {
-        await this.pointerService.update(waId, newPointer)
+        await this.pointerService.updateByPhoneNumber(waId, { pointer: newPointer })
       }
       if (!this.configUtils.existStep(stepOrder + 1, config)) {
         action = 'close'
@@ -170,6 +175,7 @@ export class ConversationManagerService {
       this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))
       const conversation = await this.conversationService.findById(conversationId)
       this.conversationGateway.emitNewConversation(conversation)
+      conversationManager = redirect.to
       newPointer = `step.${stepOrder + 1}`
     } else {
       messageToSend = this.builResponseByAction(action, { config, quiz })
@@ -180,9 +186,9 @@ export class ConversationManagerService {
       await this.pointerService.delete(waId)
     } else {
       if (stepOrder === 1) {
-        await this.pointerService.create(waId, newPointer, config, conversationId)
+        await this.pointerService.create({ phone_number: waId, pointer: newPointer, config, conversation_id: conversationId, conversation_manager: conversationManager, status: 1 })
       } else {
-        await this.pointerService.update(waId, newPointer)
+        await this.pointerService.updateByPhoneNumber(waId, { pointer: newPointer, conversation_manager: conversationManager })
       }
     }
     console.log({ action })
@@ -191,10 +197,6 @@ export class ConversationManagerService {
     await await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
     console.log({ stepOrder })
   }
-
-  //   async redirectClient(waId:string, redirect:Redirect) {
-  //     await this.pointerRepo.update({ phone_number: waId }, { pointer: newPointer })
-  //   }
 
   builResponseByAction(action: string, { config, quiz }: { config?: Config; quiz?: Quiz }): string {
     const [itemType, itemId] = action.split('.')

@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common'
-// import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-// import { DataSource, Repository } from 'typeorm'
-// import { PointerConversation } from './pointer-conversation.entity'
-// import { ChannelConfig } from 'src/channel/channel_config.entity'
 import * as twilio from 'twilio'
-// import { Config, Message, Menu, Option, Question, Quiz, Redirect } from '../conversation.types'
 import { MessageService } from '../messages/message.service'
 
 @Injectable()
@@ -21,14 +16,10 @@ export class TwilioService {
         // from: `whatsapp:${from}`,
         body: message,
         to: `whatsapp:+${to}`,
-        statusCallback: 'https://c1fd-181-66-195-199.ngrok.io/messageStatus'
+        statusCallback: `${process.env.TWILIO_URL_STATUS}/messageStatus`
 
       })
       const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
-
-      //   if (emitEvent) {
-      //     this.messageWs.sendMessageReceived(messageInfo)
-      //   }
       this.messageService.save(
         {
           sid: messageInfo.sid,
@@ -46,6 +37,7 @@ export class TwilioService {
       return messageInfo
     } catch (e) {
       console.log(e)
+      return false
     }
   }
 }

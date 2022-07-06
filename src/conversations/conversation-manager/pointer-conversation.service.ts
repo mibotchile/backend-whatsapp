@@ -2,7 +2,6 @@ import { Injectable, Scope } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
 import { PointerConversation } from './pointer-conversation.entity'
-import { Config } from '../conversation.types'
 
 @Injectable({ scope: Scope.REQUEST })
 export class PointerConversationService {
@@ -20,17 +19,17 @@ export class PointerConversationService {
     })
   }
 
-  async update(waId: string, newPointer: string) {
+  async updateByPhoneNumber(waId: string, data:PointerConversation) {
     console.log({ waId })
-    console.log({ newPointer })
+    console.log(data.pointer)
 
     this.setSchema('project_vnblnzdm0b3bdcltpvpl')
-    await this.pointerRepo.update({ phone_number: waId }, { pointer: newPointer })
+    await this.pointerRepo.update({ phone_number: waId }, data)
   }
 
-  async create(waId: string, newPointer: string, config:Config, conversationId:number) {
+  async create(data:PointerConversation) {
     this.setSchema('project_vnblnzdm0b3bdcltpvpl')
-    await this.pointerRepo.insert({ phone_number: waId, pointer: newPointer, config, conversation_id: conversationId })
+    await this.pointerRepo.insert(data)
   }
 
   async delete(waId: string) {

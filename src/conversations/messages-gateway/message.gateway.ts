@@ -42,10 +42,6 @@ export class MessageGateway {
       this.server.emit('whatsapp_message_received', data)
     }
 
-    emitNewConversation(data) {
-      this.server.emit('new_conversation', data)
-    }
-
     //   emitCountMessage(data) {
     //     this.server.emit('whatsapp_message_received', data)
     //   }
