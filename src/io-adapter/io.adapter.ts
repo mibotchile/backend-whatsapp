@@ -1,11 +1,12 @@
 import { IoAdapter } from '@nestjs/platform-socket.io'
 import { Server } from 'socket.io'
 import * as https from 'node:https'
+import * as http from 'node:http'
 import * as fs from 'node:fs'
 
 export class ExtendedSocketIoAdapter extends IoAdapter {
   protected ioServer: Server
-  protected httpsServer:https.Server
+  protected httpsServer:https.Server|http.Server
 
   constructor() {
     super()
@@ -25,10 +26,12 @@ export class ExtendedSocketIoAdapter extends IoAdapter {
         key: fs.readFileSync(process.env.SSL_KEY),
         cert: fs.readFileSync(process.env.SSL_CERT)
       }
+      this.httpsServer = https.createServer(httpsOptions)
+    } else {
+      this.httpsServer = http.createServer(httpsOptions)
     }
 
     // if ((process.env.SSL && process.env.SSL === 'true') || process.env.NODE_ENV === 'production') {
-    this.httpsServer = https.createServer(httpsOptions)
     // console.log(httpsServer)
 
     //   }
