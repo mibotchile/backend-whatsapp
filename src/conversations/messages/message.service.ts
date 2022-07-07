@@ -27,7 +27,6 @@ export class MessageService {
     const formaterUTC = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })
     const now = Date.now()
     data.created_at = formaterLima.format(now)
-
     const messageSent = await this.messageRepo.insert(data)
     data.id = messageSent.identifiers[0].id
     data.created_at = formaterUTC.format(now)

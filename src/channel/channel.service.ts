@@ -5,16 +5,22 @@ import { DataSource, ILike, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
 import * as twilio from 'twilio'
 import { ChannelConfig } from './channel-config/channel_config.entity'
+import { ChannelMapService } from './channel-map/channel-map.service'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ChannelService {
   constructor (
     @InjectDataSource() private dataSource:DataSource,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
-    @InjectRepository(ChannelConfig) private channelConfigRepository: Repository<ChannelConfig>) {
+    @InjectRepository(ChannelConfig) private channelConfigRepository: Repository<ChannelConfig>,
+    private channelMapService:ChannelMapService) {
+    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+  }
+
+  setSchema(schema:string) {
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
-      this.dataSource.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.' + em.tableName
+      this.dataSource.entityMetadatas[index].schema = schema
+      this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
     })
   }
 
@@ -47,6 +53,7 @@ export class ChannelService {
     }
 
     const data_res = await this.channelRepository.insert(data)
+    await this.channelMapService.create({ project_uid: httpContext.get('PROJECT_UID'), channel_number: data.phone_number, created_at: data.created_at, created_by: data.created_by, updated_at: data.updated_at, updated_by: data.updated_by, status: 1 })
     return {
       data: data_res,
       success: true,
