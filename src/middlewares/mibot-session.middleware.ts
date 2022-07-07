@@ -22,7 +22,8 @@ export class MibotSessionMiddleware implements NestMiddleware {
       })
       return
     }
-    const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
+    // const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
+    const now = new Date().toISOString()
     if (req.body) {
       switch (req.method) {
         case 'POST':

@@ -23,6 +23,7 @@ export class MessageService {
   }
 
   async save(data:Message) {
+    data.created_at = new Date().toISOString()
     const messageSent = await this.messageRepo.insert(data)
     data.id = messageSent.identifiers[0].id
     this.messageWs.emitNewMessage(data)
