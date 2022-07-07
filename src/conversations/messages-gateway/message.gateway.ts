@@ -1,4 +1,4 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets'
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { TwilioService } from '../twilio/twilio.service'
 import { forwardRef, Inject } from '@nestjs/common'
@@ -9,7 +9,7 @@ import { forwardRef, Inject } from '@nestjs/common'
     allowEIO3: true,
     namespace: 'messages'
   })
-export class MessageGateway {
+export class MessageGateway implements OnGatewayConnection {
   @WebSocketServer()
     server:Server
 
@@ -18,31 +18,22 @@ export class MessageGateway {
     @Inject(forwardRef(() => TwilioService))
       private twilioService:TwilioService
   ) {
-    console.log('[WEBSOCKET MESSAGES PORT] =======>  ', process.env.WEBSOCKET_PORT)
+    // console.log('[WEBSOCKET MESSAGES ] =======>  ', this.server)
+  }
+
+  handleConnection(client) {
+    console.log('[ ==== SE CONECTO UN CLIENTE ====]')
   }
 
     @SubscribeMessage('send_message')
   async sendMessage(client: Socket, { conversationId, clientNumber, channelNumber, message }:any): Promise<any> {
-    console.log('Enviando mensaje.................')
-
-    console.log(conversationId)
-
-    // const clientNumber = clientNumber // 51938432015
-    // const channelNumber = channelNumber// +519655655656
-    // const message = message // mensaje a enviar
-
+    console.log('Enviando mensaje .......')
     await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId, true)
+    console.log('Mensaje enviado .......')
   }
-    //   @SubscribeMessage('connected')
-    //     handleConnect(client:Socket, { conversationId }) {
-    //       this.rooms[client.id] = { conversationId }
-    //     }
-
-    sendMessageReceived(data) {
-      this.server.emit('whatsapp_message_received', data)
-    }
 
     emitNewMessage(data) {
+    //   this.server.of('/messages').emit('whatsapp_message_received', data)
       this.server.emit('whatsapp_message_received', data)
     }
 
@@ -51,6 +42,7 @@ export class MessageGateway {
     //   }
 
     changeMessageStatus(data) {
+    //   this.server.of('/messages').emit('whatsapp_message_status', data)
       this.server.emit('whatsapp_message_status', data)
     }
 }

@@ -20,23 +20,21 @@
         <hr />
         <button onclick="redirect()">Test Conversation socket</button>
         <script>
-            const socket = io('ws://localhost:3003/messages', {
-                withCredentials: true
-            })
-            const socketConversations = io('ws://localhost:3003/conversations', {
-                withCredentials: true
-            })
-            // console.log(socket)
+            const socket = io('http://localhost:3003')
+            // const socketConversations = io('http://localhost:3001/conversations', {
+            //     withCredentials: true
+            // })
+            console.log(socket)
             const messageBox = document.querySelector('.msgs')
 
             socket.on('whatsapp_message_received', function (data) {
                 console.log(data)
                 messageBox.innerHTML += `${data.message}<hr>`
             })
-            socketConversations.on('redirect_conversation', function (data) {
-                console.log(data)
-                messageBox.innerHTML += `${data.Body}<hr>`
-            })
+            // socketConversations.on('redirect_conversation', function (data) {
+            //     console.log(data)
+            //     messageBox.innerHTML += `${data.Body}<hr>`
+            // })
             socket.on('connect', function () {
                 console.log('Connected to messages')
 
@@ -47,21 +45,25 @@
                 console.log('event', data)
             })
 
-            socketConversations.on('connect', function () {
-                console.log('Connected to Conversations')
+            // socketConversations.on('connect', function () {
+            //     console.log('Connected to Conversations')
 
-                //socket.emit('connected')
-                // socket.emit('identity', 0, (response) => console.log('Identity:', response))
-            })
+            //     //socket.emit('connected')
+            //     // socket.emit('identity', 0, (response) => console.log('Identity:', response))
+            // })
 
             function emitEvent() {
                 const cn = document.getElementById('client-number')
                 const msg = document.getElementById('message')
+                console.log('asdasd')
                 socket.emit('send_message', { conversationId: 2, clientNumber: cn.value, channelNumber: '555', message: msg.value })
             }
             function redirect() {
-                socketConversations.emit('redirect_conversation', { conversationId: 45, manager: 'user', managerId: 45 })
+                socket.emit('redirect_conversation', { conversationId: 45, manager: 'user', managerId: 45 })
             }
+            // function redirect() {
+            //     socketConversations.emit('redirect_conversation', { conversationId: 45, manager: 'user', managerId: 45 })
+            // }
             socket.on('exception', function (data) {
                 console.log('event', data)
             })

@@ -20,7 +20,7 @@ export class ConversationGateway {
     private conversationService:ConversationService,
     @Inject('SAMPLE_SERVICE') private readonly client: ClientProxy
   ) {
-    console.log('[WEBSOCKET CONVERSATIONS PORT] =======>  ', process.env.WEBSOCKET_PORT)
+    // console.log('[WEBSOCKET CONVERSATIONS PORT] =======>  ', process.env.WEBSOCKET_PORT)
   }
 
   rooms:any[] = []
@@ -36,12 +36,14 @@ export class ConversationGateway {
 
   @SubscribeMessage('redirect_conversation')
   async redirectConversation(client: Socket, { conversationId, manager, managerId }:any): Promise<any> {
+    console.log('Redireccionando conversacion ... .. .')
     console.log({ conversationId })
     console.log({ manager })
     console.log({ managerId })
-
     await this.conversationService.updateManager(+conversationId, manager, managerId)
     const conversation = await this.conversationService.findById(conversationId)
+    console.log('Conversacion redireccionada ')
+
     this.emitNewConversation(conversation)
     return conversation
   }
