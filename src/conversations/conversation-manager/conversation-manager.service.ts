@@ -34,7 +34,9 @@ export class ConversationManagerService {
     let config
     let conversationId = 1
     let conversationManager:string
-    const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
+    const now = new Date().toISOString()
+    // const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
+
     if (!pointerDB) {
       config = await this.channelConfigService.findByChannelNumber('+19206787641')
       subpointers = ['step.1']
