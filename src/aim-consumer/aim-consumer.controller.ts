@@ -14,7 +14,7 @@ export class AIMConsumerController {
 
   @MessagePattern()
   async getNotifications(@Payload() data: {action:string, user?:any, project?:any}) {
-    const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
+    const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
     const { action, user, project } = data
     console.log({ action })
     console.log('data from rabbit', data)

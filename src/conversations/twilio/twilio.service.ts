@@ -23,7 +23,7 @@ export class TwilioService {
       }
 
       const messageInfo = await twilioClient.messages.create(messageData)
-      const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(Date.now())
+      const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
       this.messageService.save(
         {
           sid: messageInfo.sid,
