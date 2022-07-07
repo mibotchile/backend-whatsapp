@@ -23,7 +23,7 @@ export class MessageService {
   }
 
   async save(data:Message) {
-    data.created_at = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
+    data.created_at = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'America/Lima' }).format(Date.now())
 
     const messageSent = await this.messageRepo.insert(data)
     data.id = messageSent.identifiers[0].id
