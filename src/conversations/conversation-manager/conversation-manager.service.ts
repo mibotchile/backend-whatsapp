@@ -71,7 +71,7 @@ export class ConversationManagerService {
         created_at: now,
         created_by: 'system',
         status: 1
-      })
+      }, true)
     }
     if (!conversationManager.toLowerCase().includes('system')) {
       return
