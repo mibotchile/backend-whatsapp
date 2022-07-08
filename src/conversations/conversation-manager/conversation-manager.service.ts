@@ -177,7 +177,7 @@ export class ConversationManagerService {
       messageToSend = 'En breve un asesor se comunicara con usted'
       const redirect = this.configUtils.findRedirectById(Number(action.split('.')[1]), config)
       const [manager, managerId] = redirect.to.split('.')
-      this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))
+      await this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))
       const conversation = await this.conversationService.findById(conversationId)
       this.conversationGateway.emitNewConversation(conversation)
       conversationManager = redirect.to
