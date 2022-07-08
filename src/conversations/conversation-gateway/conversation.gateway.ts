@@ -25,6 +25,11 @@ export class ConversationGateway {
 
   rooms:any[] = []
 
+  handleConnection(socket:Socket) {
+    console.log('[ ==== SE CONECTO UN CLIENTE A CONVERSATIONS ====]')
+    console.log('[ ====== ID DEL CLIENTE ====== ]', socket.id)
+  }
+
   async onApplicationBootstrap() {
     try {
       await this.client.connect()

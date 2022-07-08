@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common'
 import * as twilio from 'twilio'
+import { ConversationService } from '../conversation/conversation.service'
 import { MessageService } from '../messages/message.service'
 
 @Injectable()
 export class TwilioService {
   constructor(
-    private messageService:MessageService
+    private messageService:MessageService,
+    private conversationService:ConversationService
   ) { }
 
   async sendMessage(message: string, from: string, to: string, conversationId:number, emitEvent = false) {
+    const conversation = await this.conversationService.findById(conversationId)
+    if (conversation.manager.includes('system') || conversation.manager.includes('group')) return false
     const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
     try {
       const messageData = {

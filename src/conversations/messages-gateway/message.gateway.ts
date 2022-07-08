@@ -21,8 +21,10 @@ export class MessageGateway implements OnGatewayConnection {
     // console.log('[WEBSOCKET MESSAGES ] =======>  ', this.server)
   }
 
-  handleConnection(client) {
-    console.log('[ ==== SE CONECTO UN CLIENTE ====]')
+  handleConnection(socket:Socket, query) {
+    console.log('[ ==== SE CONECTO UN CLIENTE A MESSAGES ====]')
+    console.log('[ ====== ID DEL CLIENTE ====== ]', socket.id)
+    console.log('[ ====== DATA DEL CLIENTE ====== ]', socket.handshake)
   }
 
     @SubscribeMessage('send_message')
