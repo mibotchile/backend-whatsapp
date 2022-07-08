@@ -63,7 +63,7 @@ export class ConversationService {
   }
 
   async findLastMessageByConversationId(conversationId:number):Promise<Message> {
-    const [message] = await this.dataSource.query(`select * from (select *,ROW_NUMBER () OVER (PARTITION BY conversation_id ORDER BY created_at DESC) rn FROM ${this.schema}.message where conversation_id = ${conversationId}) ) as t where rn=1`)
+    const [message] = await this.dataSource.query(`select * from (select *,ROW_NUMBER () OVER (PARTITION BY conversation_id ORDER BY created_at DESC) rn FROM ${this.schema}.message where conversation_id = ${conversationId} ) as t where rn=1`)
     return message
   }
 

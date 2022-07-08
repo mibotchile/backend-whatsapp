@@ -21,14 +21,16 @@ export class MessageGateway implements OnGatewayConnection {
     // console.log('[WEBSOCKET MESSAGES ] =======>  ', this.server)
   }
 
-  handleConnection(client) {
-    console.log('[ ==== SE CONECTO UN CLIENTE ====]')
+  handleConnection(socket:Socket, query) {
+    console.log('[ ==== SE CONECTO UN CLIENTE A MESSAGES ====]')
+    console.log('[ ====== ID DEL CLIENTE ====== ]', socket.id)
+    console.log('[ ====== DATA DEL CLIENTE ====== ]', socket.handshake)
   }
 
     @SubscribeMessage('send_message')
   async sendMessage(client: Socket, { conversationId, clientNumber, channelNumber, message }:any): Promise<any> {
     console.log('Enviando mensaje .......')
-    await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId, true)
+    await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId)
     console.log('Mensaje enviado .......')
   }
 

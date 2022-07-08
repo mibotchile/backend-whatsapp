@@ -54,6 +54,17 @@ export class GroupService {
   }
 
   async update (id: number, data: Group): Promise<any> {
+    if (id === 1) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'Este grupo no se puede desactivar ni editar'
+        },
+        HttpStatus.OK
+      )
+    }
+
     if (data.name) {
       const groups = await this.groupsRepository.find({
         where: {

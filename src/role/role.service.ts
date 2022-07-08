@@ -100,6 +100,16 @@ export class RoleService {
   }
 
   async update (id: number, data: Role): Promise<any> {
+    if ([1, 2, 3].includes(id)) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'Este rol no se puede desactivar ni editar'
+        },
+        HttpStatus.OK
+      )
+    }
     if (isNaN(id)) {
       throw new HttpException(
         {

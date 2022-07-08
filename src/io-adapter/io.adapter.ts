@@ -1,8 +1,11 @@
 import { IoAdapter } from '@nestjs/platform-socket.io'
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import * as https from 'node:https'
 import * as http from 'node:http'
 import * as fs from 'node:fs'
+import { MessageMappingProperties } from '@nestjs/websockets'
+import { Observable } from 'rxjs'
+import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
 export class ExtendedSocketIoAdapter extends IoAdapter {
   protected ioServer: Server
@@ -37,6 +40,17 @@ export class ExtendedSocketIoAdapter extends IoAdapter {
     //   }
 
     this.ioServer = new Server(this.httpsServer, options)
+
+    // this.ioServer.use((socket, next) => {
+    //   console.log('[ ====== MIDLEWARE ====== ]', socket.handshake)
+
+    //   const token = socket.handshake.auth.token
+    //   if (token === 'abcd') {
+    //     return next()
+    //   }
+    //   return next(new Error('authentication error'))
+    // })
+
     this.httpsServer.listen(process.env.WEBSOCKET_PORT)
   }
 
@@ -45,6 +59,14 @@ export class ExtendedSocketIoAdapter extends IoAdapter {
 
   //     // this.ioServer.of(options.namespace)
   //     // return this.ioServer
+  //   }
+
+  //   bindMessageHandlers(socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>, handlers: MessageMappingProperties[], transform: (data: any) => Observable<any>): void {
+  //     this.bindMessageHandlers(socket, handlers, transform)
+
+  //   }
+  //   bindClientConnect(server: any, callback: Function): void {
+  //     console.log(server)
   //   }
 
   //   bindMessageHandlers(socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>, handlers: MessageMappingProperties[], transform: (data: any) => Observable<any>): void {

@@ -1,6 +1,8 @@
 <html>
     <head>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+        <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.5.0/socket.io.js"></script> -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script> -->
     </head>
 
     <body>
@@ -20,7 +22,11 @@
         <hr />
         <button onclick="redirect()">Test Conversation socket</button>
         <script>
-            const socket = io('http://localhost:3003')
+            const socket = io('http://localhost:3003', {
+                auth: {
+                    token: `303338ce-d71e-4304-abd2-3cfc40a1589a303338ce-d71e-4304-abd2-3cfc40a1589a`
+                }
+            })
             // const socketConversations = io('http://localhost:3001/conversations', {
             //     withCredentials: true
             // })

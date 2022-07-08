@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common'
 import * as twilio from 'twilio'
+import { ConversationService } from '../conversation/conversation.service'
 import { MessageService } from '../messages/message.service'
 
 @Injectable()
 export class TwilioService {
   constructor(
-    private messageService:MessageService
+    private messageService:MessageService,
+    private conversationService:ConversationService
   ) { }
 
-  async sendMessage(message: string, from: string, to: string, conversationId:number, emitEvent = false) {
+  async sendMessage(message: string, from: string, to: string, conversationId:number) {
+    const conversation = await this.conversationService.findById(conversationId)
+    if (conversation.manager.includes('group')) return false
     const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
     try {
       const messageData = {
@@ -16,14 +20,13 @@ export class TwilioService {
         // from: `whatsapp:${from}`,
         body: message,
         to: `whatsapp:+${to}`
-
       } as any
       if (process.env.TWILIO_URL_STATUS) {
         messageData.statusCallback = `${process.env.TWILIO_URL_STATUS}/messageStatus`
       }
 
       const messageInfo = await twilioClient.messages.create(messageData)
-      this.messageService.save(
+      await this.messageService.save(
         {
           sid: messageInfo.sid,
           conversation_id: conversationId,
@@ -35,7 +38,7 @@ export class TwilioService {
           created_at: 'now',
           created_by: 'system',
           status: 1
-        }
+        }, !conversation.manager.includes('system')
       )
       return messageInfo
     } catch (e) {
