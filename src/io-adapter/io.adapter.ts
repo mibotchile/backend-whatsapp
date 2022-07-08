@@ -41,15 +41,18 @@ export class ExtendedSocketIoAdapter extends IoAdapter {
 
     this.ioServer = new Server(this.httpsServer, options)
 
-    // this.ioServer.use((socket, next) => {
-    //   console.log('[ ====== MIDLEWARE ====== ]', socket.handshake)
+    this.ioServer.use((socket, next) => {
+      console.log('[ ====== MIDLEWARE ====== ]', socket.handshake)
 
-    //   const token = socket.handshake.auth.token
-    //   if (token === 'abcd') {
-    //     return next()
-    //   }
-    //   return next(new Error('authentication error'))
-    // })
+      const token = socket.handshake.auth.token
+      if (token === 'abcd') {
+        console.log('[CONECTAD0]')
+        return next()
+      }
+      console.log('[NO SE CONECT0]')
+
+      return next(new Error('authentication error'))
+    })
 
     this.httpsServer.listen(process.env.WEBSOCKET_PORT)
   }

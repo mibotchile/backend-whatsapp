@@ -76,6 +76,7 @@ export class ConversationManagerService {
     if (!conversationManager.toLowerCase().includes('system')) {
       return
     }
+    console.log({ subpointers })
 
     let stepOrder = Number(subpointers[0].replace('step.', ''))
 
@@ -162,19 +163,24 @@ export class ConversationManagerService {
 
     if (action.includes('menu')) {
       console.log('lengthhhhhhhh-> ', subpointers.length)
-      if (subpointers.length === 1) subpointers[0] = `step.${stepOrder}` // esto sucede cuando el step contiene como action un menu
+      if (subpointers.length === 1) {
+        subpointers[0] = `step.${stepOrder}` // esto sucede cuando el step contiene como action un menu}
+      } else {
+        subpointers.pop()
+      }
       //   if (subpointers.length === 1) subpointers[0] = `step.${stepOrder + 1}` // esto sucede cuando el step contiene como action un menu
-      if (subpointers.length === 2) subpointers.pop() // esto sucede cuando la opcion escogida continen com action otro menu
+      // if (subpointers.length === 2) subpointers.pop() // esto sucede cuando la opcion escogida continen com action otro menu
       subpointers.push(action)
       newPointer = subpointers.join('>')
       if (responseTo.includes('question')) {
         // esto sucede cuando se termina un quiz (osea el quiestion id es el ultimo) y el siguiente paso tiene como action un menu
-        newPointer = `step.${stepOrder + 1}>${action}`
+        newPointer = `step.${stepOrder}>${action}`
       }
     }
 
     if (action.includes('redirect')) {
       messageToSend = 'En breve un asesor se comunicara con usted'
+      await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
       const redirect = this.configUtils.findRedirectById(Number(action.split('.')[1]), config)
       const [manager, managerId] = redirect.to.split('.')
       await this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))

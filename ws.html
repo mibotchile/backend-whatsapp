@@ -25,6 +25,9 @@
             const socket = io('http://localhost:3003', {
                 auth: {
                     token: `303338ce-d71e-4304-abd2-3cfc40a1589a303338ce-d71e-4304-abd2-3cfc40a1589a`
+                },
+                extraHeaders: {
+                    Authorization: 'Bearer 303338ce-d71e-4304-abd2-3cfc40a1589a303338ce-d71e-4304-abd2-3cfc40a1589a'
                 }
             })
             // const socketConversations = io('http://localhost:3001/conversations', {
@@ -46,6 +49,10 @@
 
                 //socket.emit('connected')
                 // socket.emit('identity', 0, (response) => console.log('Identity:', response))
+            })
+
+            socket.on('connect_failed', function () {
+                document.write('Sorry, there seems to be an issue with the connection!')
             })
             socket.on('events', function (data) {
                 console.log('event', data)
