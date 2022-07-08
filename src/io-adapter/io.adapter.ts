@@ -3,9 +3,6 @@ import { Server, Socket } from 'socket.io'
 import * as https from 'node:https'
 import * as http from 'node:http'
 import * as fs from 'node:fs'
-import { MessageMappingProperties } from '@nestjs/websockets'
-import { Observable } from 'rxjs'
-import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
 export class ExtendedSocketIoAdapter extends IoAdapter {
   protected ioServer: Server
@@ -41,18 +38,18 @@ export class ExtendedSocketIoAdapter extends IoAdapter {
 
     this.ioServer = new Server(this.httpsServer, options)
 
-    this.ioServer.use((socket, next) => {
-      console.log('[ ====== MIDLEWARE ====== ]', socket.handshake)
+    // this.ioServer.use((socket, next) => {
+    //   console.log('[ ====== MIDLEWARE ====== ]', socket.handshake)
 
-      const token = socket.handshake.auth.token
-      if (token === 'abcd') {
-        console.log('[CONECTAD0]')
-        return next()
-      }
-      console.log('[NO SE CONECT0]')
+    //   const token = socket.handshake.auth.token
+    //   if (token === 'abcd') {
+    //     console.log('[CONECTAD0]')
+    //     return next()
+    //   }
+    //   console.log('[NO SE CONECT0]')
 
-      return next(new Error('authentication error'))
-    })
+    //   return next(new Error('Error en la autenticacion'))
+    // })
 
     this.httpsServer.listen(process.env.WEBSOCKET_PORT)
   }
