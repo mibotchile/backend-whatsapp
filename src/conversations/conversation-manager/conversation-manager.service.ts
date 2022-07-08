@@ -145,7 +145,7 @@ export class ConversationManagerService {
       messageToSend = this.builResponseByAction(action, { config })
       console.log({ messageToSend })
 
-      await await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
+      await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
       newPointer = `step.${stepOrder + 1}`
       if (stepOrder === 1) {
         await this.pointerService.create({ phone_number: waId, pointer: newPointer, config, conversation_id: conversationId, conversation_manager: 'system', status: 1 })
@@ -199,7 +199,7 @@ export class ConversationManagerService {
     console.log({ action })
     console.log({ messageToSend })
 
-    await await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
+    await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
     console.log({ stepOrder })
   }
 

@@ -22,7 +22,7 @@ export class MessageService {
     })
   }
 
-  async save(data:Message) {
+  async save(data:Message, emitEvet = false) {
     const formaterLima = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'America/Lima' })
     const formaterUTC = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })
     const now = Date.now()
@@ -30,7 +30,9 @@ export class MessageService {
     const messageSent = await this.messageRepo.insert(data)
     data.id = messageSent.identifiers[0].id
     data.created_at = formaterUTC.format(now)
-    this.messageWs.emitNewMessage(data)
+    if (emitEvet) {
+      this.messageWs.emitNewMessage(data)
+    }
   }
 
   async update(id:number, data:Message) {
