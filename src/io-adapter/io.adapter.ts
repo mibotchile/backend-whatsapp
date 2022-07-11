@@ -1,5 +1,5 @@
 import { IoAdapter } from '@nestjs/platform-socket.io'
-import { Server, Socket } from 'socket.io'
+import { Server } from 'socket.io'
 import * as https from 'node:https'
 import * as http from 'node:http'
 import * as fs from 'node:fs'
