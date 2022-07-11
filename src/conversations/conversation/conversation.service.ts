@@ -89,4 +89,12 @@ export class ConversationService {
     conversation.last_message = lastMessage
     return conversation
   }
+
+  async findByIdWithLastMessage(id:number):Promise<Conversation> {
+    const [conversation] = await this.conversationRepo.find({ where: { id } }) as any
+    if (!conversation) return
+    const lastMessage = await this.findLastMessageByConversationId(conversation.id)
+    conversation.last_message = lastMessage
+    return conversation
+  }
 }
