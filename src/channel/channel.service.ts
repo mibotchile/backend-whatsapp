@@ -6,15 +6,19 @@ import * as httpContext from 'express-http-context'
 import * as twilio from 'twilio'
 import { ChannelConfig } from './channel-config/channel_config.entity'
 import { ChannelMapService } from './channel-map/channel-map.service'
+import { ChannelConfigUtils } from 'src/conversations/conversation-manager/channel-config.utils'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ChannelService {
+  configUtils:ChannelConfigUtils
+
   constructor (
     @InjectDataSource() private dataSource:DataSource,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(ChannelConfig) private channelConfigRepository: Repository<ChannelConfig>,
     private channelMapService:ChannelMapService) {
     this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+    this.configUtils = new ChannelConfigUtils()
   }
 
   setSchema(schema:string) {
@@ -265,6 +269,53 @@ export class ChannelService {
       success: true,
       message: 'Lista de todos los grupos'
     }
+  }
+
+  prettierConfig(config: ChannelConfig):any {
+    const prettyConfig = []
+
+    const { steps } = config
+
+    steps.forEach(s => {
+      prettyConfig.push(...this.buildData(s.action, config))
+    })
+
+    return prettyConfig
+  }
+
+  buildData(action:string, config:ChannelConfig) {
+    const [item, itemId] = action.split('.')
+    console.log(item)
+    const messageResponse = []
+    switch (item) {
+      case 'menu':
+        const menu = config.menus.find(m => m.id === Number(itemId))
+        const options = menu.options
+        const m = { title: menu.title } as any
+        const op = []
+        options.forEach(o => {
+          op.push(...this.buildData(o.action, config))
+        })
+        m.options = op
+        messageResponse.push({ type: 'menu', data: m })
+        break
+      case 'message':
+        const message = config.messages.find(m => m.id === Number(itemId))
+        messageResponse.push({ type: 'message', data: message.message })
+        break
+      case 'redirect':
+        const redirect = config.redirects.find(r => r.id === Number(itemId))
+        const [manager, managerId] = redirect.to.split('.')
+        messageResponse.push({ type: 'redirect', data: 'Transferencia al ' + (manager === 'group' ? 'grupo' : 'usuario') + ' con el id ' + managerId })
+        break
+      case 'quiz':
+        const quiz = config.quizes.find(q => q.id === Number(itemId))
+        const questions = quiz.questions.map(q => q.question)
+        messageResponse.push({ type: 'data_request', data: questions })
+
+        break
+    }
+    return messageResponse
   }
 
   //   async findAll ({ pageSize, page }): Promise<any> {
