@@ -184,7 +184,7 @@ export class ConversationManagerService {
       const redirect = this.configUtils.findRedirectById(Number(action.split('.')[1]), config)
       const [manager, managerId] = redirect.to.split('.')
       await this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))
-      const conversation = await this.conversationService.findById(conversationId)
+      const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
       this.conversationGateway.emitNewConversation(conversation)
       conversationManager = redirect.to
       newPointer = `step.${stepOrder + 1}`

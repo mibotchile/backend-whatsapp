@@ -41,12 +41,12 @@ export class ConversationGateway {
 
   @SubscribeMessage('redirect_conversation')
   async redirectConversation(client: Socket, { conversationId, manager, managerId }:any): Promise<any> {
-    console.log('Redireccionando conversacion ... .. .')
+    console.log('Redireccionando conversacion ...')
     console.log({ conversationId })
     console.log({ manager })
     console.log({ managerId })
     await this.conversationService.updateManager(+conversationId, manager, managerId)
-    const conversation = await this.conversationService.findById(conversationId)
+    const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
     console.log('Conversacion redireccionada ')
 
     this.emitNewConversation(conversation)
@@ -58,7 +58,7 @@ export class ConversationGateway {
     console.log({ conversationId })
 
     await this.conversationService.updateManager(+conversationId, 'system', 0)
-    const conversation = await this.conversationService.findById(conversationId)
+    const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
     this.client.emit<any>('continue_conversation', conversation)
     return conversation
     // return this.conversationGateway.emitNewConversation(conversation)

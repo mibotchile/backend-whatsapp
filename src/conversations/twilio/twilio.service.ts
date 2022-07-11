@@ -10,8 +10,8 @@ export class TwilioService {
     private conversationService:ConversationService
   ) { }
 
-  async sendMessage(message: string, from: string, to: string, conversationId:number) {
-    const conversation = await this.conversationService.findById(conversationId)
+  async sendMessage(message: string, from: string, to: string, conversationId:number) { // TODO pedir que se mande la data de conversation
+    const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
     if (conversation.manager.includes('group')) return false
     const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
     try {
