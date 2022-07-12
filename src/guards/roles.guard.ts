@@ -39,8 +39,8 @@ export class RolesGuard implements CanActivate {
     if (routePath[1] === 'responseValidator') return true
     if (routePath[1] === 'health') return true
     if (routePath[1] === 'project') return true
-    if (routePath[1] === 'project') return true
-    if (routePath[1] === 'socket.io' && routePath[2] === 'uid') {
+    if (routePath[1] === 'socket.io') return true
+    if (routePath[1] === 'user' && routePath[2] === 'uid') {
       if (request.params.uid === httpContext.get('USER').uid) {
         return true
       }
