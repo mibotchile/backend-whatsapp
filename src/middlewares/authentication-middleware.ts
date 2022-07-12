@@ -61,7 +61,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
           {
             data: [],
             success: false,
-            message: 'Este usuario no esta registrado en este servicio'
+            message: 'Este usuario no esta registrado en el servicio de whatsapp'
           }
         )
       } else {
