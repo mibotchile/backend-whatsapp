@@ -127,6 +127,16 @@ export class UserService {
     }
   }
 
+  async findManyByIds (ids:number[]): Promise<any> {
+    if (ids.length === 0) return []
+    const users = await this.usersRepo.find({
+      where: {
+        id: In(ids)
+      }
+    })
+    return users
+  }
+
   async findInactives (pageSize = 0, page = 0): Promise<any> {
     const where = { status: 0 }
     const { users, length } = await this.getFullDataUsers(pageSize, page, where)

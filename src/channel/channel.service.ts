@@ -7,6 +7,10 @@ import * as twilio from 'twilio'
 import { ChannelConfig } from './channel-config/channel_config.entity'
 import { ChannelMapService } from './channel-map/channel-map.service'
 import { ChannelConfigUtils } from 'src/conversations/conversation-manager/channel-config.utils'
+import { GroupService } from 'src/group/groups.service'
+import { UserService } from 'src/user/user.service'
+import { User } from 'src/user/user.entity'
+import { Group } from 'src/group/group.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ChannelService {
@@ -16,7 +20,9 @@ export class ChannelService {
     @InjectDataSource() private dataSource:DataSource,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(ChannelConfig) private channelConfigRepository: Repository<ChannelConfig>,
-    private channelMapService:ChannelMapService) {
+    private channelMapService:ChannelMapService,
+    private groupService:GroupService,
+    private userService:UserService) {
     this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     this.configUtils = new ChannelConfigUtils()
   }
@@ -253,7 +259,7 @@ export class ChannelService {
     return {
       data: channels[0],
       success: true,
-      message: 'Lista de todos los grupos'
+      message: 'Canal obtenido exitosamente'
     }
   }
 
@@ -267,23 +273,38 @@ export class ChannelService {
     return {
       data: channels[0],
       success: true,
-      message: 'Lista de todos los grupos'
+      message: 'Canal obtenido exitosamente'
     }
   }
 
-  prettierConfig(config: ChannelConfig):any {
+  async prettierConfig(config: ChannelConfig):Promise<any> {
+    if (!config.steps) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'No existe una configuracion para este canal'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
     const prettyConfig = []
-
-    const { steps } = config
+    const { steps, redirects } = config
+    const usersRedirect = redirects.filter(r => r.to.includes('user'))
+    const groupsRedirect = redirects.filter(r => r.to.includes('group'))
+    const userIds = usersRedirect.length > 0 ? usersRedirect.map(r => Number(r.to.replace('user.', ''))) : []
+    const groupIds = groupsRedirect.length > 0 ? groupsRedirect.map(r => Number(r.to.replace('group.', ''))) : []
+    const users = await this.userService.findManyByIds(userIds)
+    const groups = await this.groupService.findManyByIds(groupIds)
 
     steps.forEach(s => {
-      prettyConfig.push(...this.buildData(s.action, config))
+      prettyConfig.push(...this.buildData(s.action, config, users, groups))
     })
 
     return prettyConfig
   }
 
-  buildData(action:string, config:ChannelConfig) {
+  buildData(action:string, config:ChannelConfig, users:User[], groups:Group[]) {
     const [item, itemId] = action.split('.')
     console.log(item)
     const messageResponse = []
@@ -294,7 +315,7 @@ export class ChannelService {
         const m = { title: menu.title } as any
         const op = []
         options.forEach(o => {
-          op.push(...this.buildData(o.action, config))
+          op.push(...this.buildData(o.action, config, users, groups))
         })
         m.options = op
         messageResponse.push({ type: 'menu', data: m })
@@ -306,7 +327,17 @@ export class ChannelService {
       case 'redirect':
         const redirect = config.redirects.find(r => r.id === Number(itemId))
         const [manager, managerId] = redirect.to.split('.')
-        messageResponse.push({ type: 'redirect', data: 'Transferencia al ' + (manager === 'group' ? 'grupo' : 'usuario') + ' con el id ' + managerId })
+        let managerName
+        let managerType
+        if (manager === 'group') {
+          managerType = 'grupo'
+          managerName = groups.find(g => g.id === Number(managerId)).name
+        }
+        if (manager === 'user') {
+          managerType = 'usuario'
+          managerName = users.find(u => u.id === Number(managerId)).name
+        }
+        messageResponse.push({ type: 'redirect', data: 'Transferencia al ' + managerType + ' ' + managerName })
         break
       case 'quiz':
         const quiz = config.quizes.find(q => q.id === Number(itemId))
