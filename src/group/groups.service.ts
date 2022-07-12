@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common'
 import { Group } from './group.entity'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { ILike, Not, Repository } from 'typeorm'
+import { ILike, In, Not, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -104,6 +104,16 @@ export class GroupService {
       success: true,
       message: 'Grupo actualozado exitosamente'
     }
+  }
+
+  async findManyByIds (ids:number[]): Promise<any> {
+    if (ids.length === 0) return []
+    const groups = await this.groupsRepository.find({
+      where: {
+        id: In(ids)
+      }
+    })
+    return groups
   }
 
   async findAll ({ pageSize, page }): Promise<any> {
