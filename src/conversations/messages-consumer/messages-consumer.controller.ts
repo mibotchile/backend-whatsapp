@@ -35,8 +35,8 @@ export class MessagesConsumerController {
 
   @EventPattern('whatsapp_message_status')
   async handleMessageStatus(data: Record<string, any>) {
-    this.messageWs.changeMessageStatus({ sid: data.MessageSid, message_status: data.MessageStatus })
-    this.messageService.updateStatusBySid(data.MessageSid, data.MessageStatus)
+    // this.messageWs.changeMessageStatus({ sid: data.MessageSid, message_status: data.MessageStatus })
+    // this.messageService.updateStatusBySid(data.MessageSid, data.MessageStatus)
     console.log(data)
   }
 
