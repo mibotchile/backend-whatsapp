@@ -23,7 +23,8 @@ export class ChannelService {
     private channelMapService:ChannelMapService,
     private groupService:GroupService,
     private userService:UserService) {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+    const schema = httpContext.get('PROJECT_UID') ? ('project_' + httpContext.get('PROJECT_UID').toLowerCase()) : 'public'
+    this.setSchema(schema)
     this.configUtils = new ChannelConfigUtils()
   }
 
@@ -227,13 +228,14 @@ export class ChannelService {
   //   }
 
   async findNumbers (): Promise<any> {
-    const twilioClient = twilio(
-      process.env.ACCOUNT_SID,
-      process.env.AUTH_TOKEN
-    )
-    const numbers = await twilioClient.incomingPhoneNumbers.list({
-      limit: 20
-    })
+    const channels = await this.channelRepository.find()
+    // const twilioClient = twilio(
+    //   process.env.ACCOUNT_SID,
+    //   process.env.AUTH_TOKEN
+    // )
+    // const numbers = await twilioClient.incomingPhoneNumbers.list({
+    //   limit: 20
+    // })
 
     const length = 20// await this.channelsRepository.createQueryBuilder().getCount()
 
@@ -242,7 +244,7 @@ export class ChannelService {
         page: 0,
         pageSize: 0,
         length,
-        channels: numbers
+        channels
       },
       success: true,
       message: 'Lista de todos los canales'
