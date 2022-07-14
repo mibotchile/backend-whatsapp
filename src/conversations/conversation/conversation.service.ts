@@ -3,7 +3,6 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, ILike, Repository } from 'typeorm'
 import { Message } from '../messages/message.entity'
 import { Conversation } from './conversation.entity'
-import * as httpContext from 'express-http-context'
 
 @Injectable()
 export class ConversationService {
@@ -24,32 +23,26 @@ export class ConversationService {
   }
 
   async save(data:Conversation) {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     return await this.conversationRepo.insert(data)
   }
 
   async update(id:number, data:Conversation) {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     return await this.conversationRepo.update(id, data)
   }
 
   async updateManager(id:number, typeManager:'system'|'user'|'group', managerId?:number) {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     return await this.conversationRepo.update(id, { manager: `${typeManager}_${managerId}` })
   }
 
   async updateByClientNumber(clientNumber:string, data:Conversation) {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     await this.conversationRepo.update({ client_number: clientNumber }, data)
   }
 
   async findAll():Promise<Conversation[]> {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     return await this.conversationRepo.find()
   }
 
   async findByManager(manager:string):Promise<Conversation[]> {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     return await this.conversationRepo.find({
       where: {
         manager: ILike(`${manager}%`)
@@ -58,7 +51,6 @@ export class ConversationService {
   }
 
   async findByClient(clientNumber:string):Promise<Conversation[]> {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     return await this.conversationRepo.find({
       where: {
         client_number: clientNumber
@@ -76,7 +68,6 @@ export class ConversationService {
   }
 
   async findByManagerWithId(manager:string, managerId:number):Promise<Conversation[]> {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     const conversations = await this.conversationRepo.find({
       where: {
         manager: `${manager}_${managerId}`
@@ -92,7 +83,6 @@ export class ConversationService {
   }
 
   async findById(id:number):Promise<Conversation> {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     const [conversation] = await this.conversationRepo.find({ where: { id } }) as any
     if (!conversation) return
     const lastMessage = await this.findLastMessageByConversationId(conversation.id)
@@ -101,7 +91,6 @@ export class ConversationService {
   }
 
   async findByIdWithLastMessage(id:number):Promise<Conversation> {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     const [conversation] = await this.conversationRepo.find({ where: { id } }) as any
     if (!conversation) return
     const lastMessage = await this.findLastMessageByConversationId(conversation.id)
