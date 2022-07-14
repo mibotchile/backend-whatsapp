@@ -46,12 +46,15 @@ export class RolesGuard implements CanActivate {
       }
     }
 
+    if (routePath[1] === 'user' && routePath[2] === 'customToken') {
+      return true
+    }
     const role = httpContext.get('ROLE')
     const permissions = this.getPermissions(role.config, routePath[1])
     // console.log(permissions)
 
-    let permissionRequired
-    let action
+    let permissionRequired:string
+    let action:string
     switch (request.method) {
       case 'GET':
         permissionRequired = 'read'

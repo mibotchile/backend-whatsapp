@@ -17,11 +17,22 @@ import { PointerConversationService } from '../conversation-manager/pointer-conv
 import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
 import { ConversationGateway } from '../conversation-gateway/conversation.gateway'
 import { ClientsModule, Transport } from '@nestjs/microservices'
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
+    }),
+    RabbitMQModule.forRoot(RabbitMQModule, {
+      exchanges: [
+        {
+          name: process.env.RABBIT_BI_EXCHANGE,
+          type: 'direct'
+        }
+      ],
+      uri: process.env.RABBIT_URL,
+      connectionInitOptions: { wait: false }
     }),
     ClientsModule.register([
       {
@@ -58,6 +69,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
     ConversationManagerService,
     ConversationService,
     PointerConversationService,
-    ChannelConfigService]
+    ChannelConfigService
+  ]
 })
 export class MessagesConsumerModule {}
