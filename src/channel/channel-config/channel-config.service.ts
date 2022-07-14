@@ -9,7 +9,7 @@ export class ChannelConfigService {
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
   ) {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
+    // this.setSchema('project_vnblnzdm0b3bdcltpvpl')
   }
 
   setSchema(schema:string) {

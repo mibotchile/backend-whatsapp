@@ -21,4 +21,10 @@ export class ChannelMapService {
   async create (data: ChannelMap): Promise<any> {
     return await this.channelMapRepository.insert(data)
   }
+
+  async findByNumber(channelNumber:string):Promise<ChannelMap> {
+    this.setSchema('public')
+    const [channelMap] = await this.channelMapRepository.find({ where: { channel_number: channelNumber } })
+    return channelMap
+  }
 }

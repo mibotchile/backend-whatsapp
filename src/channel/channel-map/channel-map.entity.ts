@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity('channel', { schema: 'public' })
+@Entity('channel_map', { schema: 'public' })
 export class ChannelMap {
     @PrimaryGeneratedColumn()
       id?: number

@@ -24,24 +24,35 @@ export class ConversationManagerService {
     this.configUtils = new ChannelConfigUtils()
   }
 
-  async messageClientHandler(messageInfo:any, waId: string, channel_number: string, saveMessage = true) {
+  async messageClientHandler(messageInfo:any, waId: string, schema:string, channelNumber: string, saveMessage = true) {
+    console.log('[ CHANNEL NUMBER ]', { channelNumber })
+    console.log('[ SCHEMA ]', { schema })
     const message = messageInfo.Body
-    channel_number = '+19206787641'
+    // channelNumber = '+19206787641'
     // console.log('Handler')
     // console.log(JSON.stringify(config, null, '\t'))
+    this.pointerService.setSchema(schema)
     const pointerDB = await this.pointerService.findByWaId(waId)
     let subpointers = pointerDB ? pointerDB.pointer.split('>') : ['step.1']
-    let config
+    let config:Config
     let conversationId = 1
     let conversationManager:string
     const now = new Date().toISOString()
     // const now = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' }).format(Date.now())
 
+    this.channelConfigService.setSchema(schema)
+    this.conversationService.setSchema(schema)
+    this.messageService.setSchema(schema)
+
     if (!pointerDB) {
-      config = await this.channelConfigService.findByChannelNumber('+19206787641')
+      config = await this.channelConfigService.findByChannelNumber(channelNumber)
+      if (!config) {
+        console.log('[ NO HAY CONFIGURACION DISPONIBLE PARA ESTE CANAL EN ' + schema + ' ]')
+        return
+      }
       subpointers = ['step.1']
       const conversation = await this.conversationService.save({
-        channel_number,
+        channel_number: channelNumber,
         client_number: waId,
         client_name: messageInfo.ProfileName ?? '',
         manager: 'system',
@@ -98,7 +109,7 @@ export class ConversationManagerService {
       const menuId = responseTo.split('.')[1]
       const menu = this.configUtils.findMenuById(Number(menuId), config)
       if (!this.configUtils.isValidOption(message, menu)) {
-        await this.twilioService.sendMessage('Por favor elija una opcion valida', channel_number, waId, conversationId)
+        await this.twilioService.sendMessage('Por favor elija una opcion valida', channelNumber, waId, conversationId, schema)
         return
       }
       const optionSelected = this.configUtils.findOptionFromMenu(Number(message), menu)
@@ -110,7 +121,7 @@ export class ConversationManagerService {
       const questionId = Number(responseTo.split('.')[1])
       const question = this.configUtils.findQuestionFromQuiz(questionId, quiz)
       if (!this.configUtils.isValidQuestionResponse(question, message)) {
-        await this.twilioService.sendMessage(question.error_message, channel_number, waId, conversationId)
+        await this.twilioService.sendMessage(question.error_message, channelNumber, waId, conversationId, schema)
         return
       }
       if (this.configUtils.existQuestionInQuiz(questionId + 1, quiz)) {
@@ -146,7 +157,7 @@ export class ConversationManagerService {
       messageToSend = this.builResponseByAction(action, { config })
       console.log({ messageToSend })
 
-      await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
+      await this.twilioService.sendMessage(messageToSend, channelNumber, waId, conversationId, schema)
       newPointer = `step.${stepOrder + 1}`
       if (stepOrder === 1) {
         await this.pointerService.create({ phone_number: waId, pointer: newPointer, config, conversation_id: conversationId, conversation_manager: 'system', status: 1 })
@@ -156,7 +167,7 @@ export class ConversationManagerService {
       if (!this.configUtils.existStep(stepOrder + 1, config)) {
         action = 'close'
       } else {
-        await this.messageClientHandler(messageInfo, waId, channel_number, false)
+        await this.messageClientHandler(messageInfo, waId, schema, channelNumber, false)
         return
       }
     }
@@ -180,7 +191,7 @@ export class ConversationManagerService {
 
     if (action.includes('redirect')) {
       messageToSend = 'En breve un asesor se comunicara con usted'
-      await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
+      await this.twilioService.sendMessage(messageToSend, channelNumber, waId, conversationId, schema)
       const redirect = this.configUtils.findRedirectById(Number(action.split('.')[1]), config)
       const [manager, managerId] = redirect.to.split('.')
       await this.conversationService.updateManager(conversationId, manager as 'system'|'user'|'group', Number(managerId))
@@ -205,7 +216,7 @@ export class ConversationManagerService {
     console.log({ action })
     console.log({ messageToSend })
 
-    await this.twilioService.sendMessage(messageToSend, channel_number, waId, conversationId)
+    await this.twilioService.sendMessage(messageToSend, channelNumber, waId, conversationId, schema)
     console.log({ stepOrder })
   }
 
