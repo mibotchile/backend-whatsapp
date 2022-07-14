@@ -40,11 +40,12 @@ export class ConversationGateway {
   }
 
   @SubscribeMessage('redirect_conversation')
-  async redirectConversation(client: Socket, { conversationId, manager, managerId }:any): Promise<any> {
+  async redirectConversation(client: Socket, { conversationId, manager, managerId, projectUid }:any): Promise<any> {
     console.log('Redireccionando conversacion ...')
     console.log({ conversationId })
     console.log({ manager })
     console.log({ managerId })
+    this.conversationService.setSchema('project_' + projectUid.toLowerCase())
     await this.conversationService.updateManager(+conversationId, manager, managerId)
     const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
     console.log('Conversacion redireccionada ')
