@@ -23,22 +23,18 @@ export class PointerConversationService {
     console.log({ waId })
     console.log(data.pointer)
 
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     await this.pointerRepo.update({ phone_number: waId }, data)
   }
 
   async create(data:PointerConversation) {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     await this.pointerRepo.insert(data)
   }
 
   async delete(waId: string) {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     await this.pointerRepo.update({ phone_number: waId }, { status: 0 })
   }
 
   async findByWaId(waId: string): Promise<PointerConversation> {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
     const pointers = await this.pointerRepo.find({ where: { phone_number: waId, status: 1 } })
     return pointers[0]
     // return 'step2>menu1>option3>menu2'

@@ -18,6 +18,14 @@ import { ChannelConfigService } from 'src/channel/channel-config/channel-config.
 import { ConversationGateway } from '../conversation-gateway/conversation.gateway'
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
+import { ChannelMapService } from 'src/channel/channel-map/channel-map.service'
+import { ChannelMap } from 'src/channel/channel-map/channel-map.entity'
+import { ChannelService } from 'src/channel/channel.service'
+import { GroupService } from 'src/group/groups.service'
+import { UserService } from 'src/user/user.service'
+import { Group } from 'src/group/group.entity'
+import { User } from 'src/user/user.entity'
+import { Role } from 'src/role/role.entity'
 
 @Module({
   imports: [
@@ -55,10 +63,10 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [PointerConversation, Channel, ChannelConfig, Conversation, Message],
+      entities: [PointerConversation, Channel, ChannelConfig, Conversation, Message, ChannelMap, Group, User, Role],
       logging: process.env.TYPEORM_LOGS === 'true'
     }),
-    TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation, Message])
+    TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation, Message, ChannelMap, Group, User, Role])
   ],
   controllers: [MessagesConsumerController],
   providers: [
@@ -69,7 +77,11 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
     ConversationManagerService,
     ConversationService,
     PointerConversationService,
-    ChannelConfigService
+    ChannelConfigService,
+    ChannelMapService,
+    ChannelService,
+    GroupService,
+    UserService
   ]
 })
 export class MessagesConsumerModule {}

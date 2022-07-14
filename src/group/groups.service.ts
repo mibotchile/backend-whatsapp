@@ -1,18 +1,21 @@
 import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common'
 import { Group } from './group.entity'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { ILike, In, Not, Repository } from 'typeorm'
+import { DataSource, ILike, In, Not, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
 
 @Injectable({ scope: Scope.REQUEST })
 export class GroupService {
-  private connection
-  constructor (@InjectDataSource() connection, @InjectRepository(Group) private groupsRepository: Repository<Group>) {
-    this.connection = connection
-    // console.log(connection)
-    const index = this.connection.entityMetadatas.findIndex(e => e.name === 'Group')
-    this.connection.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
-    this.connection.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.group'
+  constructor (@InjectDataSource() private dataSource:DataSource, @InjectRepository(Group) private groupsRepository: Repository<Group>) {
+    const schema = httpContext.get('PROJECT_UID') ? ('project_' + httpContext.get('PROJECT_UID').toLowerCase()) : 'public'
+    this.setSchema(schema)
+  }
+
+  setSchema(schema:string) {
+    this.dataSource.entityMetadatas.forEach((em, index) => {
+      this.dataSource.entityMetadatas[index].schema = schema
+      this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
+    })
   }
 
   async create (data: Group): Promise<any> {
