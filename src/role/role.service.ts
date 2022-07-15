@@ -162,16 +162,21 @@ export class RoleService {
         )
       }
     }
-    if (data.default) {
-      await this.rolesRepo.createQueryBuilder().update().set({ default: false }).execute()
-    }
-
-    if (data.default === false) {
-      const [role] = await this.rolesRepo.find({ where: { id } })
-      if (role.default) {
-        data.default = true
+    if (data.status !== undefined && data.status === 1) {
+      if (data.default) {
+        await this.rolesRepo.createQueryBuilder().update().set({ default: false }).execute()
+      }
+      if (data.default === false) {
+        const [role] = await this.rolesRepo.find({ where: { id } })
+        if (role.default) {
+          data.default = true
+        }
       }
     }
+    if (data.status !== undefined && data.status === 0) {
+      data.default = false
+    }
+
     data.config = this.roleConfigValidator(data.config)
     const dataRes = await this.rolesRepo.update(id, data)
     return {

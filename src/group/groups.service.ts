@@ -83,15 +83,19 @@ export class GroupService {
       }
     }
 
-    if (data.default) {
-      await this.groupsRepository.createQueryBuilder().update().set({ default: false }).execute()
-    }
-
-    if (data.default === false) {
-      const [group] = await this.groupsRepository.find({ where: { id } })
-      if (group.default) {
-        data.default = true
+    if (data.status !== undefined && data.status === 1) {
+      if (data.default) {
+        await this.groupsRepository.createQueryBuilder().update().set({ default: false }).execute()
       }
+      if (data.default === false) {
+        const [group] = await this.groupsRepository.find({ where: { id } })
+        if (group.default) {
+          data.default = true
+        }
+      }
+    }
+    if (data.status !== undefined && data.status === 0) {
+      data.default = false
     }
 
     const dataRes = await this.groupsRepository.update(id, data)
@@ -312,13 +316,14 @@ export class GroupService {
         {
           data: [],
           success: false,
-          message: `No se puede desactivar este grupo, porque estas configuraciones de canal (${configsWithReference.join(' , ')}) lo referencian`
+          message: `No se puede desactivar el grupo porque está asignado en la configuración del canal (${configsWithReference.join(' , ')})`
         },
         HttpStatus.NOT_ACCEPTABLE
       )
     }
     const groupDeleted = await this.groupsRepository.update(id, {
-      status: 0
+      status: 0,
+      default: false
     })
     return {
       data: groupDeleted,
