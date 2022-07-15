@@ -5,7 +5,7 @@ import { ForbiddenException, Injectable, NestMiddleware } from '@nestjs/common'
 import * as httpContext from 'express-http-context'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
-import {log} from 'console'
+import { log } from 'console'
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware {
@@ -67,11 +67,10 @@ export class AuthenticationMiddleware implements NestMiddleware {
         )
       } else {
         httpContext.set('ROLE', { name: user.role_name, config: user.role_config })
-	if(req.originalUrl.startsWith('/user/customToken')){
-	  const customToken=await admin.auth().createCustomToken(userInfo.uid)
+        if (req.originalUrl.startsWith('/user/customToken')) {
+	  const customToken = await admin.auth().createCustomToken(userInfo.uid)
 	  httpContext.set('CUSTOM_TOKEN', customToken)
-
-	}
+        }
         next()
       }
     } catch (error) {
