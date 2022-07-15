@@ -272,8 +272,8 @@ export class UserService {
 
     const groups = await this.groupsRepo.find({
       where: {
-        id: In(user.groups_id)
-
+        id: In(user.groups_id),
+        status: 1
       }
     })
     return {

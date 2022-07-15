@@ -107,7 +107,7 @@ export class RoleService {
           success: false,
           message: 'Este rol no se puede desactivar ni editar'
         },
-        HttpStatus.OK
+        HttpStatus.NOT_ACCEPTABLE
       )
     }
     if (isNaN(id)) {
@@ -148,7 +148,7 @@ export class RoleService {
               success: false,
               message: 'Existe un grupo con el mismo nombre desactivado y se activo'
             },
-            HttpStatus.OK
+            HttpStatus.NOT_ACCEPTABLE
           )
         }
 
@@ -164,6 +164,13 @@ export class RoleService {
     }
     if (data.default) {
       await this.rolesRepo.createQueryBuilder().update().set({ default: false }).execute()
+    }
+
+    if (data.default === false) {
+      const [role] = await this.rolesRepo.find({ where: { id } })
+      if (role.default) {
+        data.default = true
+      }
     }
     data.config = this.roleConfigValidator(data.config)
     const dataRes = await this.rolesRepo.update(id, data)
@@ -189,6 +196,9 @@ export class RoleService {
       ...pagination,
       include: {
         users: true
+      },
+      order: {
+        id: 'ASC'
       }
     })
 
@@ -299,7 +309,7 @@ export class RoleService {
           success: false,
           message: 'ya existe rol con este nombre'
         },
-        HttpStatus.NO_CONTENT
+        HttpStatus.NOT_ACCEPTABLE
       )
     }
 
@@ -317,6 +327,16 @@ export class RoleService {
   }
 
   async remove (id: number) {
+    if ([1, 2, 3].includes(id)) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'Este rol no se puede desactivar ni editar'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
     const roleDeleted = await this.rolesRepo.update(id, { status: 0 })
     return {
       data: roleDeleted,
