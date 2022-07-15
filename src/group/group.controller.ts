@@ -72,6 +72,6 @@ export class GroupController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.groupService.remove(+id)
+    return this.groupService.disable(+id)
   }
 }

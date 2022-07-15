@@ -3,10 +3,15 @@ import { Group } from './group.entity'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, ILike, In, Not, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
+import { ChannelConfig } from 'src/channel/channel-config/channel_config.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class GroupService {
-  constructor (@InjectDataSource() private dataSource:DataSource, @InjectRepository(Group) private groupsRepository: Repository<Group>) {
+  constructor (
+    @InjectDataSource() private dataSource:DataSource,
+     @InjectRepository(Group) private groupsRepository: Repository<Group>,
+     @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
+  ) {
     const schema = httpContext.get('PROJECT_UID') ? ('project_' + httpContext.get('PROJECT_UID').toLowerCase()) : 'public'
     this.setSchema(schema)
   }
@@ -290,6 +295,47 @@ export class GroupService {
       },
       success: true,
       message: 'user'
+    }
+  }
+
+  async disable (id: number) {
+    const channelConfigs = await this.channelConfigRepo.find()
+    // const redirects:Redirect[] = channelConfigs.reduce((pv, cv) => {
+    //   pv.push(...cv.redirects)
+    //   return pv
+    // }, [])
+
+    // const existGroupInConfigChannel = redirects.some(r => {
+    //   const [manager, managerId] = r.to.split('.')
+    //   return (manager === 'group' && Number(managerId) === id)
+    // })
+    const configsWithReference:string[] = []
+    channelConfigs.forEach(cc => {
+      cc.redirects.forEach(r => {
+        const [manager, managerId] = r.to.split('.')
+        if (manager === 'group' && Number(managerId) === id) {
+          configsWithReference.push(cc.channel_number)
+        }
+      })
+    })
+
+    if (configsWithReference.length !== 0) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: `No se puede desactivar este grupo, porque estas configuraciones de canal (${configsWithReference.join(' , ')}) lo referencian`
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+    const groupDeleted = await this.groupsRepository.update(id, {
+      status: 0
+    })
+    return {
+      data: groupDeleted,
+      success: true,
+      message: 'Grupo desactivado aexitosamente'
     }
   }
 
