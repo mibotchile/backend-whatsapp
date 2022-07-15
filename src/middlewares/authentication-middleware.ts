@@ -68,8 +68,8 @@ export class AuthenticationMiddleware implements NestMiddleware {
       } else {
         httpContext.set('ROLE', { name: user.role_name, config: user.role_config })
         if (req.originalUrl.startsWith('/user/customToken')) {
-	  const customToken = await admin.auth().createCustomToken(userInfo.uid)
-	  httpContext.set('CUSTOM_TOKEN', customToken)
+          const customToken = await admin.auth().createCustomToken(userInfo.uid)
+          httpContext.set('CUSTOM_TOKEN', customToken)
         }
         next()
       }
