@@ -201,13 +201,14 @@ export class UserService {
     const length = await this.usersRepo.count(where)
 
     const groupIds = usersDB.reduce((pVal, cVal) => {
-      pVal.push(...(cVal.groups_id as Array<number>))
+      pVal.push(...(cVal.groups_id as number[]))
       return pVal
     }, [])
 
     const groups = await this.groupsRepo.find({
       where: {
-        id: In(groupIds)
+        id: In(groupIds),
+        status: 1
       },
       select: {
         id: true,
