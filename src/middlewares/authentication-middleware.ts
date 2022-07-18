@@ -61,11 +61,15 @@ export class AuthenticationMiddleware implements NestMiddleware {
           {
             data: [],
             success: false,
-            message: 'Este usuario no esta registrado en este servicio'
+            message: 'Este usuario no esta registrado en el servicio de whatsapp'
           }
         )
       } else {
         httpContext.set('ROLE', { name: user.role_name, config: user.role_config })
+        if (req.originalUrl.startsWith('/user/customToken')) {
+          const customToken = await admin.auth().createCustomToken(userInfo.uid)
+          httpContext.set('CUSTOM_TOKEN', customToken)
+        }
         next()
       }
     } catch (error) {

@@ -3,18 +3,28 @@ import { Channel } from './channel.entity'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, ILike, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
-import * as twilio from 'twilio'
 import { ChannelConfig } from './channel-config/channel_config.entity'
 import { ChannelMapService } from './channel-map/channel-map.service'
+import { ChannelConfigUtils } from 'src/conversations/conversation-manager/channel-config.utils'
+import { GroupService } from 'src/group/groups.service'
+import { UserService } from 'src/user/user.service'
+import { User } from 'src/user/user.entity'
+import { Group } from 'src/group/group.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ChannelService {
+  configUtils:ChannelConfigUtils
+
   constructor (
     @InjectDataSource() private dataSource:DataSource,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(ChannelConfig) private channelConfigRepository: Repository<ChannelConfig>,
-    private channelMapService:ChannelMapService) {
-    this.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+    private channelMapService:ChannelMapService,
+    private groupService:GroupService,
+    private userService:UserService) {
+    const schema = httpContext.get('PROJECT_UID') ? ('project_' + httpContext.get('PROJECT_UID').toLowerCase()) : 'public'
+    this.setSchema(schema)
+    this.configUtils = new ChannelConfigUtils()
   }
 
   setSchema(schema:string) {
@@ -217,13 +227,14 @@ export class ChannelService {
   //   }
 
   async findNumbers (): Promise<any> {
-    const twilioClient = twilio(
-      process.env.ACCOUNT_SID,
-      process.env.AUTH_TOKEN
-    )
-    const numbers = await twilioClient.incomingPhoneNumbers.list({
-      limit: 20
-    })
+    const channels = await this.channelRepository.find()
+    // const twilioClient = twilio(
+    //   process.env.ACCOUNT_SID,
+    //   process.env.AUTH_TOKEN
+    // )
+    // const numbers = await twilioClient.incomingPhoneNumbers.list({
+    //   limit: 20
+    // })
 
     const length = 20// await this.channelsRepository.createQueryBuilder().getCount()
 
@@ -232,7 +243,7 @@ export class ChannelService {
         page: 0,
         pageSize: 0,
         length,
-        channels: numbers
+        channels
       },
       success: true,
       message: 'Lista de todos los canales'
@@ -249,7 +260,7 @@ export class ChannelService {
     return {
       data: channels[0],
       success: true,
-      message: 'Lista de todos los grupos'
+      message: 'Canal obtenido exitosamente'
     }
   }
 
@@ -263,8 +274,80 @@ export class ChannelService {
     return {
       data: channels[0],
       success: true,
-      message: 'Lista de todos los grupos'
+      message: 'Canal obtenido exitosamente'
     }
+  }
+
+  async prettierConfig(config: ChannelConfig):Promise<any> {
+    if (!config.steps) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: 'No existe una configuracion para este canal'
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+    const prettyConfig = []
+    const { steps, redirects } = config
+    const usersRedirect = redirects.filter(r => r.to.includes('user'))
+    const groupsRedirect = redirects.filter(r => r.to.includes('group'))
+    const userIds = usersRedirect.length > 0 ? usersRedirect.map(r => Number(r.to.replace('user.', ''))) : []
+    const groupIds = groupsRedirect.length > 0 ? groupsRedirect.map(r => Number(r.to.replace('group.', ''))) : []
+    const users = await this.userService.findManyByIds(userIds)
+    const groups = await this.groupService.findManyByIds(groupIds)
+
+    steps.forEach(s => {
+      prettyConfig.push(...this.buildData(s.action, config, users, groups))
+    })
+
+    return prettyConfig
+  }
+
+  buildData(action:string, config:ChannelConfig, users:User[], groups:Group[]) {
+    const [item, itemId] = action.split('.')
+    console.log(item)
+    const messageResponse = []
+    switch (item) {
+      case 'menu':
+        const menu = config.menus.find(m => m.id === Number(itemId))
+        const options = menu.options
+        const m = { title: menu.title } as any
+        const op = []
+        options.forEach(o => {
+          op.push(...this.buildData(o.action, config, users, groups))
+        })
+        m.options = op
+        messageResponse.push({ type: 'menu', data: m })
+        break
+      case 'message':
+        const message = config.messages.find(m => m.id === Number(itemId))
+        messageResponse.push({ type: 'message', data: message.message })
+        break
+      case 'redirect':
+        const redirect = config.redirects.find(r => r.id === Number(itemId))
+        const [manager, managerId] = redirect.to.split('.')
+        let managerName
+        let managerType
+        if (manager === 'group') {
+          managerType = 'grupo'
+          managerName = groups.find(g => g.id === Number(managerId)).name
+        }
+        if (manager === 'user') {
+          managerType = 'usuario'
+          managerName = users.find(u => u.id === Number(managerId)).name
+        }
+        messageResponse.push({ type: 'redirect', data: 'Transferencia al ' + managerType + ' ' + managerName })
+        break
+      case 'quiz':
+        const quiz = config.quizes.find(q => q.id === Number(itemId))
+        const questions = quiz.questions.map(q => q.question)
+        messageResponse.push({ type: 'data_request', data: questions })
+
+        break
+    }
+    return messageResponse
   }
 
   //   async findAll ({ pageSize, page }): Promise<any> {

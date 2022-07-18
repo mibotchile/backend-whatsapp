@@ -1,18 +1,26 @@
 import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common'
 import { Group } from './group.entity'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { ILike, Not, Repository } from 'typeorm'
+import { DataSource, ILike, In, Not, Repository } from 'typeorm'
 import * as httpContext from 'express-http-context'
+import { ChannelConfig } from 'src/channel/channel-config/channel_config.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class GroupService {
-  private connection
-  constructor (@InjectDataSource() connection, @InjectRepository(Group) private groupsRepository: Repository<Group>) {
-    this.connection = connection
-    // console.log(connection)
-    const index = this.connection.entityMetadatas.findIndex(e => e.name === 'Group')
-    this.connection.entityMetadatas[index].schema = 'project_' + httpContext.get('PROJECT_UID')
-    this.connection.entityMetadatas[index].tablePath = 'project_' + httpContext.get('PROJECT_UID').toLowerCase() + '.group'
+  constructor (
+    @InjectDataSource() private dataSource:DataSource,
+     @InjectRepository(Group) private groupsRepository: Repository<Group>,
+     @InjectRepository(ChannelConfig) private channelConfigRepo: Repository<ChannelConfig>
+  ) {
+    const schema = httpContext.get('PROJECT_UID') ? ('project_' + httpContext.get('PROJECT_UID').toLowerCase()) : 'public'
+    this.setSchema(schema)
+  }
+
+  setSchema(schema:string) {
+    this.dataSource.entityMetadatas.forEach((em, index) => {
+      this.dataSource.entityMetadatas[index].schema = schema
+      this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
+    })
   }
 
   async create (data: Group): Promise<any> {
@@ -55,14 +63,7 @@ export class GroupService {
 
   async update (id: number, data: Group): Promise<any> {
     if (id === 1) {
-      throw new HttpException(
-        {
-          data: [],
-          success: false,
-          message: 'Este grupo no se puede desactivar ni editar'
-        },
-        HttpStatus.OK
-      )
+      this.showHttpException('Este grupo no se puede desactivar ni editar', HttpStatus.NOT_ACCEPTABLE)
     }
 
     if (data.name) {
@@ -76,34 +77,44 @@ export class GroupService {
       if (groups.length > 0) {
         if (groups[0].status === 0) {
           await this.groupsRepository.update(groups[0].id, { status: 1 })
-          throw new HttpException(
-            {
-              data: [],
-              success: false,
-              message: 'Existe un grupo con el mismo nombre desactivado y se activo'
-            },
-            HttpStatus.OK
-          )
+          this.showHttpException('Existe un grupo con el mismo nombre desactivado y se activo', HttpStatus.OK)
         }
-        throw new HttpException(
-          {
-            data: [],
-            success: false,
-            message: 'Ya existe un grupo con el mismo nombre'
-          },
-          HttpStatus.NOT_ACCEPTABLE
-        )
+        this.showHttpException('Ya existe un grupo con el mismo nombre', HttpStatus.NOT_ACCEPTABLE)
       }
     }
-    if (data.default) {
-      await this.groupsRepository.createQueryBuilder().update().set({ default: false }).execute()
+
+    if (data.status !== undefined && data.status === 1) {
+      if (data.default) {
+        await this.groupsRepository.createQueryBuilder().update().set({ default: false }).execute()
+      }
+      if (data.default === false) {
+        const [group] = await this.groupsRepository.find({ where: { id } })
+        if (group.default) {
+          data.default = true
+        }
+      }
     }
+    if (data.status !== undefined && data.status === 0) {
+      data.default = false
+      await this.groupsRepository.update(1, { default: true })
+    }
+
     const dataRes = await this.groupsRepository.update(id, data)
     return {
       data: dataRes,
       success: true,
-      message: 'Grupo actualozado exitosamente'
+      message: 'Grupo actualizado exitosamente'
     }
+  }
+
+  async findManyByIds (ids:number[]): Promise<any> {
+    if (ids.length === 0) return []
+    const groups = await this.groupsRepository.find({
+      where: {
+        id: In(ids)
+      }
+    })
+    return groups
   }
 
   async findAll ({ pageSize, page }): Promise<any> {
@@ -278,6 +289,59 @@ export class GroupService {
       success: true,
       message: 'user'
     }
+  }
+
+  async disable (id: number) {
+    if (id === 1) {
+      this.showHttpException('Este grupo no se puede eliminar', HttpStatus.NOT_ACCEPTABLE)
+    }
+
+    const [group] = await this.groupsRepository.find({ where: { id } })
+    if (group.default) {
+      await this.groupsRepository.update(1, { default: true })
+    }
+    const channelConfigs = await this.channelConfigRepo.find()
+
+    const configsWithReference:string[] = []
+    channelConfigs.forEach(cc => {
+      cc.redirects.forEach(r => {
+        const [manager, managerId] = r.to.split('.')
+        if (manager === 'group' && Number(managerId) === id) {
+          configsWithReference.push(cc.channel_number)
+        }
+      })
+    })
+
+    if (configsWithReference.length !== 0) {
+      throw new HttpException(
+        {
+          data: [],
+          success: false,
+          message: `No se puede desactivar el grupo porque está asignado en la configuración del canal (${configsWithReference.join(' , ')})`
+        },
+        HttpStatus.NOT_ACCEPTABLE
+      )
+    }
+    const groupDeleted = await this.groupsRepository.update(id, {
+      status: 0,
+      default: false
+    })
+    return {
+      data: groupDeleted,
+      success: true,
+      message: 'Grupo desactivado aexitosamente'
+    }
+  }
+
+  showHttpException(message:string, status:HttpStatus) {
+    throw new HttpException(
+      {
+        data: [],
+        success: false,
+        message
+      },
+      status
+    )
   }
 
   async remove (id: number) {

@@ -10,8 +10,9 @@ export class TwilioService {
     private conversationService:ConversationService
   ) { }
 
-  async sendMessage(message: string, from: string, to: string, conversationId:number) { // TODO pedir que se mande la data de conversation
-    const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
+  async sendMessage(message: string, from: string, to: string, conversationId:number, schema:string) { // TODO pedir que se mande toda la data de conversation
+    this.conversationService.setSchema(schema)
+    const conversation = await this.conversationService.findById(conversationId) // FIXME es nesesario devolver el ultimo mensaje??
     if (conversation.manager.includes('group')) return false
     const twilioClient = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
     try {
@@ -26,6 +27,7 @@ export class TwilioService {
       }
 
       const messageInfo = await twilioClient.messages.create(messageData)
+      this.messageService.setSchema(schema)
       await this.messageService.save(
         {
           sid: messageInfo.sid,

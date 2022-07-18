@@ -127,6 +127,16 @@ export class UserService {
     }
   }
 
+  async findManyByIds (ids:number[]): Promise<any> {
+    if (ids.length === 0) return []
+    const users = await this.usersRepo.find({
+      where: {
+        id: In(ids)
+      }
+    })
+    return users
+  }
+
   async findInactives (pageSize = 0, page = 0): Promise<any> {
     const where = { status: 0 }
     const { users, length } = await this.getFullDataUsers(pageSize, page, where)
@@ -191,13 +201,14 @@ export class UserService {
     const length = await this.usersRepo.count(where)
 
     const groupIds = usersDB.reduce((pVal, cVal) => {
-      pVal.push(...(cVal.groups_id as Array<number>))
+      pVal.push(...(cVal.groups_id as number[]))
       return pVal
     }, [])
 
     const groups = await this.groupsRepo.find({
       where: {
-        id: In(groupIds)
+        id: In(groupIds),
+        status: 1
       },
       select: {
         id: true,
@@ -261,8 +272,8 @@ export class UserService {
 
     const groups = await this.groupsRepo.find({
       where: {
-        id: In(user.groups_id)
-
+        id: In(user.groups_id),
+        status: 1
       }
     })
     return {

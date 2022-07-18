@@ -75,7 +75,7 @@ async function bootstrap() {
     options: {
       urls: [process.env.RABBIT_URL],
       queue: process.env.RABBIT_AIM_ACTIONS_QUEUE,
-      noAck: false,
+      // noAck: false,
       queueOptions: {
         durable: true
       }

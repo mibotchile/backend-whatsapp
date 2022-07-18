@@ -42,6 +42,7 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findAll(@Query() queryParams: any): Promise<Conversation[]> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
     return this.conversationService.findAll()
   }
 
@@ -50,6 +51,8 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findWithGroupManager(@Query() queryParams: any): Promise<Conversation[]> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+
     return this.conversationService.findByManager('group')
   }
 
@@ -58,6 +61,8 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findWithUserManager(@Query() queryParams: any): Promise<Conversation[]> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+
     return this.conversationService.findByManager('user')
   }
 
@@ -66,6 +71,8 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findByClientNumber(@Query() queryParams: any, @Param('clientNumber') clientNumber:string): Promise<Conversation[]> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+
     return this.conversationService.findByClient(clientNumber)
   }
 
@@ -74,6 +81,8 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findByUserId(@Query() queryParams: any, @Param('userId') userId:string): Promise<Conversation[]> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+
     return this.conversationService.findByManagerWithId('user', Number(userId))
   }
 
@@ -82,6 +91,8 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findGroupId(@Query() queryParams: any, @Param('groupId') groupId:string): Promise<Conversation[]> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+
     return this.conversationService.findByManagerWithId('group', Number(groupId))
   }
 
@@ -114,6 +125,8 @@ export class ConversationController {
   @Put('redirectToUser')
   @ApiBody({ schema: { examples: { conversationId: 2, userId: 5 } } })
   async redirectToUser(@Body() data: any): Promise<any> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+
     delete data.created_by
     data.updated_by = httpContext.get('USER').email
     return this.conversationService.updateManager(+data.conversationId, 'user', data.userId)
@@ -122,6 +135,8 @@ export class ConversationController {
   @Put('redirectToGroup')
   @ApiBody({ schema: { examples: { conversationId: 2, groupId: 5 } } })
   async redirectToGroup(@Body() data: any): Promise<any> {
+    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
+
     delete data.created_by
     data.updated_by = httpContext.get('USER').email
     return this.conversationService.updateManager(+data.conversationId, 'group', data.groupId)

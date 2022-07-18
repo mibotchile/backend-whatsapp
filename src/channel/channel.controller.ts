@@ -62,4 +62,11 @@ export class ChannelController {
   async findByNumber(@Param('number') number: string): Promise<any> {
     return this.channelService.findConfigByPhoneNumber(number)
   }
+
+  @Get('prettyConfig/number/:number')// cambio
+  async findPrettyByNumber(@Param('number') number: string): Promise<any> {
+    const config = await this.channelService.findConfigByPhoneNumber(number)
+    config.data = await this.channelService.prettierConfig(config.data)
+    return config
+  }
 }

@@ -17,11 +17,30 @@ import { PointerConversationService } from '../conversation-manager/pointer-conv
 import { ChannelConfigService } from 'src/channel/channel-config/channel-config.service'
 import { ConversationGateway } from '../conversation-gateway/conversation.gateway'
 import { ClientsModule, Transport } from '@nestjs/microservices'
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
+import { ChannelMapService } from 'src/channel/channel-map/channel-map.service'
+import { ChannelMap } from 'src/channel/channel-map/channel-map.entity'
+import { ChannelService } from 'src/channel/channel.service'
+import { GroupService } from 'src/group/groups.service'
+import { UserService } from 'src/user/user.service'
+import { Group } from 'src/group/group.entity'
+import { User } from 'src/user/user.entity'
+import { Role } from 'src/role/role.entity'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`)
+    }),
+    RabbitMQModule.forRoot(RabbitMQModule, {
+      exchanges: [
+        {
+          name: process.env.RABBIT_BI_EXCHANGE,
+          type: 'direct'
+        }
+      ],
+      uri: process.env.RABBIT_URL,
+      connectionInitOptions: { wait: false }
     }),
     ClientsModule.register([
       {
@@ -38,15 +57,16 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
     ]),
     TypeOrmModule.forRoot({
       type: 'postgres',
+      useUTC: false,
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [PointerConversation, Channel, ChannelConfig, Conversation, Message],
+      entities: [PointerConversation, Channel, ChannelConfig, Conversation, Message, ChannelMap, Group, User, Role],
       logging: process.env.TYPEORM_LOGS === 'true'
     }),
-    TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation, Message])
+    TypeOrmModule.forFeature([PointerConversation, Channel, ChannelConfig, Conversation, Message, ChannelMap, Group, User, Role])
   ],
   controllers: [MessagesConsumerController],
   providers: [
@@ -57,6 +77,11 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
     ConversationManagerService,
     ConversationService,
     PointerConversationService,
-    ChannelConfigService]
+    ChannelConfigService,
+    ChannelMapService,
+    ChannelService,
+    GroupService,
+    UserService
+  ]
 })
 export class MessagesConsumerModule {}

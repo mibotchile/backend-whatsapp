@@ -35,6 +35,11 @@ export class UserController {
     })
   }
 
+  @Get('customToken')
+  findCustomToken(): any {
+    return { data: httpContext.get('CUSTOM_TOKEN'), success: true, message: 'success' }
+  }
+
   @Get('actives')
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })

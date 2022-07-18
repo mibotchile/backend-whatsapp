@@ -39,19 +39,22 @@ export class RolesGuard implements CanActivate {
     if (routePath[1] === 'responseValidator') return true
     if (routePath[1] === 'health') return true
     if (routePath[1] === 'project') return true
-    if (routePath[1] === 'project') return true
-    if (routePath[1] === 'socket.io' && routePath[2] === 'uid') {
+    if (routePath[1] === 'socket.io') return true
+    if (routePath[1] === 'user' && routePath[2] === 'uid') {
       if (request.params.uid === httpContext.get('USER').uid) {
         return true
       }
     }
 
+    if (routePath[1] === 'user' && routePath[2] === 'customToken') {
+      return true
+    }
     const role = httpContext.get('ROLE')
     const permissions = this.getPermissions(role.config, routePath[1])
     // console.log(permissions)
 
-    let permissionRequired
-    let action
+    let permissionRequired:string
+    let action:string
     switch (request.method) {
       case 'GET':
         permissionRequired = 'read'

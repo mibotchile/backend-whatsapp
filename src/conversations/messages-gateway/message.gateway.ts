@@ -29,9 +29,9 @@ export class MessageGateway implements OnGatewayConnection {
   }
 
     @SubscribeMessage('send_message')
-  async sendMessage(client: Socket, { conversationId, clientNumber, channelNumber, message }:any): Promise<any> {
+  async sendMessage(client: Socket, { conversationId, clientNumber, channelNumber, message, projectUid }:any): Promise<any> {
     console.log('Enviando mensaje .......')
-    await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId)
+    await this.twilioService.sendMessage(message, channelNumber, clientNumber, conversationId, 'project_' + projectUid.toLowerCase())
     console.log('Mensaje enviado .......')
   }
 

@@ -11,7 +11,7 @@ export class ConversationService {
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(Conversation) private conversationRepo: Repository<Conversation>
   ) {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
+
   }
 
   setSchema(schema:string) {
