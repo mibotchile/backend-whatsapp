@@ -2,6 +2,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnectio
 import { Server, Socket } from 'socket.io'
 import { TwilioService } from '../twilio/twilio.service'
 import { forwardRef, Inject } from '@nestjs/common'
+import { IoSocketsRepository } from 'src/io-adapter/io-sockets-repository'
 
 @WebSocketGateway(Number(process.env.WEBSOCKET_PORT),
   {
@@ -34,6 +35,13 @@ export class MessageGateway implements OnGatewayConnection {
     console.log('Mensaje enviado .......')
   }
 
+    @SubscribeMessage('test')
+    test(client: Socket, data:any):any {
+      console.log('TESTEANDO SOCKeT .......')
+      this.emitTest(data)
+      console.log('SOCKET TESTTEADO .......')
+    }
+
     emitNewMessage(data) {
     //   this.server.of('/messages').emit('whatsapp_message_received', data)
       this.server.emit('whatsapp_message_received', data)
@@ -42,6 +50,10 @@ export class MessageGateway implements OnGatewayConnection {
     //   emitCountMessage(data) {
     //     this.server.emit('whatsapp_message_received', data)
     //   }
+    emitTest(data) {
+      const client = IoSocketsRepository.findByUserEmail('fernando@onbotgo.com')
+      this.server.to(client.id).emit('test', data)
+    }
 
     changeMessageStatus(data) {
     //   this.server.of('/messages').emit('whatsapp_message_status', data)

@@ -18,13 +18,14 @@
         <input type="mensaje" id="message" />
         <br />
         <br />
-        <button onclick="emitEvent()">test messages socket</button>
+        <button onclick="emitEvent()">test send messages</button>
         <hr />
-        <button onclick="redirect()">Test Conversation socket</button>
+        <button onclick="test()">Test socket</button>
+        <!-- <button onclick="redirect()">Test Conversation socket</button> -->
         <script>
             const socket = io('http://localhost:3003', {
                 auth: {
-                    token: `303338ce-d71e-4304-abd2-3cfc40a1589a303338ce-d71e-4304-abd2-3cfc40a1589a`
+                    token: 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImVhNWY2NDYxMjA4Y2ZmMGVlYzgwZDFkYmI1MjgyZTkyMDY0MjAyNWEiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiRmVybmFuZG8gUm9kcmlndWV6IiwiZW1haWwiOiJmZXJuYW5kb0BvbmJvdGdvLmNvbSIsInBhc3N3b3JkIjoib25ib3RnbzE1OSIsInJvbCI6InVzZXIiLCJkaXNwbGF5TmFtZSI6IkZlcm5hbmRvIFJvZHJpZ3VleiIsInVpZF9jbGllbnQiOm51bGwsInNlcnZpY2VzIjp7InRlcnJlbm8iOmZhbHNlLCJtaWJvdGFpciI6dHJ1ZSwidm9pY2Vib3QiOnRydWV9LCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdmFsaGFsbGEtb25ib3RnbyIsImF1ZCI6InZhbGhhbGxhLW9uYm90Z28iLCJhdXRoX3RpbWUiOjE2NTc1NzE2NTMsInVzZXJfaWQiOiJNeUhkZmhPZFJ3WURwUUxPaGFQb0hXWGNYVXIxIiwic3ViIjoiTXlIZGZoT2RSd1lEcFFMT2hhUG9IV1hjWFVyMSIsImlhdCI6MTY1NzU3MTY1MywiZXhwIjoxNjU3NTc1MjUzLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJmZXJuYW5kb0BvbmJvdGdvLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.M8sdMTMM-MyWEF8fnnjwEumOxcEDGCgInbf18QighIt5nj2HVhWLL_HqE3m-FHwCEupy39nE8b0EOwSh6iuJgxdaEd-Jri4nsL6odAptkA31EcBUsemiA7Dbtq6Eg0mxke8maUKlsEqu4f3m5Dxw_pf0hB-aBAv-uec8S-C3sbsNYn_48_7ny28LaKXyP2RzZM8W3IHw9sT8yPOA9hv-mJuo_e-5j18HBWozSNP15BzT8l_Y16dapd1HJvTFjjBScrgXzBqPQvahQ9VBjl64dMYPitfUnJ00_d-Uxfb2UtzRMgf5lSmOefkGOzAzQjeY7VWksH9Yw-vvCMuWnXKPmQ'
                 },
                 extraHeaders: {
                     Authorization: 'Bearer 303338ce-d71e-4304-abd2-3cfc40a1589a303338ce-d71e-4304-abd2-3cfc40a1589a'
@@ -36,9 +37,9 @@
             console.log(socket)
             const messageBox = document.querySelector('.msgs')
 
-            socket.on('whatsapp_message_received', function (data) {
+            socket.on('test', function (data) {
                 console.log(data)
-                messageBox.innerHTML += `${data.message}<hr>`
+                messageBox.innerHTML += `<pre>${data}</pre><hr>`
             })
             // socketConversations.on('redirect_conversation', function (data) {
             //     console.log(data)
@@ -70,6 +71,9 @@
                 const msg = document.getElementById('message')
                 console.log('asdasd')
                 socket.emit('send_message', { conversationId: 2, clientNumber: cn.value, channelNumber: '555', message: msg.value })
+            }
+            function test() {
+                socket.emit('test', { conversationId: 45, manager: 'user', managerId: 45 })
             }
             function redirect() {
                 socket.emit('redirect_conversation', { conversationId: 45, manager: 'user', managerId: 45 })
