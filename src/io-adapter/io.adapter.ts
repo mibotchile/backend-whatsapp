@@ -4,18 +4,14 @@ import * as https from 'node:https'
 import * as http from 'node:http'
 import * as fs from 'node:fs'
 import { IOAuthenticationMiddleware } from './io-auth.middleware'
-import { DataSource } from 'typeorm'
-import { InjectDataSource } from '@nestjs/typeorm'
 import { IoSocketsRepository } from './io-sockets-repository'
 
 export class ExtendedSocketIoAdapter extends IoAdapter {
   protected ioServer: Server
   protected httpsServer:https.Server|http.Server
-  @InjectDataSource('default') dataSource:DataSource
 
   constructor() {
     super()
-    console.log('Datasources', this.dataSource)
 
     console.log('SE LLAMO AL CONTRUCTOR DEL IO ADAPTER')
     const options = {
@@ -44,7 +40,7 @@ export class ExtendedSocketIoAdapter extends IoAdapter {
     this.ioServer.use(async (socket, next) => {
       console.log('[ ====== MIDLEWARE ====== ]', socket.handshake)
 
-      const { token, project_uid } = socket.handshake.auth.token
+      const { token, project_uid } = socket.handshake.auth
       const { success, data } = await authMidleware.use(token)
       if (success) {
         IoSocketsRepository.socketClients.push({ id: socket.id, projectUid: project_uid, user: data, socket })

@@ -15,7 +15,7 @@ export class MessageApiService {
 
   setSchema(schema:string) {
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = schema // httpContext.get('PROJECT_UID').toLowerCase()
+      this.dataSource.entityMetadatas[index].schema = schema
       this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
     })
   }

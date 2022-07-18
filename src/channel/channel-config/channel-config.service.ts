@@ -14,12 +14,19 @@ export class ChannelConfigService {
 
   setSchema(schema:string) {
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = schema // httpContext.get('PROJECT_UID').toLowerCase()
+      this.dataSource.entityMetadatas[index].schema = schema
       this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
     })
   }
 
-  async findByChannelNumber(phoneNumber: string): Promise<ChannelConfig> {
+  buildSchemaName(projectUid:string):string {
+    const schemaName = 'project_' + projectUid.toLowerCase()
+    return schemaName
+  }
+
+  async findByChannelNumber(projectUid:string, phoneNumber: string): Promise<ChannelConfig> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     const configs = await this.channelConfigRepo.find({ where: { channel_number: phoneNumber } })
     return configs[0]
   }

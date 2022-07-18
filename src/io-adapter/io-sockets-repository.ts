@@ -9,19 +9,19 @@ interface SocketClient {
 export class IoSocketsRepository {
   public static socketClients:SocketClient[] = []
 
-  static findByUserEmail(email:string):SocketClient {
-    return this.socketClients.find(sc => sc.user.email === email)
+  static findByUserEmail(projectUid:string, email:string):SocketClient {
+    return this.socketClients.find(sc => (sc.projectUid === projectUid && sc.user.email === email))
   }
 
-  static findByProjectUid(projectUid:string):SocketClient[] {
-    return this.socketClients.filter(sc => sc.projectUid === projectUid)
+  //   static findByProjectUid(projectUid:string):SocketClient[] {
+  //     return this.socketClients.filter(sc => sc.projectUid === projectUid)
+  //   }
+
+  static findByGroupId(projectUid:string, groupId:number):SocketClient[] {
+    return this.socketClients.filter(sc => (sc.projectUid === projectUid && sc.user.groups_id.includes(groupId)))
   }
 
-  static findGroupId(groupId:number):SocketClient[] {
-    return this.socketClients.filter(sc => sc.user.groups_id.includes(groupId))
-  }
-
-  static findUserId(userId:number):SocketClient {
-    return this.socketClients.find(sc => sc.user.id === userId)
+  static findByUserId(projectUid:string, userId:number):SocketClient {
+    return this.socketClients.find(sc => (sc.projectUid === projectUid && sc.user.id === userId))
   }
 }

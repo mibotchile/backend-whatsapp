@@ -3,6 +3,8 @@ import { forwardRef, Inject } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { ConversationService } from '../conversation/conversation.service'
 import { ClientProxy } from '@nestjs/microservices'
+import { Conversation } from '../conversation/conversation.entity'
+import { IoSocketsRepository } from 'src/io-adapter/io-sockets-repository'
 
 @WebSocketGateway(Number(process.env.WEBSOCKET_PORT),
   {
@@ -45,26 +47,34 @@ export class ConversationGateway {
     console.log({ conversationId })
     console.log({ manager })
     console.log({ managerId })
-    this.conversationService.setSchema('project_' + projectUid.toLowerCase())
-    await this.conversationService.updateManager(+conversationId, manager, managerId)
-    const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
+    await this.conversationService.updateManager(projectUid, +conversationId, manager, managerId)
+    const conversation = await this.conversationService.findById(projectUid, conversationId) // FIXME devolver el ultimo mensaje
     console.log('Conversacion redireccionada ')
 
-    this.emitNewConversation(conversation)
+    this.emitNewConversation(projectUid, conversation)
     return conversation
   }
 
   @SubscribeMessage('end_conversation')
   async endConversation(client: Socket, { conversationId, projectUid }:any): Promise<any> {
     console.log({ conversationId })
-    this.conversationService.setSchema('project_' + projectUid.toLowerCase())
-    await this.conversationService.updateManager(+conversationId, 'system', 0)
-    const conversation = await this.conversationService.findById(conversationId) // FIXME devolver el ultimo mensaje
+    await this.conversationService.updateManager(projectUid, +conversationId, 'system', 0)
+    const conversation = await this.conversationService.findById(projectUid, conversationId) // FIXME devolver el ultimo mensaje
     this.client.emit<any>('continue_conversation', { conversation, project_uid: projectUid })
     return conversation
   }
 
-  emitNewConversation(data) {
-    this.server.emit('new_conversation', data)
+  emitNewConversation(projectUid:string, data:Conversation) {
+    const [manager, managerId] = data.manager.split('_')
+    let socketsClientIds:string[]
+    if (manager === 'group') {
+      const socketsClient = IoSocketsRepository.findByGroupId(projectUid, Number(managerId))
+      socketsClientIds = socketsClient.map(sci => sci.id)
+    }
+    if (manager === 'user') {
+      const socketsClient = IoSocketsRepository.findByUserId(projectUid, Number(managerId))
+      socketsClientIds = [socketsClient.id]
+    }
+    this.server.to(socketsClientIds).emit('new_conversation', data)
   }
 }

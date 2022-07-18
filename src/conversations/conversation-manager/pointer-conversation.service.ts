@@ -14,27 +14,36 @@ export class PointerConversationService {
 
   setSchema(schema:string) {
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = schema // httpContext.get('PROJECT_UID').toLowerCase()
+      this.dataSource.entityMetadatas[index].schema = schema
       this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
     })
   }
 
-  async updateByPhoneNumber(waId: string, data:PointerConversation) {
+  buildSchemaName(projectUid:string):string {
+    const schemaName = 'project_' + projectUid.toLowerCase()
+    return schemaName
+  }
+
+  async updateByPhoneNumber(projectUid:string, waId: string, data:PointerConversation) {
+    this.setSchema(this.buildSchemaName(projectUid))
     console.log({ waId })
     console.log(data.pointer)
-
     await this.pointerRepo.update({ phone_number: waId }, data)
   }
 
-  async create(data:PointerConversation) {
+  async create(projectUid:string, data:PointerConversation) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     await this.pointerRepo.insert(data)
   }
 
-  async delete(waId: string) {
+  async delete(projectUid:string, waId: string) {
+    this.setSchema(this.buildSchemaName(projectUid))
     await this.pointerRepo.update({ phone_number: waId }, { status: 0 })
   }
 
-  async findByWaId(waId: string): Promise<PointerConversation> {
+  async findByWaId(projectUid:string, waId: string): Promise<PointerConversation> {
+    this.setSchema(this.buildSchemaName(projectUid))
     const pointers = await this.pointerRepo.find({ where: { phone_number: waId, status: 1 } })
     return pointers[0]
     // return 'step2>menu1>option3>menu2'

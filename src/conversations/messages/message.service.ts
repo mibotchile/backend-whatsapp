@@ -8,27 +8,29 @@ import { AmqpConnection } from '@golevelup/nestjs-rabbitmq'
 @Injectable()
 // @Injectable({ scope: Scope.REQUEST })
 export class MessageService {
-  projectUid:string
   constructor(
     @Inject(forwardRef(() => MessageGateway)) private readonly messageWs: MessageGateway,
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(Message) private messageRepo: Repository<Message>,
         private readonly amqpConnection: AmqpConnection
   ) {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
   }
 
   setSchema(schema:string) {
-    if (schema.startsWith('project_')) {
-      this.projectUid = schema.replace('project_', '')
-    }
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = schema // httpContext.get('PROJECT_UID').toLowerCase()
+      this.dataSource.entityMetadatas[index].schema = schema
       this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
     })
   }
 
-  async save(data:Message, emitEvet = false) {
+  buildSchemaName(projectUid:string):string {
+    const schemaName = 'project_' + projectUid.toLowerCase()
+    return schemaName
+  }
+
+  async save(projectUid:string, data:Message, conversationManager:string, emitEvet = false) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     const formaterLima = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'America/Lima' })
     const formaterUTC = new Intl.DateTimeFormat('af-ZA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })
     const now = Date.now()
@@ -41,25 +43,33 @@ export class MessageService {
     }
     data.id = messageSent.identifiers[0].id
     data.created_at = formaterUTC.format(now)
-    this.amqpConnection.publish('bots_managements.dev', 'whatsapp.bi.messages.dev', { meta, data: { message: data, project_uid: this.projectUid } })
+    this.amqpConnection.publish('bots_managements.dev', 'whatsapp.bi.messages.dev', { meta, data: { message: data, project_uid: projectUid } })
     if (emitEvet) {
-      this.messageWs.emitNewMessage(data)
+      this.messageWs.emitNewMessage(projectUid, conversationManager, data)
     }
   }
 
-  async update(id:number, data:Message) {
+  async update(projectUid:string, id:number, data:Message) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.messageRepo.update(id, data)
   }
 
-  async updateStatusBySid(sid:string, status:string) {
+  async updateStatusBySid(projectUid:string, sid:string, status:string) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.messageRepo.update({ sid }, { message_status: status })
   }
 
-  async findAll():Promise<Message[]> {
+  async findAll(projectUid:string):Promise<Message[]> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.messageRepo.find()
   }
 
-  async findByConversationId(conversationId:number):Promise<Message[]> {
+  async findByConversationId(projectUid:string, conversationId:number):Promise<Message[]> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.messageRepo.find({
       where: {
         conversation_id: conversationId

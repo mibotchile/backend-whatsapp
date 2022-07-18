@@ -6,7 +6,6 @@ import { Conversation } from './conversation.entity'
 
 @Injectable()
 export class ConversationService {
-  schema:string
   constructor(
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(Conversation) private conversationRepo: Repository<Conversation>
@@ -15,34 +14,50 @@ export class ConversationService {
   }
 
   setSchema(schema:string) {
-    this.schema = schema
     this.dataSource.entityMetadatas.forEach((em, index) => {
-      this.dataSource.entityMetadatas[index].schema = schema // httpContext.get('PROJECT_UID').toLowerCase()
+      this.dataSource.entityMetadatas[index].schema = schema
       this.dataSource.entityMetadatas[index].tablePath = `${schema}.${em.tableName}`
     })
   }
 
-  async save(data:Conversation) {
+  buildSchemaName(projectUid:string):string {
+    const schemaName = 'project_' + projectUid.toLowerCase()
+    return schemaName
+  }
+
+  async save(projectUid:string, data:Conversation) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.conversationRepo.insert(data)
   }
 
-  async update(id:number, data:Conversation) {
+  async update(projectUid:string, id:number, data:Conversation) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.conversationRepo.update(id, data)
   }
 
-  async updateManager(id:number, typeManager:'system'|'user'|'group', managerId?:number) {
+  async updateManager(projectUid:string, id:number, typeManager:'system'|'user'|'group', managerId?:number) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.conversationRepo.update(id, { manager: `${typeManager}_${managerId}` })
   }
 
-  async updateByClientNumber(clientNumber:string, data:Conversation) {
+  async updateByClientNumber(projectUid:string, clientNumber:string, data:Conversation) {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     await this.conversationRepo.update({ client_number: clientNumber }, data)
   }
 
-  async findAll():Promise<Conversation[]> {
+  async findAll(projectUid:string):Promise<Conversation[]> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.conversationRepo.find()
   }
 
-  async findByManager(manager:string):Promise<Conversation[]> {
+  async findByManager(projectUid:string, manager:string):Promise<Conversation[]> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.conversationRepo.find({
       where: {
         manager: ILike(`${manager}%`)
@@ -50,7 +65,9 @@ export class ConversationService {
     })
   }
 
-  async findByClient(clientNumber:string):Promise<Conversation[]> {
+  async findByClient(projectUid:string, clientNumber:string):Promise<Conversation[]> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     return await this.conversationRepo.find({
       where: {
         client_number: clientNumber
@@ -58,16 +75,23 @@ export class ConversationService {
     })
   }
 
-  async findLastMessagesByConversationIds(conversationIds:number[]):Promise<Message[]> {
-    return await this.dataSource.query(`select * from (select *,ROW_NUMBER () OVER (PARTITION BY conversation_id ORDER BY created_at DESC) rn FROM ${this.schema}.message where conversation_id in (${conversationIds.join(',')}) ) as t where rn=1`)
+  async findLastMessagesByConversationIds(projectUid:string, conversationIds:number[]):Promise<Message[]> {
+    const schema = this.buildSchemaName(projectUid)
+    this.setSchema(schema)
+    return await this.dataSource.query(`select * from (select *,ROW_NUMBER () OVER (PARTITION BY conversation_id ORDER BY created_at DESC) rn FROM ${schema}.message where conversation_id in (${conversationIds.join(',')}) ) as t where rn=1`)
   }
 
-  async findLastMessageByConversationId(conversationId:number):Promise<Message> {
-    const [message] = await this.dataSource.query(`select * from (select *,ROW_NUMBER () OVER (PARTITION BY conversation_id ORDER BY created_at DESC) rn FROM ${this.schema}.message where conversation_id = ${conversationId} ) as t where rn=1`)
+  async findLastMessageByConversationId(projectUid:string, conversationId:number):Promise<Message> {
+    const schema = this.buildSchemaName(projectUid)
+    this.setSchema(schema)
+
+    const [message] = await this.dataSource.query(`select * from (select *,ROW_NUMBER () OVER (PARTITION BY conversation_id ORDER BY created_at DESC) rn FROM ${schema}.message where conversation_id = ${conversationId} ) as t where rn=1`)
     return message
   }
 
-  async findByManagerWithId(manager:string, managerId:number):Promise<Conversation[]> {
+  async findByManagerWithId(projectUid:string, manager:string, managerId:number):Promise<Conversation[]> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     const conversations = await this.conversationRepo.find({
       where: {
         manager: `${manager}_${managerId}`
@@ -75,25 +99,29 @@ export class ConversationService {
     })
     if (conversations.length === 0) return []
     const conversationIds = conversations.map(c => c.id)
-    const lastMessages = await this.findLastMessagesByConversationIds(conversationIds)
+    const lastMessages = await this.findLastMessagesByConversationIds(projectUid, conversationIds)
     return conversations.map((c:any) => {
       c.last_message = lastMessages.find(m => m.conversation_id === c.id)
       return c
     })
   }
 
-  async findById(id:number):Promise<Conversation> {
+  async findById(projectUid:string, id:number):Promise<Conversation> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     const [conversation] = await this.conversationRepo.find({ where: { id } }) as any
     if (!conversation) return
-    const lastMessage = await this.findLastMessageByConversationId(conversation.id)
+    const lastMessage = await this.findLastMessageByConversationId(projectUid, conversation.id)
     conversation.last_message = lastMessage
     return conversation
   }
 
-  async findByIdWithLastMessage(id:number):Promise<Conversation> {
+  async findByIdWithLastMessage(projectUid:string, id:number):Promise<Conversation> {
+    this.setSchema(this.buildSchemaName(projectUid))
+
     const [conversation] = await this.conversationRepo.find({ where: { id } }) as any
     if (!conversation) return
-    const lastMessage = await this.findLastMessageByConversationId(conversation.id)
+    const lastMessage = await this.findLastMessageByConversationId(projectUid, conversation.id)
     conversation.last_message = lastMessage
     return conversation
   }

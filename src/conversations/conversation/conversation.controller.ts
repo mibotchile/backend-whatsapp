@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common'
+import { Controller, Get, Body, Put, Param, Query } from '@nestjs/common'
 import { ConversationService } from './conversation.service'
-import { ApiBody, ApiHeader, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 import { Conversation } from './conversation.entity'
 import * as httpContext from 'express-http-context'
@@ -42,8 +42,7 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findAll(@Query() queryParams: any): Promise<Conversation[]> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-    return this.conversationService.findAll()
+    return this.conversationService.findAll(httpContext.get('PROJECT_UID'))
   }
 
   @Get('groupManager')
@@ -51,9 +50,7 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findWithGroupManager(@Query() queryParams: any): Promise<Conversation[]> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-
-    return this.conversationService.findByManager('group')
+    return this.conversationService.findByManager(httpContext.get('PROJECT_UID'), 'group')
   }
 
   @Get('userManager')
@@ -61,9 +58,7 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findWithUserManager(@Query() queryParams: any): Promise<Conversation[]> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-
-    return this.conversationService.findByManager('user')
+    return this.conversationService.findByManager(httpContext.get('PROJECT_UID'), 'user')
   }
 
   @Get('client/:clientNumber')
@@ -71,9 +66,7 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findByClientNumber(@Query() queryParams: any, @Param('clientNumber') clientNumber:string): Promise<Conversation[]> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-
-    return this.conversationService.findByClient(clientNumber)
+    return this.conversationService.findByClient(httpContext.get('PROJECT_UID'), clientNumber)
   }
 
   @Get('user/:userId')
@@ -81,9 +74,7 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findByUserId(@Query() queryParams: any, @Param('userId') userId:string): Promise<Conversation[]> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-
-    return this.conversationService.findByManagerWithId('user', Number(userId))
+    return this.conversationService.findByManagerWithId(httpContext.get('PROJECT_UID'), 'user', Number(userId))
   }
 
   @Get('group/:groupId')
@@ -91,9 +82,7 @@ export class ConversationController {
   //   @ApiQuery({ name: 'page', type: Number, required: false })
   //   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   async findGroupId(@Query() queryParams: any, @Param('groupId') groupId:string): Promise<Conversation[]> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-
-    return this.conversationService.findByManagerWithId('group', Number(groupId))
+    return this.conversationService.findByManagerWithId(httpContext.get('PROJECT_UID'), 'group', Number(groupId))
   }
 
   //   @Get('actives')
@@ -125,21 +114,17 @@ export class ConversationController {
   @Put('redirectToUser')
   @ApiBody({ schema: { examples: { conversationId: 2, userId: 5 } } })
   async redirectToUser(@Body() data: any): Promise<any> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-
     delete data.created_by
     data.updated_by = httpContext.get('USER').email
-    return this.conversationService.updateManager(+data.conversationId, 'user', data.userId)
+    return this.conversationService.updateManager(httpContext.get('PROJECT_UID'), +data.conversationId, 'user', data.userId)
   }
 
   @Put('redirectToGroup')
   @ApiBody({ schema: { examples: { conversationId: 2, groupId: 5 } } })
   async redirectToGroup(@Body() data: any): Promise<any> {
-    this.conversationService.setSchema('project_' + httpContext.get('PROJECT_UID').toLowerCase())
-
     delete data.created_by
     data.updated_by = httpContext.get('USER').email
-    return this.conversationService.updateManager(+data.conversationId, 'group', data.groupId)
+    return this.conversationService.updateManager(httpContext.get('PROJECT_UID'), +data.conversationId, 'group', data.groupId)
   }
 
 //   @Delete(':id')

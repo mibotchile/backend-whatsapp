@@ -20,16 +20,14 @@ export class MessagesConsumerController {
     const channelNumber = data.To.replace('whatsapp:', '')
     const channelMap = await this.channelMapService.findByNumber(channelNumber)
     if (!channelMap) return
-    const schema = 'project_' + channelMap.project_uid.toLowerCase()
-    await this.conversatioManagerService.messageClientHandler(data, data.WaId, schema, channelNumber)
+    await this.conversatioManagerService.messageClientHandler(data, data.WaId, channelMap.project_uid, channelNumber)
     console.log(data)
   }
 
   @EventPattern('continue_conversation')
   async handleConversation(data: Record<string, any>) {
     const { conversation, project_uid } = data
-    const schema = 'project_' + project_uid.toLowerCase()
-    await this.conversatioManagerService.messageClientHandler({ Body: '' }, conversation.client_number, schema, conversation.channel_number, false)
+    await this.conversatioManagerService.messageClientHandler({ Body: '' }, conversation.client_number, project_uid, conversation.channel_number, false)
     console.log(data)
   }
 
