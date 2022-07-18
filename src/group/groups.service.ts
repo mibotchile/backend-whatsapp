@@ -96,6 +96,7 @@ export class GroupService {
     }
     if (data.status !== undefined && data.status === 0) {
       data.default = false
+      await this.groupsRepository.update(1, { default: true })
     }
 
     const dataRes = await this.groupsRepository.update(id, data)

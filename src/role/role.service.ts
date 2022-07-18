@@ -175,6 +175,7 @@ export class RoleService {
     }
     if (data.status !== undefined && data.status === 0) {
       data.default = false
+      await this.rolesRepo.update(1, { default: true })
     }
 
     data.config = this.roleConfigValidator(data.config)
@@ -341,6 +342,10 @@ export class RoleService {
         },
         HttpStatus.NOT_ACCEPTABLE
       )
+    }
+    const [role] = await this.rolesRepo.find({ where: { id } })
+    if (role.default) {
+      await this.rolesRepo.update(1, { default: true })
     }
     const roleDeleted = await this.rolesRepo.update(id, { status: 0 })
     return {

@@ -5,7 +5,6 @@ import { ForbiddenException, Injectable, NestMiddleware } from '@nestjs/common'
 import * as httpContext from 'express-http-context'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
-import { log } from 'console'
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware {
