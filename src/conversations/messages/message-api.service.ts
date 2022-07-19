@@ -54,10 +54,4 @@ export class MessageApiService {
       }
     })
   }
-
-//   async findClientNumber(clientNumber:number):Promise<Message[]> {
-//     return await this.messageRepo.find({where:{
-//         clien
-//     }})
-//   }
 }

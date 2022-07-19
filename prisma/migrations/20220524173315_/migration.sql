@@ -113,3 +113,15 @@ CREATE TABLE "conversation" (
     "status" SMALLINT NOT NULL DEFAULT 1,
     CONSTRAINT "conversation_pkey" PRIMARY KEY ("id")
 );
+
+CREATE TABLE "censored_sentence" (
+    "id" SERIAL NOT NULL,
+    "sentence" VARCHAR(255) NOT NULL,
+    "description" TEXT,
+    "created_by" VARCHAR(120) NOT NULL,
+    "updated_by" VARCHAR(120) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "status" SMALLINT NOT NULL DEFAULT 1,
+    CONSTRAINT "censored_sentence_pkey" PRIMARY KEY ("id")
+);

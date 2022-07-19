@@ -24,6 +24,8 @@ import { ConversationModule } from './conversations/conversation/conversation.mo
 import { Conversation } from './conversations/conversation/conversation.entity'
 import { Message } from './conversations/messages/message.entity'
 import { MessageApiModule } from './conversations/messages/message-api.module'
+import { CensoredSentenceModule } from './censored-sentence/censored-sentence.module'
+import { CensoredSentence } from './censored-sentence/censored-sentence.entity'
 
 @Module({
   imports: [
@@ -38,7 +40,7 @@ import { MessageApiModule } from './conversations/messages/message-api.module'
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [Group, Role, User, Channel, ChannelConfig, Conversation, Message],
+      entities: [Group, Role, User, Channel, ChannelConfig, Conversation, Message,CensoredSentence],
       autoLoadEntities: false,
       logging: process.env.TYPEORM_LOGS === 'true'
     }),
@@ -50,7 +52,8 @@ import { MessageApiModule } from './conversations/messages/message-api.module'
     ChannelModule,
     ResponseValidatorModule,
     ConversationModule,
-    MessageApiModule
+    MessageApiModule,
+    CensoredSentenceModule
   ],
   controllers: [HealthController],
   providers: [

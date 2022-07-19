@@ -9,7 +9,6 @@ export class PointerConversationService {
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(PointerConversation) private pointerRepo: Repository<PointerConversation>
   ) {
-    this.setSchema('project_vnblnzdm0b3bdcltpvpl')
   }
 
   setSchema(schema:string) {
@@ -44,9 +43,7 @@ export class PointerConversationService {
 
   async findByWaId(projectUid:string, waId: string): Promise<PointerConversation> {
     this.setSchema(this.buildSchemaName(projectUid))
-    const pointers = await this.pointerRepo.find({ where: { phone_number: waId, status: 1 } })
-    return pointers[0]
-    // return 'step2>menu1>option3>menu2'
-    // return 'step3>quiz2>question5'
+    const [pointer] = await this.pointerRepo.find({ where: { phone_number: waId, status: 1 } })
+    return pointer
   }
 }

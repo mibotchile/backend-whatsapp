@@ -58,7 +58,7 @@ export class AIMConsumerController {
                 console.log(error)
               }
             } else {
-              console.log('ya existe este usuario huerfano jejejej')
+              console.log('ya existe este usuario huerfano')
             }
           } else {
             console.log('creando usuario normal')

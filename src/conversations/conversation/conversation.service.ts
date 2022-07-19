@@ -10,7 +10,6 @@ export class ConversationService {
         @InjectDataSource('default') private dataSource: DataSource,
         @InjectRepository(Conversation) private conversationRepo: Repository<Conversation>
   ) {
-
   }
 
   setSchema(schema:string) {
