@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity('censored_sentences', { schema: 'public' })
+@Entity('censored_sentence', { schema: 'public' })
 export class CensoredSentence {
     @PrimaryGeneratedColumn()
       id: number
